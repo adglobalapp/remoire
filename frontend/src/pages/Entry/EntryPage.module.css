@@ -1,0 +1,28 @@
+.pageContainer {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-dark-beige);
+}
+
+.mainLayout {
+    display: grid;
+    grid-template-columns: 320px 1fr 230px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.leftColumn {
+    height: 100%;
+}
+
+.rightColumn {
+    height: 100%;
+}
+
+.editorArea {
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}

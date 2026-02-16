@@ -1,0 +1,17 @@
+:root {
+    --color-dark-blue: #262431;
+    --color-burgundy: #541D30;
+    --color-light-beige: #FCF6ED;
+    --color-dark-beige: #EFE8DE;
+    --color-dark-brown: #2A1E22;
+
+    --color-burgundy-hover: #471728;
+
+    --color-white: #ffffff;
+    --shadow-card: 0 4px 6px rgba(0, 0, 0, 0.05);
+    --shadow-paper: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    --font-logo: 'Odor Mean Chey', cursive;
+    --font-ui: 'Gurajada', serif;
+    --font-body: 'Gudea', sans-serif;
+}

@@ -1,0 +1,91 @@
+@import './styles/variables.css';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-ui);
+  background-color: var(--color-dark-beige);
+  color: var(--color-dark-brown);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.2;
+}
+
+p,
+textarea,
+input,
+.text-body,
+.text-small {
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+.font-logo {
+  font-family: var(--font-logo);
+  font-size: 1.5rem;
+  color: var(--color-dark-brown);
+}
+
+.btn,
+button {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 1.4rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.2rem 1.1rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: var(--color-burgundy);
+  color: var(--color-light-beige);
+  border-color: var(--color-burgundy);
+}
+
+.btn-primary:hover {
+  background-color: var(--color-burgundy-hover);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-burgundy);
+  border-color: var(--color-burgundy);
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-dark-beige);
+  transform: translateY(-1px);
+}
+
+.btn-sm {
+  font-size: 1.2rem;
+  padding: 0.3rem 0.6rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+h3 {
+  font-weight: 400 !important;
+  font-size: 2rem !important;
+}
