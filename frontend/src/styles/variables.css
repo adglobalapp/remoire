@@ -4,6 +4,7 @@
     --color-light-beige: #FCF6ED;
     --color-dark-beige: #EFE8DE;
     --color-dark-brown: #2A1E22;
+    --color-light-brown: #493627;
 
     --color-burgundy-hover: #471728;
 
@@ -14,4 +15,5 @@
     --font-logo: 'Odor Mean Chey', cursive;
     --font-ui: 'Gurajada', serif;
     --font-body: 'Gudea', sans-serif;
+    --font-handwriting: 'Kaushan Script', cursive;
 }

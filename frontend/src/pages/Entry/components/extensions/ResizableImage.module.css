@@ -1,0 +1,90 @@
+.imageBox {
+    box-sizing: border-box;
+}
+
+.selectionBorder {
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--color-light-brown, #8B6347);
+    border-radius: 2px;
+    pointer-events: none;
+}
+
+.handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border: 1px solid var(--color-light-brown, #8B6347);
+    border-radius: 50%;
+    box-sizing: border-box;
+    margin: -6px;
+    z-index: 10;
+}
+
+.nw {
+    top: 0;
+    left: 0;
+    cursor: nw-resize;
+}
+
+.ne {
+    top: 0;
+    right: 0;
+    cursor: ne-resize;
+    margin-left: 0;
+    margin-right: -6px;
+}
+
+.sw {
+    bottom: 0;
+    left: 0;
+    cursor: sw-resize;
+    margin-top: 0;
+    margin-bottom: -6px;
+}
+
+.se {
+    bottom: 0;
+    right: 0;
+    cursor: se-resize;
+    margin-top: 0;
+    margin-bottom: -6px;
+    margin-left: 0;
+    margin-right: -6px;
+}
+
+.rotateHandle {
+    position: absolute;
+    top: -36px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: 1px solid var(--color-light-brown, #8B6347);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    color: var(--color-light-brown, #8B6347);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    z-index: 10;
+}
+
+.rotateHandle:active {
+    cursor: grabbing;
+}
+
+.rotateHandle::after {
+    content: '';
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 14px;
+    background: var(--color-light-brown, #8B6347);
+    pointer-events: none;
+}

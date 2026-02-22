@@ -6,6 +6,7 @@ import '@fontsource/odor-mean-chey/400.css';
 import '@fontsource/gurajada/400.css';
 import '@fontsource/gudea/400.css';
 import '@fontsource/gudea/700.css';
+import '@fontsource/kaushan-script/400.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

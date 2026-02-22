@@ -1,6 +1,7 @@
 import Navbar from '../../components/Navbar/Navbar';
 import LeftSidebar from './components/LeftSidebar';
 import RightSidebar from './components/RightSidebar';
+import EntryEditor from './components/EntryEditor';
 import styles from './EntryPage.module.css';
 
 const EntryPage = () => {
@@ -14,7 +15,9 @@ const EntryPage = () => {
                     <LeftSidebar />
                 </div>
 
-                <section className={styles.editorArea}></section>
+                <section className={styles.editorArea}>
+                    <EntryEditor />
+                </section>
 
                 <div className={styles.rightColumn}>
                     <RightSidebar />
