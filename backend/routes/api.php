@@ -2,12 +2,10 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\Entry;
+use App\Http\Controllers\EntryController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/entries', function () {
-    return Entry::orderBy('date', 'desc')->get();
-});
+Route::apiResource('entries', EntryController::class);

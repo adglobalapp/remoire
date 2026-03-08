@@ -1,24 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Trash2, Plus, Search } from 'lucide-react';
 import styles from './LeftSidebar.module.css';
-import { getEntries, type Entry } from '../../../services/api';
+import { useEntryContext } from '../../../contexts/EntryContext';
 
 const LeftSidebar = () => {
-    const [entries, setEntries] = useState<Entry[]>([]);
-    const [activeId, setActiveId] = useState<number | null>(null);
+    const { entries, activeEntry, selectEntry, createEntry, deleteEntry } = useEntryContext();
     const [activeFilter, setActiveFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
-
-    useEffect(() => {
-        const loadEntries = async () => {
-            const data = await getEntries();
-            setEntries(data);
-            if (data.length > 0) {
-                setActiveId(data[0].id);
-            }
-        };
-        loadEntries();
-    }, []);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -31,28 +19,29 @@ const LeftSidebar = () => {
 
     const filteredEntries = entries.filter(entry => {
         const matchesSearch = entry.title.toLowerCase().includes(searchQuery.toLowerCase());
-
         if (activeFilter === 'all') return matchesSearch;
 
-        const entryDate = new Date(entry.date);
+        const entryDate = new Date(entry.created_at);
         const now = new Date();
 
         if (activeFilter === 'today') {
             return matchesSearch && entryDate.toDateString() === now.toDateString();
         }
-
         if (activeFilter === 'this-month') {
             return matchesSearch &&
                 entryDate.getMonth() === now.getMonth() &&
                 entryDate.getFullYear() === now.getFullYear();
         }
-
         if (activeFilter === 'this-year') {
             return matchesSearch && entryDate.getFullYear() === now.getFullYear();
         }
-
         return matchesSearch;
     });
+
+    const handleDelete = (e: React.MouseEvent, id: number) => {
+        e.stopPropagation();
+        deleteEntry(id);
+    };
 
     return (
         <aside className={styles.sidebarContainer}>
@@ -64,22 +53,34 @@ const LeftSidebar = () => {
                 {filteredEntries.map((entry) => (
                     <div
                         key={entry.id}
-                        className={`${styles.entryItem} ${activeId === entry.id ? styles.active : ''}`}
-                        onClick={() => setActiveId(entry.id)}
+                        className={`${styles.entryItem} ${activeEntry?.id === entry.id ? styles.active : ''}`}
+                        onClick={() => selectEntry(entry)}
                     >
                         <div className={styles.entryInfo}>
-                            <span className={styles.entryTitle}>{entry.title}</span>
-                            <span className={styles.entryDate}>{formatDate(entry.date)}</span>
+                            <span className={styles.entryTitle}>{entry.title || 'Untitled'}</span>
+                            <span className={styles.entryDate}>{formatDate(entry.created_at)}</span>
                         </div>
-                        <button className={styles.deleteBtn}>
+                        <button
+                            className={styles.deleteBtn}
+                            onClick={(e) => handleDelete(e, entry.id)}
+                        >
                             <Trash2 size={18} />
                         </button>
                     </div>
                 ))}
+
+                {filteredEntries.length === 0 && (
+                    <div className={styles.emptyState}>
+                        No entries yet. Create one!
+                    </div>
+                )}
             </div>
 
             <div className={styles.sidebarFooter}>
-                <button className={`btn btn-primary w-full ${styles.btnAddSidebar}`}>
+                <button
+                    className={`btn btn-primary w-full ${styles.btnAddSidebar}`}
+                    onClick={createEntry}
+                >
                     <Plus size={16} /> Add Entry
                 </button>
                 <div className={styles.searchBox}>
@@ -92,30 +93,15 @@ const LeftSidebar = () => {
                     <Search size={16} className={styles.searchIcon} />
                 </div>
                 <div className={styles.filterRow}>
-                    <span
-                        className={`${styles.filterItem} ${activeFilter === 'all' ? styles.active : ''}`}
-                        onClick={() => setActiveFilter('all')}
-                    >
-                        All
-                    </span>
-                    <span
-                        className={`${styles.filterItem} ${activeFilter === 'today' ? styles.active : ''}`}
-                        onClick={() => setActiveFilter('today')}
-                    >
-                        Today
-                    </span>
-                    <span
-                        className={`${styles.filterItem} ${activeFilter === 'this-month' ? styles.active : ''}`}
-                        onClick={() => setActiveFilter('this-month')}
-                    >
-                        This month
-                    </span>
-                    <span
-                        className={`${styles.filterItem} ${activeFilter === 'this-year' ? styles.active : ''}`}
-                        onClick={() => setActiveFilter('this-year')}
-                    >
-                        This year
-                    </span>
+                    {(['all', 'today', 'this-month', 'this-year'] as const).map(filter => (
+                        <span
+                            key={filter}
+                            className={`${styles.filterItem} ${activeFilter === filter ? styles.active : ''}`}
+                            onClick={() => setActiveFilter(filter)}
+                        >
+                            {filter === 'all' ? 'All' : filter === 'today' ? 'Today' : filter === 'this-month' ? 'This month' : 'This year'}
+                        </span>
+                    ))}
                 </div>
             </div>
         </aside>

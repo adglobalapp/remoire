@@ -21,17 +21,13 @@ export interface ResizableImageAttributes {
     rotation?: number;
 }
 
-// Get the cumulative scale factor from an element up to the editor root,
-// so pointer deltas can be converted to local-space distances.
 function getCumulativeScale(el: HTMLElement): number {
     let scale = 1;
     let cur: HTMLElement | null = el;
     while (cur) {
         const m = new DOMMatrix(getComputedStyle(cur).transform);
-        // The 'a' component of a 2D matrix is scaleX (assuming uniform scale)
         scale *= m.a;
         cur = cur.parentElement;
-        // Stop at the editor root (ProseMirror)
         if (cur && cur.classList.contains('ProseMirror')) break;
     }
     return scale === 0 ? 1 : scale;
@@ -44,7 +40,6 @@ const ImageNodeView = (props: any) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const imgRef = useRef<HTMLImageElement>(null);
 
-    // Local mutable state for live drags (avoids React re-renders mid-drag)
     const state = useRef({
         x: x ?? 0,
         y: y ?? 0,
@@ -52,18 +47,6 @@ const ImageNodeView = (props: any) => {
         height: height ?? 0,
         rotation: rotation ?? 0,
     });
-
-    // Keep ref in sync with Tiptap attributes
-    useEffect(() => {
-        state.current = {
-            x: x ?? 0,
-            y: y ?? 0,
-            width: width ?? 300,
-            height: height ?? 0,
-            rotation: rotation ?? 0,
-        };
-        applyTransform();
-    }, [x, y, width, height, rotation]);
 
     const applyTransform = useCallback(() => {
         const el = wrapperRef.current;
@@ -78,7 +61,17 @@ const ImageNodeView = (props: any) => {
         }
     }, []);
 
-    // Once image is loaded, capture its natural height if not set
+    useEffect(() => {
+        state.current = {
+            x: x ?? 0,
+            y: y ?? 0,
+            width: width ?? 300,
+            height: height ?? 0,
+            rotation: rotation ?? 0,
+        };
+        applyTransform();
+    }, [x, y, width, height, rotation, applyTransform]);
+
     const onImgLoad = useCallback(() => {
         if (!imgRef.current) return;
         if (!state.current.height || state.current.height === 0) {
@@ -89,9 +82,6 @@ const ImageNodeView = (props: any) => {
         }
     }, [applyTransform]);
 
-    // ──────────────────────────────────────────────
-    // DRAG (move)
-    // ──────────────────────────────────────────────
     const startDrag = useCallback((e: React.MouseEvent) => {
         if (e.button !== 0) return;
         e.preventDefault();
@@ -117,9 +107,6 @@ const ImageNodeView = (props: any) => {
         window.addEventListener('mouseup', onUp);
     }, [applyTransform, updateAttributes]);
 
-    // ──────────────────────────────────────────────
-    // RESIZE (4 corner handles)
-    // ──────────────────────────────────────────────
     const startResize = useCallback((e: React.MouseEvent, corner: 'nw' | 'ne' | 'sw' | 'se') => {
         if (e.button !== 0) return;
         e.preventDefault();
@@ -136,11 +123,9 @@ const ImageNodeView = (props: any) => {
         const origH = state.current.height > 0 ? state.current.height : (imgRef.current?.offsetHeight ?? origW);
         const ratio = origH / origW;
 
-        // Pivot is the opposite corner in local space (relative to center)
         const pivotLocalX = corner === 'ne' || corner === 'se' ? -origW / 2 : origW / 2;
         const pivotLocalY = corner === 'sw' || corner === 'se' ? -origH / 2 : origH / 2;
 
-        // Pivot in world space (before resize)
         const pivotWorldX = state.current.x + origW / 2 + cos * pivotLocalX - sin * pivotLocalY;
         const pivotWorldY = state.current.y + origH / 2 + sin * pivotLocalX + cos * pivotLocalY;
 
@@ -148,7 +133,6 @@ const ImageNodeView = (props: any) => {
             const dx = (ev.clientX - startClientX) / scale;
             const dy = (ev.clientY - startClientY) / scale;
 
-            // Project delta onto the image's local axes
             const localDx = dx * cos + dy * sin;
 
             let newW: number;
@@ -166,11 +150,9 @@ const ImageNodeView = (props: any) => {
 
             newH = newW * ratio;
 
-            // Re-compute top-left so that the pivot corner stays fixed
             const newHalfW = newW / 2;
             const newHalfH = newH / 2;
 
-            // Adjust center based on new size
             const scaledPivotLocalX = (pivotLocalX / Math.abs(pivotLocalX)) * newHalfW;
             const scaledPivotLocalY = (pivotLocalY / Math.abs(pivotLocalY)) * newHalfH;
             const adjustedCenterX = pivotWorldX - cos * scaledPivotLocalX + sin * scaledPivotLocalY;
@@ -197,9 +179,6 @@ const ImageNodeView = (props: any) => {
         window.addEventListener('mouseup', onUp);
     }, [applyTransform, updateAttributes]);
 
-    // ──────────────────────────────────────────────
-    // ROTATE
-    // ──────────────────────────────────────────────
     const startRotate = useCallback((e: React.MouseEvent) => {
         if (e.button !== 0) return;
         e.preventDefault();
@@ -228,7 +207,6 @@ const ImageNodeView = (props: any) => {
         window.addEventListener('mouseup', onUp);
     }, [applyTransform, updateAttributes]);
 
-    // Click outside to deselect
     useEffect(() => {
         if (!selected) return;
 
@@ -253,7 +231,14 @@ const ImageNodeView = (props: any) => {
         };
     }, [selected, props]);
 
-    const s = state.current;
+    // We use the attributes from props directly to render instead of ref state to avoid React lint errors
+    const s = {
+        width: props.node.attrs.width ?? 300,
+        height: props.node.attrs.height ?? 0,
+        x: props.node.attrs.x ?? 0,
+        y: props.node.attrs.y ?? 0,
+        rotation: props.node.attrs.rotation ?? 0,
+    };
 
     return (
         <NodeViewWrapper
@@ -291,7 +276,7 @@ const ImageNodeView = (props: any) => {
                     title={title}
                     draggable={false}
                     onLoad={onImgLoad}
-                    style={{ width: '100%', height: '100%', display: 'block', objectFit: 'fill' }}
+                    style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover' }}
                 />
 
                 {selected && (
@@ -329,7 +314,7 @@ const ImageNodeView = (props: any) => {
     );
 };
 
-export const ResizableImage = Node.create({
+export const ResizableImage = Node.create<any, any>({
     name: 'resizableImage',
 
     addOptions() {

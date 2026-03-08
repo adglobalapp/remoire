@@ -174,3 +174,12 @@
     opacity: 1;
     color: var(--color-burgundy);
 }
+
+.emptyState {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--color-dark-brown);
+    opacity: 0.5;
+    font-size: 0.9rem;
+    font-family: var(--font-body);
+}

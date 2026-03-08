@@ -50,6 +50,12 @@
     opacity: 1;
 }
 
+.actionButton:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background-color: transparent;
+}
+
 .dropdownSelect {
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -76,21 +82,119 @@
     border-color: rgba(255, 255, 255, 0.4);
 }
 
+.dropdownSelect:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
 .dropdownSelect option {
     color: var(--color-dark-blue);
     background: var(--color-white);
+}
+
+.paletteContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.palettePopup {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-dark-blue);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 1rem;
+    min-width: 200px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    z-index: 1000;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.paletteSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.paletteLabel {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-weight: 500;
+    margin-bottom: 0.1rem;
+}
+
+.colorGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.4rem;
+}
+
+.colorSquare {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.colorSquare:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-white);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+.paletteDivider {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0.25rem 0;
+}
+
+.customColorSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.colorInputWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 0.4rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.colorHex {
+    color: var(--color-white);
+    font-size: 0.8rem;
+    font-family: monospace;
+    font-weight: 500;
+    opacity: 0.8;
 }
 
 .colorPicker {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     background-color: transparent;
     border: none;
     cursor: pointer;
     padding: 0;
+    flex-shrink: 0;
 }
 
 .colorPicker::-webkit-color-swatch {
@@ -101,4 +205,103 @@
 .colorPicker::-moz-color-swatch {
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.settingsContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.settingsPopup {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-dark-blue);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 1rem;
+    min-width: 240px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    z-index: 1000;
+}
+
+.settingsSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.settingsLabel {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+}
+
+.bgActions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btnSm {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: var(--color-white);
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: background-color 0.2s;
+}
+
+.btnSm:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.settingsDivider {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.marginsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+.marginInput {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.marginInput span {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.8rem;
+    font-family: var(--font-body);
+}
+
+.marginInput input {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--color-white);
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.marginInput input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.4);
 }
