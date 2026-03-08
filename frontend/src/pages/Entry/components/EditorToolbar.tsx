@@ -37,6 +37,8 @@ const EditorToolbar = ({
     const paletteRef = useRef<HTMLDivElement>(null);
     const settingsRef = useRef<HTMLDivElement>(null);
     const bgInputRef = useRef<HTMLInputElement>(null);
+    const lastPreviewTimeRef = useRef<number>(0);
+    const originalColorRef = useRef<string | null>(null);
     const [, forceUpdate] = useState({});
 
     const presetColors = [
@@ -88,6 +90,8 @@ const EditorToolbar = ({
         };
 
         const updateState = () => {
+            if (isPickingColorRef.current) return;
+
             const attrs = editor.getAttributes('textStyle');
             setCurrentFont(attrs.fontFamily || "'Kaushan Script', cursive");
 
@@ -106,22 +110,13 @@ const EditorToolbar = ({
         const handleGlobalClick = (e: MouseEvent) => {
             const target = e.target as HTMLElement;
 
-            // Palette closure
             if (paletteRef.current && !paletteRef.current.contains(target)) {
                 setShowPalette(false);
                 isPickingColorRef.current = false;
                 onColorPickerToggle?.(false);
             }
-
-            // Settings closure
             if (settingsRef.current && !settingsRef.current.contains(target)) {
                 setShowSettings(false);
-            }
-
-            // Reset isPickingColor if we clicked outside the picker itself
-            if (isPickingColorRef.current && !target.closest(`.${styles.colorPicker}`)) {
-                // We keep it true if the dialog is theoretically open, 
-                // but if we are clicking somewhere else entirely we should reset.
             }
         };
 
@@ -141,12 +136,12 @@ const EditorToolbar = ({
             editor.off('transaction', updateState);
             editor.off('focus', handleFocus);
         };
-    }, [editor, titleEditor, contentEditor, onColorPickerToggle]);
+    }, [editor, titleEditor, contentEditor, showPalette, onColorPickerToggle]);
 
     const applyColor = (color: string) => {
         if (!editor) return;
         setCurrentColor(color);
-        editor.chain().focus().setColor(color).run();
+        editor.chain().setColor(color).run();
 
         setShowPalette(false);
         isPickingColorRef.current = false;
@@ -176,8 +171,8 @@ const EditorToolbar = ({
             const reader = new FileReader();
             reader.onload = (e) => {
                 const result = e.target?.result as string;
-                // @ts-ignore - custom extension command
-                editor.chain().focus().setImage({ src: result }).run();
+                const targetEditor = contentEditor || editor;
+                (targetEditor.chain() as any).setImage({ src: result }).run();
             };
             reader.readAsDataURL(file);
             event.target.value = '';
@@ -189,8 +184,8 @@ const EditorToolbar = ({
             <div className={styles.toolbarGroup}>
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().undo().run()}
-                    disabled={isDragMode || !editor.can().chain().focus().undo().run()}
+                    onClick={() => editor.chain().undo().run()}
+                    disabled={isDragMode || !editor.can().chain().undo().run()}
                     className={styles.actionButton}
                     title="Undo"
                 >
@@ -198,8 +193,8 @@ const EditorToolbar = ({
                 </button>
                 <button
                     type="button"
-                    onClick={() => editor.chain().focus().redo().run()}
-                    disabled={isDragMode || !editor.can().chain().focus().redo().run()}
+                    onClick={() => editor.chain().redo().run()}
+                    disabled={isDragMode || !editor.can().chain().redo().run()}
                     className={styles.actionButton}
                     title="Redo"
                 >
@@ -256,7 +251,7 @@ const EditorToolbar = ({
                     onChange={(e) => {
                         const val = e.target.value;
                         setCurrentFont(val);
-                        editor.chain().focus().setFontFamily(val).run();
+                        editor.chain().setFontFamily(val).run();
                     }}
                 >
                     <option value="'Kaushan Script', cursive">Kaushan Script</option>
@@ -273,7 +268,7 @@ const EditorToolbar = ({
                     onChange={(e) => {
                         const val = e.target.value;
                         setCurrentSize(val);
-                        editor.chain().focus().setFontSize(val).run();
+                        editor.chain().setFontSize(val).run();
                     }}
                 >
                     <option value="12px">12px</option>
@@ -347,17 +342,68 @@ const EditorToolbar = ({
                                         type="color"
                                         className={styles.colorPicker}
                                         value={currentColor}
+                                        ref={(node) => {
+                                            if (node) {
+                                                if (!(node as any)._hasChangeHandler) {
+                                                    (node as any)._hasChangeHandler = true;
+                                                    node.addEventListener('change', (e) => {
+                                                        const val = (e.target as HTMLInputElement).value;
+
+                                                        if (originalColorRef.current !== null) {
+                                                            const { from, to } = editor.state.selection;
+                                                            const tr = editor.state.tr.setMeta('addToHistory', false);
+                                                            const markType = editor.schema.marks.textStyle;
+
+                                                            editor.state.doc.nodesBetween(from, to, (node, pos) => {
+                                                                if (!node.isText) return;
+                                                                const existingMark = node.marks.find(m => m.type === markType);
+                                                                const newAttrs = existingMark ? { ...existingMark.attrs, color: originalColorRef.current } : { color: originalColorRef.current };
+                                                                tr.addMark(Math.max(from, pos), Math.min(to, pos + node.nodeSize), markType.create(newAttrs));
+                                                            });
+
+                                                            editor.view.dispatch(tr);
+                                                        }
+
+                                                        editor.chain().setColor(val).run();
+
+                                                        originalColorRef.current = null;
+                                                        isPickingColorRef.current = false;
+                                                        onColorPickerToggle?.(false);
+                                                    });
+                                                }
+                                            }
+                                        }}
                                         onFocus={() => {
                                             isPickingColorRef.current = true;
+                                            originalColorRef.current = editor.getAttributes('textStyle').color || '#493627';
                                             onColorPickerToggle?.(true);
                                         }}
                                         onInput={(e) => {
                                             const val = (e.target as HTMLInputElement).value;
                                             setCurrentColor(val);
-                                            editor.chain().setColor(val).run();
+
+                                            const now = Date.now();
+                                            if (now - lastPreviewTimeRef.current > 32) {
+                                                lastPreviewTimeRef.current = now;
+                                                const { from, to } = editor.state.selection;
+                                                const tr = editor.state.tr
+                                                    .setMeta('addToHistory', false)
+                                                    .setMeta('isColorPreview', true);
+                                                const markType = editor.schema.marks.textStyle;
+
+                                                editor.state.doc.nodesBetween(from, to, (node, pos) => {
+                                                    if (!node.isText) return;
+                                                    const existingMark = node.marks.find(m => m.type === markType);
+                                                    const newAttrs = existingMark ? { ...existingMark.attrs, color: val } : { color: val };
+                                                    tr.addMark(Math.max(from, pos), Math.min(to, pos + node.nodeSize), markType.create(newAttrs));
+                                                });
+
+                                                editor.view.dispatch(tr);
+                                            }
                                         }}
                                         onClick={() => {
                                             isPickingColorRef.current = true;
+                                            originalColorRef.current = editor.getAttributes('textStyle').color || '#493627';
                                             onColorPickerToggle?.(true);
                                         }}
                                     />

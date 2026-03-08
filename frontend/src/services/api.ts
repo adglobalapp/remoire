@@ -15,6 +15,19 @@ export const getEntries = async (): Promise<Entry[]> => {
     }
 };
 
+export const getEntry = async (id: number): Promise<Entry | null> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        });
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch entry:', error);
+        return null;
+    }
+};
+
 export const createEntry = async (title: string): Promise<Entry | null> => {
     try {
         const response = await fetch(`${API_BASE_URL}/entries`, {

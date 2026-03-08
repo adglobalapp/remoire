@@ -1,4 +1,5 @@
 import { useEditor, EditorContent, Editor, Extension } from '@tiptap/react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import StarterKit from '@tiptap/starter-kit';
 import Document from '@tiptap/extension-document';
 import Underline from '@tiptap/extension-underline';
@@ -10,7 +11,6 @@ import { FontFamily } from '@tiptap/extension-font-family';
 import { Color } from '@tiptap/extension-color';
 import { FontSize } from './extensions/FontSize';
 import { Plugin } from '@tiptap/pm/state';
-import { useState, useRef, useCallback, useEffect } from 'react';
 import EditorToolbar from './EditorToolbar';
 import styles from './EntryEditor.module.css';
 import classNames from 'classnames';
@@ -78,10 +78,6 @@ const EntryEditor = () => {
         content: getInitialContent(),
         editable: !isDragMode,
         onCreate: ({ editor }) => {
-            const stored = activeEntry ? parseStoredContent(activeEntry.content) : null;
-            if (!stored || (typeof stored === 'object' && !stored.contentJSON)) {
-                editor.chain().focus().setFontFamily("'Kaushan Script', cursive").run();
-            }
             setActiveEditor(editor);
         },
         onFocus: ({ editor }) => setActiveEditor(editor),
@@ -117,17 +113,6 @@ const EntryEditor = () => {
                                         return true;
                                     }
                                 },
-                                handlePaste: (view, event) => {
-                                    const text = event.clipboardData?.getData('text/plain') ?? '';
-                                    if (text.includes('\n') || text.includes('\r')) {
-                                        const cleanText = text.replace(/[\n\r]+/g, ' ');
-                                        const { tr } = view.state;
-                                        tr.insertText(cleanText);
-                                        view.dispatch(tr);
-                                        return true;
-                                    }
-                                    return false;
-                                },
                             },
                         }),
                     ];
@@ -142,7 +127,9 @@ const EntryEditor = () => {
 
     useEffect(() => {
         if (!contentEditor || initialEntryId === null) return;
-        const handleUpdate = () => {
+        const handleUpdate = ({ transaction }: { transaction: any }) => {
+            if (transaction.getMeta('isColorPreview')) return;
+
             const titleHTML = titleEditor?.getHTML() ?? `<h1>${activeEntry?.title || 'Untitled'}</h1>`;
             const titleText = titleEditor?.getText() || 'Untitled';
             const contentJSON = contentEditor.getJSON();
@@ -155,7 +142,9 @@ const EntryEditor = () => {
 
     useEffect(() => {
         if (!titleEditor || initialEntryId === null) return;
-        const handleUpdate = () => {
+        const handleUpdate = ({ transaction }: { transaction: any }) => {
+            if (transaction.getMeta('isColorPreview')) return;
+
             const titleText = titleEditor.getText() || 'Untitled';
             updateEntryTitle(initialEntryId, titleText);
             const titleHTML = titleEditor.getHTML();
@@ -206,14 +195,15 @@ const EntryEditor = () => {
         }
 
         if (contentJSON) {
-            contentEditor?.commands.setContent(contentJSON);
+            contentEditor?.commands.setContent(contentJSON, { emitUpdate: false });
+            setTimeout(() => {
+                contentEditor?.commands.blur();
+            }, 10);
         } else {
             contentEditor?.commands.setContent('');
-            contentEditor?.chain().focus().setFontFamily("'Kaushan Script', cursive").run();
+            contentEditor?.chain().setFontFamily("'Kaushan Script', cursive").run();
         }
     }, [activeEntry, titleEditor, contentEditor, initialEntryId]);
-
-
 
     useEffect(() => {
         contentEditor?.setEditable(!isDragMode);
