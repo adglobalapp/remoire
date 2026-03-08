@@ -25,10 +25,13 @@ function getCumulativeScale(el: HTMLElement): number {
     let scale = 1;
     let cur: HTMLElement | null = el;
     while (cur) {
-        const m = new DOMMatrix(getComputedStyle(cur).transform);
-        scale *= m.a;
+        const style = getComputedStyle(cur);
+        const transform = style.transform;
+        if (transform && transform !== 'none') {
+            const m = new DOMMatrix(transform);
+            scale *= m.a;
+        }
         cur = cur.parentElement;
-        if (cur && cur.classList.contains('ProseMirror')) break;
     }
     return scale === 0 ? 1 : scale;
 }
@@ -94,8 +97,10 @@ const ImageNodeView = (props: any) => {
         const origY = state.current.y;
 
         const onMove = (ev: MouseEvent) => {
-            state.current.x = origX + (ev.clientX - startX) / scale;
-            state.current.y = origY + (ev.clientY - startY) / scale;
+            const dx = (ev.clientX - startX) / scale;
+            const dy = (ev.clientY - startY) / scale;
+            state.current.x = origX + dx;
+            state.current.y = origY + dy;
             applyTransform();
         };
         const onUp = () => {
