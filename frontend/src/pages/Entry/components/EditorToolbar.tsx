@@ -92,7 +92,6 @@ const EditorToolbar = ({
         const updateState = () => {
             if (isPickingColorRef.current) return;
 
-            // Helper to get attributes from selection with priority
             const getAttr = (name: string, fallback?: string) => {
                 const textStyle = editor.getAttributes('textStyle')[name];
                 const listItem = editor.getAttributes('listItem')[name];
@@ -101,40 +100,30 @@ const EditorToolbar = ({
                 return textStyle || listItem || heading || paragraph || fallback;
             };
 
-            // 1. Font Family
             let fontFamily = getAttr('fontFamily', "'Kaushan Script', cursive");
             setCurrentFont(fontFamily);
 
-            // 2. Color
             const colorAttr = getAttr('color', '#493627');
             const color = rgbToHex(colorAttr);
             setCurrentColor(color);
 
-            // 3. Font Size - Exact Visual Sensor
             let fontSize = getAttr('fontSize');
 
-            // Even if we have a Tiptap attribute, let's verify with Computed Style 
-            // to ensure absolute parity with what the user sees.
             try {
                 const { view, state } = editor;
                 const { from } = state.selection;
 
-                // domAtPos gives us the container and offset. 
-                // We want the most specific element containing the text.
                 const { node } = view.domAtPos(from);
                 const el = node.nodeType === 3 ? node.parentElement : (node as HTMLElement);
 
                 if (el) {
                     const computed = window.getComputedStyle(el).fontSize;
                     const numericSize = parseFloat(computed);
-                    // Use the exact computed value if it's significantly different 
-                    // or if the attribute is missing.
                     if (!fontSize || Math.abs(parseFloat(fontSize) - numericSize) > 0.1) {
                         fontSize = Math.round(numericSize) + 'px';
                     }
                 }
             } catch (err) {
-                // Fallback to attribute or default if sensing fails
                 fontSize = fontSize || '16px';
             }
 
@@ -310,7 +299,6 @@ const EditorToolbar = ({
                         editor.chain().setFontSize(val).run();
                     }}
                 >
-                    {/* Ensure currentSize is always an option even if not in standard list */}
                     {![
                         '12px', '14px', '16px', '18px', '20px', '24px', '30px', '36px', '48px', '64px', '72px'
                     ].includes(currentSize) && (

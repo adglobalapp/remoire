@@ -243,7 +243,6 @@ const EntryEditor = () => {
         if (!container) return;
 
         if (e.ctrlKey) {
-            // Zoom logic
             const rect = container.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
@@ -257,7 +256,6 @@ const EntryEditor = () => {
                 return { x: nextX, y: nextY, scale: nextScale };
             });
         } else {
-            // Regular scroll logic
             setTransform(prev => ({
                 ...prev,
                 x: prev.x - e.deltaX,
