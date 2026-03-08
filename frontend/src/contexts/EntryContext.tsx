@@ -1,22 +1,12 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
-import { type Entry, getEntries, createEntry as apiCreateEntry, updateEntry as apiUpdateEntry, deleteEntry as apiDeleteEntry } from '../services/api';
+import { getEntries, createEntry as apiCreateEntry, updateEntry as apiUpdateEntry, deleteEntry as apiDeleteEntry } from '../services/api';
+import { type Entry, type EntryContextValue } from '../types';
 
-interface EntryContextValue {
-    entries: Entry[];
-    activeEntry: Entry | null;
-    selectEntry: (entry: Entry) => void;
-    createEntry: () => Promise<void>;
-    deleteEntry: (id: number) => Promise<void>;
-    saveEntry: (id: number, title: string, content: string) => void;
-    updateEntryTitle: (id: number, title: string) => void;
-}
-
-const EntryContext = createContext<EntryContextValue | null>(null);
+export const EntryContext = createContext<EntryContextValue | null>(null);
 
 export const EntryProvider = ({ children }: { children: ReactNode }) => {
     const [entries, setEntries] = useState<Entry[]>([]);
     const [activeEntry, setActiveEntry] = useState<Entry | null>(null);
-    const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         getEntries().then(async data => {
@@ -58,14 +48,40 @@ export const EntryProvider = ({ children }: { children: ReactNode }) => {
         });
     }, []);
 
-    const saveEntry = useCallback((id: number, title: string, content: string) => {
-        if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-        saveTimerRef.current = setTimeout(async () => {
-            const updated = await apiUpdateEntry(id, { title, content });
-            if (!updated) return;
-            setEntries(prev => prev.map(e => e.id === id ? { ...e, title: updated.title, content: updated.content, updated_at: updated.updated_at } : e));
-        }, 1000);
+    const savingRef = useRef(false);
+    const pendingSavesRef = useRef<Map<number, { title: string, content: string }>>(new Map());
+
+    const processQueue = useCallback(async () => {
+        if (savingRef.current || pendingSavesRef.current.size === 0) return;
+
+        savingRef.current = true;
+        const entry = pendingSavesRef.current.entries().next().value;
+        if (!entry) {
+            savingRef.current = false;
+            return;
+        }
+
+        const [id, data] = entry;
+        pendingSavesRef.current.delete(id);
+
+        try {
+            const updated = await apiUpdateEntry(id, data);
+            if (updated) {
+                setEntries(prev => prev.map(e => e.id === id ? updated : e));
+                setActiveEntry(prev => prev?.id === id ? updated : prev);
+            }
+        } catch (error) {
+            console.error('Save failed:', error);
+        } finally {
+            savingRef.current = false;
+            processQueue();
+        }
     }, []);
+
+    const saveEntry = useCallback((id: number, title: string, content: string) => {
+        pendingSavesRef.current.set(id, { title, content });
+        processQueue();
+    }, [processQueue]);
 
     const updateEntryTitle = useCallback((id: number, title: string) => {
         setEntries(prev => prev.map(e => e.id === id ? { ...e, title } : e));

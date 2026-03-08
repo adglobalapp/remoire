@@ -136,7 +136,6 @@ const ImageNodeView = (props: any) => {
             const localDx = dx * cos + dy * sin;
 
             let newW: number;
-            let newH: number;
 
             if (corner === 'se') {
                 newW = Math.max(50, origW + localDx);
@@ -148,7 +147,7 @@ const ImageNodeView = (props: any) => {
                 newW = Math.max(50, origW - localDx);
             }
 
-            newH = newW * ratio;
+            const newH = newW * ratio;
 
             const newHalfW = newW / 2;
             const newHalfH = newH / 2;
@@ -231,7 +230,6 @@ const ImageNodeView = (props: any) => {
         };
     }, [selected, props]);
 
-    // We use the attributes from props directly to render instead of ref state to avoid React lint errors
     const s = {
         width: props.node.attrs.width ?? 300,
         height: props.node.attrs.height ?? 0,
@@ -314,7 +312,7 @@ const ImageNodeView = (props: any) => {
     );
 };
 
-export const ResizableImage = Node.create<any, any>({
+export const ResizableImage = Node.create({
     name: 'resizableImage',
 
     addOptions() {

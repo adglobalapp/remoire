@@ -1,5 +1,6 @@
-import { useEditor, EditorContent, Editor } from '@tiptap/react';
+import { useEditor, EditorContent, Editor, Extension } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import Document from '@tiptap/extension-document';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -8,27 +9,13 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { Color } from '@tiptap/extension-color';
 import { FontSize } from './extensions/FontSize';
+import { Plugin } from '@tiptap/pm/state';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import EditorToolbar from './EditorToolbar';
 import styles from './EntryEditor.module.css';
 import classNames from 'classnames';
 import { useEntryContext } from '../../../contexts/EntryContext';
-
-export interface PageSettings {
-    backgroundUrl: string | null;
-    paddingTop: number;
-    paddingRight: number;
-    paddingBottom: number;
-    paddingLeft: number;
-}
-
-export const DEFAULT_PAGE_SETTINGS: PageSettings = {
-    backgroundUrl: null,
-    paddingTop: 56,
-    paddingRight: 75,
-    paddingBottom: 56,
-    paddingLeft: 75,
-};
+import { type PageSettings, DEFAULT_PAGE_SETTINGS } from '../../../types';
 
 const EntryEditor = () => {
     const { activeEntry, saveEntry, updateEntryTitle } = useEntryContext();
@@ -45,6 +32,7 @@ const EntryEditor = () => {
     const [pageSettings, setPageSettings] = useState<PageSettings>(DEFAULT_PAGE_SETTINGS);
     const pageSettingsRef = useRef<PageSettings>(DEFAULT_PAGE_SETTINGS);
 
+    const initialEntryId = useRef<number | null>(activeEntry?.id ?? null).current;
     const loadedEntryIdRef = useRef<number | null>(null);
 
     const parseStoredContent = (raw: string | null | undefined) => {
@@ -97,23 +85,15 @@ const EntryEditor = () => {
             setActiveEditor(editor);
         },
         onFocus: ({ editor }) => setActiveEditor(editor),
-        onUpdate: ({ editor }) => {
-            if (!activeEntry) return;
-            const titleHTML = titleEditor?.getHTML() ?? `<h1>${activeEntry.title}</h1>`;
-            const titleText = titleEditor?.getText() || 'Untitled';
-            const contentJSON = editor.getJSON();
-            const serialized = JSON.stringify({ titleHTML, contentJSON, pageSettings: pageSettingsRef.current });
-            saveEntry(activeEntry.id, titleText, serialized);
-        },
     });
 
     const titleEditor = useEditor({
         extensions: [
             StarterKit.configure({
-                codeBlock: false,
-                bulletList: false,
-                orderedList: false,
-                blockquote: false,
+                document: false,
+            }),
+            Document.extend({
+                content: 'heading',
             }),
             Underline,
             TextStyle,
@@ -121,24 +101,74 @@ const EntryEditor = () => {
             FontSize,
             Color,
             Placeholder.configure({ placeholder: 'Entry Title' }),
+            Extension.create({
+                name: 'singleLine',
+                addKeyboardShortcuts() {
+                    return {
+                        Enter: () => true,
+                    };
+                },
+                addProseMirrorPlugins() {
+                    return [
+                        new Plugin({
+                            props: {
+                                handleKeyDown: (_, event) => {
+                                    if (event.key === 'Enter') {
+                                        return true;
+                                    }
+                                },
+                                handlePaste: (view, event) => {
+                                    const text = event.clipboardData?.getData('text/plain') ?? '';
+                                    if (text.includes('\n') || text.includes('\r')) {
+                                        const cleanText = text.replace(/[\n\r]+/g, ' ');
+                                        const { tr } = view.state;
+                                        tr.insertText(cleanText);
+                                        view.dispatch(tr);
+                                        return true;
+                                    }
+                                    return false;
+                                },
+                            },
+                        }),
+                    ];
+                },
+            }),
         ],
         content: getInitialTitle(),
         editable: !isDragMode,
         onCreate: ({ editor }) => setActiveEditor(editor),
         onFocus: ({ editor }) => setActiveEditor(editor),
-        onUpdate: ({ editor }) => {
-            if (!activeEntry) return;
-            const titleText = editor.getText() || 'Untitled';
-            updateEntryTitle(activeEntry.id, titleText);
-            const titleHTML = editor.getHTML();
-            const contentJSON = contentEditor?.getJSON() ?? null;
-            const serialized = JSON.stringify({ titleHTML, contentJSON, pageSettings: pageSettingsRef.current });
-            saveEntry(activeEntry.id, titleText, serialized);
-        },
     });
 
     useEffect(() => {
-        if (!activeEntry) return;
+        if (!contentEditor || initialEntryId === null) return;
+        const handleUpdate = () => {
+            const titleHTML = titleEditor?.getHTML() ?? `<h1>${activeEntry?.title || 'Untitled'}</h1>`;
+            const titleText = titleEditor?.getText() || 'Untitled';
+            const contentJSON = contentEditor.getJSON();
+            const serialized = JSON.stringify({ titleHTML, contentJSON, pageSettings: pageSettingsRef.current });
+            saveEntry(initialEntryId, titleText, serialized);
+        };
+        contentEditor.on('update', handleUpdate);
+        return () => { contentEditor.off('update', handleUpdate); };
+    }, [contentEditor, titleEditor, saveEntry, initialEntryId]);
+
+    useEffect(() => {
+        if (!titleEditor || initialEntryId === null) return;
+        const handleUpdate = () => {
+            const titleText = titleEditor.getText() || 'Untitled';
+            updateEntryTitle(initialEntryId, titleText);
+            const titleHTML = titleEditor.getHTML();
+            const contentJSON = contentEditor?.getJSON() ?? null;
+            const serialized = JSON.stringify({ titleHTML, contentJSON, pageSettings: pageSettingsRef.current });
+            saveEntry(initialEntryId, titleText, serialized);
+        };
+        titleEditor.on('update', handleUpdate);
+        return () => { titleEditor.off('update', handleUpdate); };
+    }, [titleEditor, contentEditor, saveEntry, updateEntryTitle, initialEntryId]);
+
+    useEffect(() => {
+        if (!activeEntry || initialEntryId === null) return;
         if (loadedEntryIdRef.current === activeEntry.id) return;
         loadedEntryIdRef.current = activeEntry.id;
 
@@ -155,11 +185,10 @@ const EntryEditor = () => {
             settings = { ...DEFAULT_PAGE_SETTINGS, ...stored.pageSettings };
         }
 
-        // Wrap setting state in a microtask to avoid "setState during render" or "cascading renders" warnings
-        Promise.resolve().then(() => {
+        queueMicrotask(() => {
             setPageSettings(settings);
-            pageSettingsRef.current = settings;
         });
+        pageSettingsRef.current = settings;
 
         const hasSavedTitle = stored && typeof stored === 'object' && stored.titleHTML;
 
@@ -182,7 +211,7 @@ const EntryEditor = () => {
             contentEditor?.commands.setContent('');
             contentEditor?.chain().focus().setFontFamily("'Kaushan Script', cursive").run();
         }
-    }, [activeEntry, titleEditor, contentEditor]);
+    }, [activeEntry, titleEditor, contentEditor, initialEntryId]);
 
 
 
@@ -215,7 +244,15 @@ const EntryEditor = () => {
     }, []);
 
     const handleMouseDown = (e: React.MouseEvent) => {
-        mouseDownTargetRef.current = e.target;
+        const target = e.target as Element;
+        mouseDownTargetRef.current = target;
+
+        const isBackdrop = target === containerRef.current || target?.classList?.contains(styles.canvas);
+
+        if (isBackdrop && !isDragMode) {
+            e.preventDefault();
+        }
+
         if (e.button === 0 && isDragMode) {
             setIsDragging(true);
             setLastMousePos({ x: e.clientX, y: e.clientY });
@@ -256,6 +293,18 @@ const EntryEditor = () => {
         return () => container.removeEventListener('wheel', onWheel);
     }, []);
 
+    const handlePageSettingsChange = (newSettings: PageSettings) => {
+        setPageSettings(newSettings);
+        pageSettingsRef.current = newSettings;
+        if (initialEntryId !== null) {
+            const titleHTML = titleEditor?.getHTML() || '';
+            const titleText = titleEditor?.getText() || 'Untitled';
+            const contentJSON = contentEditor?.getJSON() || null;
+            const serialized = JSON.stringify({ titleHTML, contentJSON, pageSettings: newSettings });
+            saveEntry(initialEntryId, titleText, serialized);
+        }
+    };
+
     return (
         <>
             <div
@@ -293,7 +342,10 @@ const EntryEditor = () => {
                             }}
                             onClick={(e) => {
                                 if (e.target === e.currentTarget) {
-                                    contentEditor?.chain().focus('end').run();
+                                    const selection = window.getSelection();
+                                    if (!selection || selection.isCollapsed) {
+                                        contentEditor?.chain().focus('end').run();
+                                    }
                                 }
                             }}
                         >
@@ -317,18 +369,7 @@ const EntryEditor = () => {
                 onToggleDragMode={() => setIsDragMode(!isDragMode)}
                 onColorPickerToggle={setIsColorPicking}
                 pageSettings={pageSettings}
-                onPageSettingsChange={(newSettings) => {
-                    setPageSettings(newSettings);
-                    pageSettingsRef.current = newSettings;
-                    // Trigger save
-                    if (activeEntry && titleEditor) {
-                        const titleText = titleEditor.getText() || 'Untitled';
-                        const titleHTML = titleEditor.getHTML();
-                        const contentJSON = contentEditor?.getJSON() ?? null;
-                        const serialized = JSON.stringify({ titleHTML, contentJSON, pageSettings: newSettings });
-                        saveEntry(activeEntry.id, titleText, serialized);
-                    }
-                }}
+                onPageSettingsChange={handlePageSettingsChange}
             />
         </>
     );

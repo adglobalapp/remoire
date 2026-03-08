@@ -3,7 +3,7 @@ import { Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJusti
 import { useRef, useEffect, useState } from 'react';
 import styles from './EditorToolbar.module.css';
 import classNames from 'classnames';
-import type { PageSettings } from './EntryEditor';
+import type { PageSettings } from '../../../types';
 
 interface EditorToolbarProps {
     editor: Editor | null;
@@ -46,6 +46,17 @@ const EditorToolbar = ({
         '#FFC0CB', '#B0C4DE', '#98FB98', '#FFFACD'
     ];
 
+    const rgbToHex = (color: string) => {
+        if (!color || typeof color !== 'string') return '#493627';
+        if (color.startsWith('#')) return color;
+        const match = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)$/);
+        if (!match) return color;
+        const r = parseInt(match[1]);
+        const g = parseInt(match[2]);
+        const b = parseInt(match[3]);
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+    };
+
     useEffect(() => {
         if (!editor) return;
 
@@ -79,7 +90,9 @@ const EditorToolbar = ({
         const updateState = () => {
             const attrs = editor.getAttributes('textStyle');
             setCurrentFont(attrs.fontFamily || "'Kaushan Script', cursive");
-            setCurrentColor(attrs.color || '#493627');
+
+            const color = rgbToHex(attrs.color || '#493627');
+            setCurrentColor(color);
 
             let size = attrs.fontSize;
             if (!size) {
@@ -93,19 +106,22 @@ const EditorToolbar = ({
         const handleGlobalClick = (e: MouseEvent) => {
             const target = e.target as HTMLElement;
 
-            if (paletteRef.current && !paletteRef.current.contains(target) && !target.closest(`.${styles.paletteTrigger}`)) {
+            // Palette closure
+            if (paletteRef.current && !paletteRef.current.contains(target)) {
                 setShowPalette(false);
                 isPickingColorRef.current = false;
                 onColorPickerToggle?.(false);
             }
 
-            if (settingsRef.current && !settingsRef.current.contains(target) && !target.closest(`.${styles.settingsTrigger}`)) {
+            // Settings closure
+            if (settingsRef.current && !settingsRef.current.contains(target)) {
                 setShowSettings(false);
             }
 
+            // Reset isPickingColor if we clicked outside the picker itself
             if (isPickingColorRef.current && !target.closest(`.${styles.colorPicker}`)) {
-                isPickingColorRef.current = false;
-                onColorPickerToggle?.(false);
+                // We keep it true if the dialog is theoretically open, 
+                // but if we are clicking somewhere else entirely we should reset.
             }
         };
 
@@ -160,7 +176,8 @@ const EditorToolbar = ({
             const reader = new FileReader();
             reader.onload = (e) => {
                 const result = e.target?.result as string;
-                (editor.chain().focus() as any).setImage({ src: result }).run();
+                // @ts-ignore - custom extension command
+                editor.chain().focus().setImage({ src: result }).run();
             };
             reader.readAsDataURL(file);
             event.target.value = '';

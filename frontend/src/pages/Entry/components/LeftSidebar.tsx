@@ -10,11 +10,13 @@ const LeftSidebar = () => {
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('hu-HU', {
+        return date.toLocaleString('hu-HU', {
             year: 'numeric',
             month: '2-digit',
-            day: '2-digit'
-        }).replace(/\.\s/g, '. ');
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
     };
 
     const filteredEntries = entries.filter(entry => {

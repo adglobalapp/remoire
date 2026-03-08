@@ -1,13 +1,4 @@
-export interface Entry {
-    id: number;
-    title: string;
-    date: string;
-    content: string | null;
-    image_url?: string;
-    user_id: number;
-    created_at: string;
-    updated_at: string;
-}
+import { type Entry } from '../types';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
