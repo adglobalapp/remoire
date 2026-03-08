@@ -16,7 +16,7 @@ export const FontSize = Extension.create<FontSizeOptions>({
 
     addOptions() {
         return {
-            types: ['textStyle', 'listItem'],
+            types: ['textStyle', 'listItem', 'heading', 'paragraph'],
         };
     },
 

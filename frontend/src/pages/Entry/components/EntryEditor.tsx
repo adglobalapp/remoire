@@ -71,7 +71,7 @@ const EntryEditor = () => {
             ResizableImage,
             Placeholder.configure({ placeholder: 'Dear Diary...' }),
             TextStyle,
-            FontFamily.configure({ types: ['textStyle'] }),
+            FontFamily.configure({ types: ['textStyle', 'heading', 'paragraph', 'listItem'] }),
             Color,
             FontSize,
         ],
@@ -81,6 +81,17 @@ const EntryEditor = () => {
             setActiveEditor(editor);
         },
         onFocus: ({ editor }) => setActiveEditor(editor),
+        editorProps: {
+            transformPastedHTML(html) {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                doc.body.querySelectorAll('*').forEach(el => {
+                    if (el instanceof HTMLElement) {
+                        el.style.fontFamily = '';
+                    }
+                });
+                return doc.body.innerHTML;
+            },
+        },
     });
 
     const titleEditor = useEditor({
@@ -93,7 +104,7 @@ const EntryEditor = () => {
             }),
             Underline,
             TextStyle,
-            FontFamily.configure({ types: ['textStyle'] }),
+            FontFamily.configure({ types: ['textStyle', 'heading', 'paragraph', 'listItem'] }),
             FontSize,
             Color,
             Placeholder.configure({ placeholder: 'Entry Title' }),
@@ -123,6 +134,17 @@ const EntryEditor = () => {
         editable: !isDragMode,
         onCreate: ({ editor }) => setActiveEditor(editor),
         onFocus: ({ editor }) => setActiveEditor(editor),
+        editorProps: {
+            transformPastedHTML(html) {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                doc.body.querySelectorAll('*').forEach(el => {
+                    if (el instanceof HTMLElement) {
+                        el.style.fontFamily = '';
+                    }
+                });
+                return doc.body.innerHTML;
+            },
+        },
     });
 
     useEffect(() => {
@@ -219,18 +241,29 @@ const EntryEditor = () => {
         e.preventDefault();
         const container = containerRef.current;
         if (!container) return;
-        const rect = container.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        const delta = e.deltaY;
-        const zoomStep = 0.1;
-        setTransform(prev => {
-            const nextScale = delta > 0 ? Math.max(0.4, prev.scale - zoomStep) : Math.min(2, prev.scale + zoomStep);
-            if (nextScale === prev.scale) return prev;
-            const nextX = mouseX - (mouseX - prev.x) * nextScale / prev.scale;
-            const nextY = mouseY - (mouseY - prev.y) * nextScale / prev.scale;
-            return { x: nextX, y: nextY, scale: nextScale };
-        });
+
+        if (e.ctrlKey) {
+            // Zoom logic
+            const rect = container.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            const delta = e.deltaY;
+            const zoomStep = 0.1;
+            setTransform(prev => {
+                const nextScale = delta > 0 ? Math.max(0.4, prev.scale - zoomStep) : Math.min(2, prev.scale + zoomStep);
+                if (nextScale === prev.scale) return prev;
+                const nextX = mouseX - (mouseX - prev.x) * nextScale / prev.scale;
+                const nextY = mouseY - (mouseY - prev.y) * nextScale / prev.scale;
+                return { x: nextX, y: nextY, scale: nextScale };
+            });
+        } else {
+            // Regular scroll logic
+            setTransform(prev => ({
+                ...prev,
+                x: prev.x - e.deltaX,
+                y: prev.y - e.deltaY
+            }));
+        }
     }, []);
 
     const handleMouseDown = (e: React.MouseEvent) => {
