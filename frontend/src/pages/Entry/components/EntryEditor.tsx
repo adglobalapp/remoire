@@ -1,7 +1,6 @@
-import { useEditor, EditorContent, Editor, Extension } from '@tiptap/react';
+import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import StarterKit from '@tiptap/starter-kit';
-import Document from '@tiptap/extension-document';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -10,7 +9,6 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { Color } from '@tiptap/extension-color';
 import { FontSize } from './extensions/FontSize';
-import { Plugin } from '@tiptap/pm/state';
 import EditorToolbar from './EditorToolbar';
 import styles from './EntryEditor.module.css';
 import classNames from 'classnames';
@@ -45,31 +43,42 @@ const EntryEditor = () => {
         }
     };
 
-    const getInitialTitle = () => {
-        if (!activeEntry) return '<h1>Untitled</h1>';
-        const stored = parseStoredContent(activeEntry.content);
-        if (stored && typeof stored === 'object' && stored.titleHTML) {
-            return stored.titleHTML;
-        }
-        return `<h1>${activeEntry.title || 'Untitled'}</h1>`;
-    };
-
     const getInitialContent = () => {
-        if (!activeEntry) return '';
+        if (!activeEntry) return '<h1>Untitled</h1><p>Dear Diary...</p>';
         const stored = parseStoredContent(activeEntry.content);
         if (stored && typeof stored === 'object' && stored.contentJSON) {
             return stored.contentJSON;
         }
-        return '';
+        // Fallback for legacy data or simple strings
+        if (typeof stored === 'string' && stored) return stored;
+
+        // New entry or empty
+        return '<h1>Untitled</h1><p>Dear Diary...</p>';
     };
 
-    const contentEditor = useEditor({
+    const extractTitle = (editor: Editor) => {
+        const { doc } = editor.state;
+        let title = '';
+        
+        // Look for the first node that has text
+        doc.descendants((node) => {
+            if (title) return false;
+            if (node.isTextblock && node.textContent.trim()) {
+                title = node.textContent.trim();
+                return false;
+            }
+        });
+
+        return (title.length > 50 ? title.substring(0, 50) + '...' : title) || 'Untitled';
+    };
+
+    const editor = useEditor({
         extensions: [
             StarterKit,
             Underline,
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
             ResizableImage,
-            Placeholder.configure({ placeholder: 'Dear Diary...' }),
+            Placeholder.configure({ placeholder: 'Start writing...' }),
             TextStyle,
             FontFamily.configure({ types: ['textStyle', 'heading', 'paragraph', 'listItem'] }),
             Color,
@@ -94,89 +103,21 @@ const EntryEditor = () => {
         },
     });
 
-    const titleEditor = useEditor({
-        extensions: [
-            StarterKit.configure({
-                document: false,
-            }),
-            Document.extend({
-                content: 'heading',
-            }),
-            Underline,
-            TextStyle,
-            FontFamily.configure({ types: ['textStyle', 'heading', 'paragraph', 'listItem'] }),
-            FontSize,
-            Color,
-            Placeholder.configure({ placeholder: 'Entry Title' }),
-            Extension.create({
-                name: 'singleLine',
-                addKeyboardShortcuts() {
-                    return {
-                        Enter: () => true,
-                    };
-                },
-                addProseMirrorPlugins() {
-                    return [
-                        new Plugin({
-                            props: {
-                                handleKeyDown: (_, event) => {
-                                    if (event.key === 'Enter') {
-                                        return true;
-                                    }
-                                },
-                            },
-                        }),
-                    ];
-                },
-            }),
-        ],
-        content: getInitialTitle(),
-        editable: !isDragMode,
-        onCreate: ({ editor }) => setActiveEditor(editor),
-        onFocus: ({ editor }) => setActiveEditor(editor),
-        editorProps: {
-            transformPastedHTML(html) {
-                const doc = new DOMParser().parseFromString(html, 'text/html');
-                doc.body.querySelectorAll('*').forEach(el => {
-                    if (el instanceof HTMLElement) {
-                        el.style.fontFamily = '';
-                    }
-                });
-                return doc.body.innerHTML;
-            },
-        },
-    });
-
     useEffect(() => {
-        if (!contentEditor || initialEntryId === null) return;
+        if (!editor || initialEntryId === null) return;
         const handleUpdate = ({ transaction }: { transaction: any }) => {
             if (transaction.getMeta('isColorPreview')) return;
 
-            const titleHTML = titleEditor?.getHTML() ?? `<h1>${activeEntry?.title || 'Untitled'}</h1>`;
-            const titleText = titleEditor?.getText() || 'Untitled';
-            const contentJSON = contentEditor.getJSON();
-            const serialized = JSON.stringify({ titleHTML, contentJSON, pageSettings: pageSettingsRef.current });
-            saveEntry(initialEntryId, titleText, serialized);
-        };
-        contentEditor.on('update', handleUpdate);
-        return () => { contentEditor.off('update', handleUpdate); };
-    }, [contentEditor, titleEditor, saveEntry, initialEntryId]);
-
-    useEffect(() => {
-        if (!titleEditor || initialEntryId === null) return;
-        const handleUpdate = ({ transaction }: { transaction: any }) => {
-            if (transaction.getMeta('isColorPreview')) return;
-
-            const titleText = titleEditor.getText() || 'Untitled';
+            const titleText = extractTitle(editor);
             updateEntryTitle(initialEntryId, titleText);
-            const titleHTML = titleEditor.getHTML();
-            const contentJSON = contentEditor?.getJSON() ?? null;
-            const serialized = JSON.stringify({ titleHTML, contentJSON, pageSettings: pageSettingsRef.current });
+
+            const contentJSON = editor.getJSON();
+            const serialized = JSON.stringify({ contentJSON, pageSettings: pageSettingsRef.current });
             saveEntry(initialEntryId, titleText, serialized);
         };
-        titleEditor.on('update', handleUpdate);
-        return () => { titleEditor.off('update', handleUpdate); };
-    }, [titleEditor, contentEditor, saveEntry, updateEntryTitle, initialEntryId]);
+        editor.on('update', handleUpdate);
+        return () => { editor.off('update', handleUpdate); };
+    }, [editor, saveEntry, updateEntryTitle, initialEntryId]);
 
     useEffect(() => {
         if (!activeEntry || initialEntryId === null) return;
@@ -184,12 +125,9 @@ const EntryEditor = () => {
         loadedEntryIdRef.current = activeEntry.id;
 
         const stored = parseStoredContent(activeEntry.content);
-        const titleHTML = (stored && typeof stored === 'object' && stored.titleHTML)
-            ? stored.titleHTML
-            : `<h1>${activeEntry.title || 'Untitled'}</h1>`;
         const contentJSON = (stored && typeof stored === 'object' && stored.contentJSON)
             ? stored.contentJSON
-            : null;
+            : (typeof stored === 'string' ? stored : '<h1>Untitled</h1><p>Dear Diary...</p>');
 
         let settings = DEFAULT_PAGE_SETTINGS;
         if (stored && typeof stored === 'object' && stored.pageSettings) {
@@ -201,41 +139,20 @@ const EntryEditor = () => {
         });
         pageSettingsRef.current = settings;
 
-        const hasSavedTitle = stored && typeof stored === 'object' && stored.titleHTML;
-
-        titleEditor?.commands.setContent(titleHTML);
-
-        if (!hasSavedTitle && titleEditor) {
+        if (editor) {
+            editor.commands.setContent(contentJSON, { emitUpdate: false });
             setTimeout(() => {
-                titleEditor.chain()
-                    .selectAll()
-                    .setFontFamily("'Kaushan Script', cursive")
-                    .setFontSize('36px')
-                    .setTextSelection(0)
-                    .run();
-            }, 0);
-        }
-
-        if (contentJSON) {
-            contentEditor?.commands.setContent(contentJSON, { emitUpdate: false });
-            setTimeout(() => {
-                contentEditor?.commands.blur();
+                editor.commands.blur();
             }, 10);
-        } else {
-            contentEditor?.commands.setContent('');
-            contentEditor?.chain().setFontFamily("'Kaushan Script', cursive").run();
         }
-    }, [activeEntry, titleEditor, contentEditor, initialEntryId]);
+    }, [activeEntry, editor, initialEntryId]);
 
     useEffect(() => {
-        contentEditor?.setEditable(!isDragMode);
-        titleEditor?.setEditable(!isDragMode);
-
+        editor?.setEditable(!isDragMode);
         if (isDragMode) {
-            contentEditor?.commands.blur();
-            titleEditor?.commands.blur();
+            editor?.commands.blur();
         }
-    }, [isDragMode, contentEditor, titleEditor]);
+    }, [isDragMode, editor]);
 
     const handleWheel = useCallback((e: React.WheelEvent) => {
         e.preventDefault();
@@ -317,11 +234,10 @@ const EntryEditor = () => {
     const handlePageSettingsChange = (newSettings: PageSettings) => {
         setPageSettings(newSettings);
         pageSettingsRef.current = newSettings;
-        if (initialEntryId !== null) {
-            const titleHTML = titleEditor?.getHTML() || '';
-            const titleText = titleEditor?.getText() || 'Untitled';
-            const contentJSON = contentEditor?.getJSON() || null;
-            const serialized = JSON.stringify({ titleHTML, contentJSON, pageSettings: newSettings });
+        if (initialEntryId !== null && editor) {
+            const titleText = extractTitle(editor);
+            const contentJSON = editor.getJSON() || null;
+            const serialized = JSON.stringify({ contentJSON, pageSettings: newSettings });
             saveEntry(initialEntryId, titleText, serialized);
         }
     };
@@ -344,8 +260,7 @@ const EntryEditor = () => {
                     const isBackdrop = (el: Element) => el === containerRef.current || el?.classList?.contains(styles.canvas);
 
                     if (isBackdrop(target) && isBackdrop(startTarget)) {
-                        contentEditor?.chain().setTextSelection(contentEditor.state.selection.from).blur().run();
-                        titleEditor?.chain().setTextSelection(titleEditor.state.selection.from).blur().run();
+                        editor?.chain().setTextSelection(editor.state.selection.from).blur().run();
                     }
                 }}
             >
@@ -365,16 +280,13 @@ const EntryEditor = () => {
                                 if (e.target === e.currentTarget) {
                                     const selection = window.getSelection();
                                     if (!selection || selection.isCollapsed) {
-                                        contentEditor?.chain().focus('end').run();
+                                        editor?.chain().focus('end').run();
                                     }
                                 }
                             }}
                         >
-                            <div className={styles.titleInput} onClick={(e) => e.stopPropagation()}>
-                                <EditorContent editor={titleEditor} />
-                            </div>
                             <div className={styles.editorContent}>
-                                <EditorContent editor={contentEditor} />
+                                <EditorContent editor={editor} />
                             </div>
                         </div>
                     )}
@@ -384,8 +296,6 @@ const EntryEditor = () => {
 
             <EditorToolbar
                 editor={activeEditor}
-                titleEditor={titleEditor}
-                contentEditor={contentEditor}
                 isDragMode={isDragMode}
                 onToggleDragMode={() => setIsDragMode(!isDragMode)}
                 onColorPickerToggle={setIsColorPicking}

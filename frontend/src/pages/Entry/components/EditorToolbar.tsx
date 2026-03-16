@@ -7,8 +7,6 @@ import type { PageSettings } from '../../../types';
 
 interface EditorToolbarProps {
     editor: Editor | null;
-    titleEditor?: Editor | null;
-    contentEditor?: Editor | null;
     isDragMode?: boolean;
     onToggleDragMode?: () => void;
     onColorPickerToggle?: (active: boolean) => void;
@@ -18,8 +16,6 @@ interface EditorToolbarProps {
 
 const EditorToolbar = ({
     editor,
-    titleEditor,
-    contentEditor,
     isDragMode = false,
     onToggleDragMode,
     onColorPickerToggle,
@@ -65,26 +61,16 @@ const EditorToolbar = ({
 
         const updateRecentColors = () => {
             const colors = new Set<string>();
-            const scanEditor = (ed: Editor | null | undefined) => {
-                if (!ed) return;
-                ed.state.doc.descendants((node) => {
-                    if (node.marks) {
-                        node.marks.forEach((mark) => {
-                            if (mark.type.name === 'textStyle' && mark.attrs.color) {
-                                colors.add(mark.attrs.color.toLowerCase());
-                            }
-                        });
-                    }
-                    return true;
-                });
-            };
-
-            if (titleEditor || contentEditor) {
-                scanEditor(titleEditor);
-                scanEditor(contentEditor);
-            } else {
-                scanEditor(editor);
-            }
+            editor.state.doc.descendants((node) => {
+                if (node.marks) {
+                    node.marks.forEach((mark) => {
+                        if (mark.type.name === 'textStyle' && mark.attrs.color) {
+                            colors.add(mark.attrs.color.toLowerCase());
+                        }
+                    });
+                }
+                return true;
+            });
             const combined = Array.from(colors).reverse();
 
             setRecentColors(combined.filter(c => !presetColors.includes(c.toUpperCase()) && !presetColors.includes(c.toLowerCase())).slice(0, 10));
@@ -165,7 +151,7 @@ const EditorToolbar = ({
             editor.off('update', updateState);
             editor.off('focus', handleFocus);
         };
-    }, [editor, titleEditor, contentEditor, showPalette, onColorPickerToggle]);
+    }, [editor, showPalette, onColorPickerToggle]);
 
     const applyColor = (color: string) => {
         if (!editor) return;
@@ -200,8 +186,7 @@ const EditorToolbar = ({
             const reader = new FileReader();
             reader.onload = (e) => {
                 const result = e.target?.result as string;
-                const targetEditor = contentEditor || editor;
-                (targetEditor.chain() as any).setImage({ src: result }).run();
+                (editor.chain() as any).setImage({ src: result }).run();
             };
             reader.readAsDataURL(file);
             event.target.value = '';
