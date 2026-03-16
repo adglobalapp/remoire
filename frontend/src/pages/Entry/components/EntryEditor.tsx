@@ -44,7 +44,7 @@ const EntryEditor = () => {
     };
 
     const getInitialContent = () => {
-        if (!activeEntry) return '<h1>Untitled</h1><p>Dear Diary...</p>';
+        if (!activeEntry) return '<h1 style="text-align: center">Untitled</h1><p>Dear Diary...</p>';
         const stored = parseStoredContent(activeEntry.content);
         if (stored && typeof stored === 'object' && stored.contentJSON) {
             return stored.contentJSON;
@@ -53,7 +53,7 @@ const EntryEditor = () => {
         if (typeof stored === 'string' && stored) return stored;
 
         // New entry or empty
-        return '<h1>Untitled</h1><p>Dear Diary...</p>';
+        return '<h1 style="text-align: center">Untitled</h1><p>Dear Diary...</p>';
     };
 
     const extractTitle = (editor: Editor) => {

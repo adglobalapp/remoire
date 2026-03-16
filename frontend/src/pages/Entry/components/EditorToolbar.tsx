@@ -26,6 +26,7 @@ const EditorToolbar = ({
     const [currentFont, setCurrentFont] = useState("'Kaushan Script', cursive");
     const [currentSize, setCurrentSize] = useState('16px');
     const [currentColor, setCurrentColor] = useState('#493627');
+    const [currentAlign, setCurrentAlign] = useState('left');
     const [recentColors, setRecentColors] = useState<string[]>([]);
     const [showPalette, setShowPalette] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
@@ -76,45 +77,49 @@ const EditorToolbar = ({
             setRecentColors(combined.filter(c => !presetColors.includes(c.toUpperCase()) && !presetColors.includes(c.toLowerCase())).slice(0, 10));
         };
 
+        // Updating the toolbar state
         const updateState = () => {
             if (isPickingColorRef.current) return;
-
-            const getAttr = (name: string, fallback?: string) => {
-                const textStyle = editor.getAttributes('textStyle')[name];
-                const listItem = editor.getAttributes('listItem')[name];
-                const heading = editor.getAttributes('heading')[name];
-                const paragraph = editor.getAttributes('paragraph')[name];
-                return textStyle || listItem || heading || paragraph || fallback;
-            };
-
-            let fontFamily = getAttr('fontFamily', "'Kaushan Script', cursive");
-            setCurrentFont(fontFamily);
-
-            const colorAttr = getAttr('color', '#493627');
-            const color = rgbToHex(colorAttr);
-            setCurrentColor(color);
-
-            let fontSize = getAttr('fontSize');
 
             try {
                 const { view, state } = editor;
                 const { from } = state.selection;
-
                 const { node } = view.domAtPos(from);
                 const el = node.nodeType === 3 ? node.parentElement : (node as HTMLElement);
 
                 if (el) {
-                    const computed = window.getComputedStyle(el).fontSize;
-                    const numericSize = parseFloat(computed);
-                    if (!fontSize || Math.abs(parseFloat(fontSize) - numericSize) > 0.1) {
-                        fontSize = Math.round(numericSize) + 'px';
+                    const style = window.getComputedStyle(el);
+                    
+                    // Font Family
+                    let family = style.fontFamily;
+                    if (family) {
+                        family = family.split(',')[0].replace(/['"]/g, '').trim();
+                        const presets = [
+                            "'Kaushan Script', cursive",
+                            "Helvetica",
+                            "'Odor Mean Chey', cursive",
+                            "'Gurajada', serif",
+                            "'Gudea', sans-serif"
+                        ];
+                        const match = presets.find(p => p.includes(family)) || family;
+                        setCurrentFont(match);
                     }
+
+                    // Color
+                    const color = rgbToHex(style.color);
+                    setCurrentColor(color);
+
+                    // Font Size
+                    const size = style.fontSize;
+                    setCurrentSize(size);
+
+                    // Alignment
+                    const align = style.textAlign || 'left';
+                    setCurrentAlign(align);
                 }
             } catch (err) {
-                fontSize = fontSize || '16px';
+                console.warn('Failed to update toolbar state from DOM:', err);
             }
-
-            setCurrentSize(fontSize || '16px');
 
             updateRecentColors();
             forceUpdate({});
@@ -249,7 +254,13 @@ const EditorToolbar = ({
                             chain = chain.setFontSize(newSize);
                         }
 
-                        chain.setParagraph().run();
+                        // Apply heading level or paragraph while preserving alignment
+                        if (val === 'p') {
+                            chain.setParagraph().setTextAlign(currentAlign).run();
+                        } else {
+                            const level = parseInt(val.substring(1)) as 1 | 2 | 3;
+                            chain.setHeading({ level }).setTextAlign(currentAlign).run();
+                        }
                     }}
                 >
                     <option value="p">Normal Text</option>
@@ -282,7 +293,7 @@ const EditorToolbar = ({
                     onChange={(e) => {
                         const val = e.target.value;
                         setCurrentSize(val);
-                        editor.chain().setFontSize(val).run();
+                        editor.chain().focus().setFontSize(val).setTextAlign(currentAlign).run();
                     }}
                 >
                     {![
@@ -470,7 +481,7 @@ const EditorToolbar = ({
                     type="button"
                     disabled={isDragMode}
                     onClick={() => editor.chain().focus().setTextAlign('left').run()}
-                    className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive({ textAlign: 'left' }) })}
+                    className={classNames(styles.actionButton, { [styles.isActive]: currentAlign === 'left' })}
                 >
                     <AlignLeft size={18} />
                 </button>
@@ -478,7 +489,7 @@ const EditorToolbar = ({
                     type="button"
                     disabled={isDragMode}
                     onClick={() => editor.chain().focus().setTextAlign('center').run()}
-                    className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive({ textAlign: 'center' }) })}
+                    className={classNames(styles.actionButton, { [styles.isActive]: currentAlign === 'center' })}
                 >
                     <AlignCenter size={18} />
                 </button>
@@ -486,7 +497,7 @@ const EditorToolbar = ({
                     type="button"
                     disabled={isDragMode}
                     onClick={() => editor.chain().focus().setTextAlign('right').run()}
-                    className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive({ textAlign: 'right' }) })}
+                    className={classNames(styles.actionButton, { [styles.isActive]: currentAlign === 'right' })}
                 >
                     <AlignRight size={18} />
                 </button>
@@ -494,7 +505,7 @@ const EditorToolbar = ({
                     type="button"
                     disabled={isDragMode}
                     onClick={() => editor.chain().focus().setTextAlign('justify').run()}
-                    className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive({ textAlign: 'justify' }) })}
+                    className={classNames(styles.actionButton, { [styles.isActive]: currentAlign === 'justify' })}
                 >
                     <AlignJustify size={18} />
                 </button>
