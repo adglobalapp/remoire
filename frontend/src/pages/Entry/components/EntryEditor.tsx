@@ -59,7 +59,7 @@ const EntryEditor = () => {
     const extractTitle = (editor: Editor) => {
         const { doc } = editor.state;
         let title = '';
-        
+
         // Look for the first node that has text
         doc.descendants((node) => {
             if (title) return false;
@@ -163,10 +163,12 @@ const EntryEditor = () => {
             const rect = container.getBoundingClientRect();
             const mouseX = e.clientX - rect.left;
             const mouseY = e.clientY - rect.top;
-            const delta = e.deltaY;
-            const zoomStep = 0.1;
+
+            const sensitivity = 0.001;
+            const delta = e.deltaY * sensitivity;
+
             setTransform(prev => {
-                const nextScale = delta > 0 ? Math.max(0.4, prev.scale - zoomStep) : Math.min(2, prev.scale + zoomStep);
+                const nextScale = Math.min(2, Math.max(0.4, prev.scale - delta));
                 if (nextScale === prev.scale) return prev;
                 const nextX = mouseX - (mouseX - prev.x) * nextScale / prev.scale;
                 const nextY = mouseY - (mouseY - prev.y) * nextScale / prev.scale;
