@@ -56,10 +56,11 @@ const EditorToolbar = ({
         return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
     };
 
-    // Recent colors (last 10)
+    // Update toolbar state
     useEffect(() => {
         if (!editor) return;
 
+        // recent colors (last 10)
         const updateRecentColors = () => {
             const colors = new Set<string>();
             editor.state.doc.descendants((node) => {
@@ -77,7 +78,7 @@ const EditorToolbar = ({
             setRecentColors(combined.filter(c => !presetColors.includes(c.toUpperCase()) && !presetColors.includes(c.toLowerCase())).slice(0, 10));
         };
 
-        // Updating the toolbar state
+        // updating the toolbar state
         const updateState = () => {
             if (isPickingColorRef.current) return;
 
@@ -89,8 +90,8 @@ const EditorToolbar = ({
 
                 if (el) {
                     const style = window.getComputedStyle(el);
-                    
-                    // Font Family
+
+                    // font family
                     let family = style.fontFamily;
                     if (family) {
                         family = family.split(',')[0].replace(/['"]/g, '').trim();
@@ -105,15 +106,15 @@ const EditorToolbar = ({
                         setCurrentFont(match);
                     }
 
-                    // Color
+                    // color
                     const color = rgbToHex(style.color);
                     setCurrentColor(color);
 
-                    // Font Size
+                    // font size
                     const size = style.fontSize;
                     setCurrentSize(size);
 
-                    // Alignment
+                    // alignment
                     const align = style.textAlign || 'left';
                     setCurrentAlign(align);
                 }
@@ -125,6 +126,7 @@ const EditorToolbar = ({
             forceUpdate({});
         };
 
+        // close modals when clicking outside
         const handleGlobalClick = (e: MouseEvent) => {
             const target = e.target as HTMLElement;
 
@@ -138,7 +140,7 @@ const EditorToolbar = ({
             }
         };
 
-        const handleFocus = () => {
+        const handleFocus = () => { // avoid stuck color picker state
             isPickingColorRef.current = false;
             onColorPickerToggle?.(false);
         };
@@ -158,8 +160,10 @@ const EditorToolbar = ({
         };
     }, [editor, showPalette, onColorPickerToggle]);
 
+    if (!editor) return null;
+
+    // Apply preset color
     const applyColor = (color: string) => {
-        if (!editor) return;
         setCurrentColor(color);
         editor.chain().setColor(color).run();
 
@@ -167,23 +171,6 @@ const EditorToolbar = ({
         isPickingColorRef.current = false;
         onColorPickerToggle?.(false);
     };
-
-    if (!editor) {
-        return (
-            <div className={styles.toolbarWrapper}>
-                <div className={styles.toolbarGroup}>
-                    <button
-                        type="button"
-                        onClick={onToggleDragMode}
-                        className={classNames(styles.actionButton, { [styles.isActive]: isDragMode })}
-                        title="Drag Tool"
-                    >
-                        <Hand size={18} />
-                    </button>
-                </div>
-            </div>
-        );
-    }
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -245,6 +232,7 @@ const EditorToolbar = ({
                         const { $from, $to } = editor.state.selection;
                         let chain = editor.chain().focus();
 
+                        // change whole paragraph style
                         if ($from.pos === $to.pos && $from.sameParent($to)) {
                             chain = chain
                                 .setTextSelection({ from: $from.start(), to: $from.end() })
@@ -254,10 +242,10 @@ const EditorToolbar = ({
                             chain = chain.setFontSize(newSize);
                         }
 
-                        // Apply heading level or paragraph while preserving alignment
-                        if (val === 'p') {
+                        // apply heading level or paragraph while preserving alignment
+                        if (val === 'p') { // paragraph
                             chain.setParagraph().setTextAlign(currentAlign).run();
-                        } else {
+                        } else { // heading (h1, h2, h3)
                             const level = parseInt(val.substring(1)) as 1 | 2 | 3;
                             chain.setHeading({ level }).setTextAlign(currentAlign).run();
                         }
