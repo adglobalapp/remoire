@@ -21,6 +21,11 @@
     flex-shrink: 0;
 }
 
+.sidebarHeader h3 {
+    font-weight: 400;
+    margin: 0;
+}
+
 .entryList {
     flex: 1;
     overflow-y: auto;
