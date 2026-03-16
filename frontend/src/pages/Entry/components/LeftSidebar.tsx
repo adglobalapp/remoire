@@ -41,7 +41,7 @@ const LeftSidebar = () => {
     });
 
     const handleDelete = (e: React.MouseEvent, id: number) => {
-        e.stopPropagation();
+        e.stopPropagation(); // dont select entry on delete
         deleteEntry(id);
     };
 

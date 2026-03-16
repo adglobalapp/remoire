@@ -59,6 +59,7 @@ const EditorToolbar = ({
         return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
     };
 
+    // Recent colors (last 10)
     useEffect(() => {
         if (!editor) return;
 
