@@ -40,3 +40,29 @@ export interface EntryContextValue {
 export interface EntryProviderProps {
     children: ReactNode;
 }
+
+export type FontSizeOptions = {
+    types: string[],
+};
+
+export interface ResizableImageAttributes {
+    src: string;
+    alt?: string;
+    title?: string;
+    width?: number;
+    height?: number;
+    x?: number;
+    y?: number;
+    rotation?: number;
+}
+
+import { type Editor } from '@tiptap/react';
+
+export interface EditorToolbarProps {
+    editor: Editor | null;
+    isDragMode?: boolean;
+    onToggleDragMode?: () => void;
+    onColorPickerToggle?: (active: boolean) => void;
+    pageSettings?: PageSettings;
+    onPageSettingsChange?: (settings: PageSettings) => void;
+}

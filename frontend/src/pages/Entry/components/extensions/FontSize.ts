@@ -1,8 +1,5 @@
 import { Extension } from '@tiptap/core';
-
-export type FontSizeOptions = {
-    types: string[],
-};
+import { type FontSizeOptions } from '../../../../types';
 
 declare module '@tiptap/core' {
     interface Commands<ReturnType> {
@@ -49,6 +46,7 @@ export const FontSize = Extension.create<FontSizeOptions>({
                     const { selection } = state;
                     const { from, to } = selection;
 
+                    // set font size for all list items in the selection
                     tr.doc.nodesBetween(from, to, (node, pos) => {
                         if (node.type.name === 'listItem') {
                             tr.setNodeMarkup(pos, undefined, { ...node.attrs, fontSize });
@@ -79,6 +77,7 @@ export const FontSize = Extension.create<FontSizeOptions>({
                     const { selection } = state;
                     const { from, to } = selection;
 
+                    // unset font size for all list items in the selection
                     tr.doc.nodesBetween(from, to, (node, pos) => {
                         if (node.type.name === 'listItem') {
                             tr.setNodeMarkup(pos, undefined, { ...node.attrs, fontSize: null });

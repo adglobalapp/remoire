@@ -1,18 +1,8 @@
-import { Editor } from '@tiptap/react';
 import { Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify, Image as ImageIcon, Undo, Redo, List, ListOrdered, Hand, Palette, Settings } from 'lucide-react';
 import { useRef, useEffect, useState } from 'react';
 import styles from './EditorToolbar.module.css';
 import classNames from 'classnames';
-import type { PageSettings } from '../../../types';
-
-interface EditorToolbarProps {
-    editor: Editor | null;
-    isDragMode?: boolean;
-    onToggleDragMode?: () => void;
-    onColorPickerToggle?: (active: boolean) => void;
-    pageSettings?: PageSettings;
-    onPageSettingsChange?: (settings: PageSettings) => void;
-}
+import type { EditorToolbarProps } from '../../../types';
 
 const EditorToolbar = ({
     editor,

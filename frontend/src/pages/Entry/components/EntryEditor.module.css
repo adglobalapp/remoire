@@ -20,6 +20,8 @@
 
 .dragMode {
     cursor: grab !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
 }
 
 .dragMode .paper,
@@ -58,8 +60,13 @@
     cursor: text;
     overflow: hidden;
     position: relative;
-    user-select: text !important;
-    -webkit-user-select: text !important;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.dragMode .paper {
+    user-select: none !important;
+    -webkit-user-select: none !important;
 }
 
 .editorContent {

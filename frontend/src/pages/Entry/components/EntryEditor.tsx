@@ -13,6 +13,7 @@ import EditorToolbar from './EditorToolbar';
 import styles from './EntryEditor.module.css';
 import classNames from 'classnames';
 import { useEntryContext } from '../../../contexts/EntryContext';
+import { CanvasScaleContext } from '../../../contexts/CanvasScaleContext';
 import { type PageSettings, DEFAULT_PAGE_SETTINGS } from '../../../types';
 
 const EntryEditor = () => {
@@ -194,6 +195,7 @@ const EntryEditor = () => {
         }
 
         if (e.button === 0 && isDragMode) {
+            e.preventDefault();
             setIsDragging(true);
             setLastMousePos({ x: e.clientX, y: e.clientY });
         }
@@ -266,6 +268,7 @@ const EntryEditor = () => {
                     }
                 }}
             >
+                <CanvasScaleContext.Provider value={transform.scale}>
                 <div
                     className={styles.canvas}
                     style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})` }}
@@ -294,6 +297,7 @@ const EntryEditor = () => {
                     )}
 
                 </div>
+                </CanvasScaleContext.Provider>
             </div>
 
             <EditorToolbar

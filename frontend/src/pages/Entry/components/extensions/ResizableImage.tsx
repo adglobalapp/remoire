@@ -1,56 +1,20 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 import { ReactNodeViewRenderer, NodeViewWrapper } from '@tiptap/react';
-import { useRef, useEffect, useCallback, useState } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { Trash2 } from 'lucide-react';
 import Moveable from 'react-moveable';
+import { useCanvasScale } from '../../../../contexts/CanvasScaleContext';
 import styles from './ResizableImage.module.css';
 import classNames from 'classnames';
-
-declare module '@tiptap/core' {
-    interface Commands<ReturnType> {
-        setImage: (options: { src: string; alt?: string; title?: string }) => ReturnType;
-    }
-}
-
-export interface ResizableImageAttributes {
-    src: string;
-    alt?: string;
-    title?: string;
-    width?: number;
-    height?: number;
-    x?: number;
-    y?: number;
-    rotation?: number;
-}
-
-function getCumulativeScale(el: HTMLElement): number {
-    let scale = 1;
-    let cur: HTMLElement | null = el;
-    while (cur) {
-        const style = getComputedStyle(cur);
-        const transform = style.transform;
-        if (transform && transform !== 'none') {
-            const m = new DOMMatrix(transform);
-            scale *= m.a;
-        }
-        cur = cur.parentElement;
-    }
-    return scale === 0 ? 1 : scale;
-}
 
 const ImageNodeView = (props: any) => {
     const { node, updateAttributes, selected } = props;
     const { src, width, height, x, y, rotation, alt, title } = node.attrs;
 
     const targetRef = useRef<HTMLDivElement>(null);
-    const [zoom, setZoom] = useState(1);
+    const canvasScale = useCanvasScale();
 
-    useEffect(() => {
-        if (selected && targetRef.current) {
-            setZoom(getCumulativeScale(targetRef.current));
-        }
-    }, [selected]);
-
+    // Image actions
     const handleDrag = useCallback(({ target, beforeTranslate }: any) => {
         target.style.transform = `translate(${beforeTranslate[0]}px, ${beforeTranslate[1]}px) rotate(${rotation ?? 0}deg)`;
     }, [rotation]);
@@ -95,6 +59,7 @@ const ImageNodeView = (props: any) => {
         }
     }, [updateAttributes]);
 
+    // Image selection
     useEffect(() => {
         if (!selected) return;
 
@@ -159,6 +124,7 @@ const ImageNodeView = (props: any) => {
                     <div
                         className={styles.deleteButton}
                         title="Delete Image"
+                        style={{ transform: `translateX(-50%) scale(${1 / canvasScale})` }}
                         onClick={(e) => {
                             e.stopPropagation();
                             props.editor.commands.deleteSelection();
@@ -176,10 +142,11 @@ const ImageNodeView = (props: any) => {
                     resizable={true}
                     rotatable={true}
                     keepRatio={true}
+                    rootContainer={document.body}
                     throttleDrag={0}
                     throttleResize={0}
                     throttleRotate={0}
-                    zoom={1 / zoom}
+                    zoom={1 / canvasScale}
                     renderDirections={['nw', 'ne', 'sw', 'se']}
                     origin={false}
                     onDrag={handleDrag}
