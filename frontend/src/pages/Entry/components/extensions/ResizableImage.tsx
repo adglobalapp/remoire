@@ -87,6 +87,10 @@ const ImageNodeView = (props: any) => {
     const w = width ?? 300;
     const h = height > 0 ? height : 'auto';
 
+    // cap the delete button and padding size
+    const deleteScale = Math.min(1 / canvasScale, 1.5);
+    const deleteBottom = -(8 + 12 * (1 + deleteScale));
+
     return (
         <NodeViewWrapper
             style={{
@@ -124,7 +128,10 @@ const ImageNodeView = (props: any) => {
                     <div
                         className={styles.deleteButton}
                         title="Delete Image"
-                        style={{ transform: `translateX(-50%) scale(${1 / canvasScale})` }}
+                        style={{
+                            transform: `translateX(-50%) scale(${deleteScale})`,
+                            bottom: `${deleteBottom}px`,
+                        }}
                         onClick={(e) => {
                             e.stopPropagation();
                             props.editor.commands.deleteSelection();
