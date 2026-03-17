@@ -12,6 +12,7 @@ const ImageNodeView = (props: any) => {
     const { src, width, height, x, y, rotation, alt, title } = node.attrs;
 
     const targetRef = useRef<HTMLDivElement>(null);
+    const moveableRef = useRef<any>(null);
     const canvasScale = useCanvasScale();
 
     // Image actions
@@ -58,6 +59,13 @@ const ImageNodeView = (props: any) => {
             });
         }
     }, [updateAttributes]);
+
+    // Update Moveable rect when attributes or scale change
+    useEffect(() => {
+        if (selected && moveableRef.current) {
+            moveableRef.current.updateRect();
+        }
+    }, [selected, src, width, height, x, y, rotation, canvasScale]);
 
     // Image selection
     useEffect(() => {
@@ -121,6 +129,11 @@ const ImageNodeView = (props: any) => {
                     alt={alt}
                     title={title}
                     draggable={false}
+                    onLoad={() => {
+                        if (selected && moveableRef.current) {
+                            moveableRef.current.updateRect();
+                        }
+                    }}
                     style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover' }}
                 />
 
@@ -144,6 +157,7 @@ const ImageNodeView = (props: any) => {
 
             {selected && (
                 <Moveable
+                    ref={moveableRef}
                     target={targetRef}
                     draggable={true}
                     resizable={true}
