@@ -105,6 +105,7 @@ const EntryEditor = () => {
         },
     });
 
+    // Save entry
     useEffect(() => {
         if (!editor || initialEntryId === null) return;
         const handleUpdate = ({ transaction }: { transaction: any }) => {
@@ -121,6 +122,7 @@ const EntryEditor = () => {
         return () => { editor.off('update', handleUpdate); };
     }, [editor, saveEntry, updateEntryTitle, initialEntryId]);
 
+    // Load entry
     useEffect(() => {
         if (!activeEntry || initialEntryId === null) return;
         if (loadedEntryIdRef.current === activeEntry.id) return;
@@ -149,6 +151,7 @@ const EntryEditor = () => {
         }
     }, [activeEntry, editor, initialEntryId]);
 
+    // Drag mode
     useEffect(() => {
         editor?.setEditable(!isDragMode);
         if (isDragMode) {
@@ -187,6 +190,7 @@ const EntryEditor = () => {
         }
     }, []);
 
+    // Event handlers
     const handleMouseDown = (e: React.MouseEvent) => {
         const target = e.target as Element;
         mouseDownTargetRef.current = target;
