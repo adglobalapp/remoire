@@ -50,18 +50,18 @@ const EntryEditor = () => {
         if (stored && typeof stored === 'object' && stored.contentJSON) {
             return stored.contentJSON;
         }
-        // Fallback for legacy data or simple strings
+
         if (typeof stored === 'string' && stored) return stored;
 
-        // New entry or empty
         return '<h1 style="text-align: center">Untitled</h1><p>Dear Diary...</p>';
     };
 
+    // Automatic title
     const extractTitle = (editor: Editor) => {
         const { doc } = editor.state;
         let title = '';
 
-        // Look for the first node that has text
+        // look for the first node that has text
         doc.descendants((node) => {
             if (title) return false;
             if (node.isTextblock && node.textContent.trim()) {
@@ -73,6 +73,7 @@ const EntryEditor = () => {
         return (title.length > 50 ? title.substring(0, 50) + '...' : title) || 'Untitled';
     };
 
+    // Config editor
     const editor = useEditor({
         extensions: [
             StarterKit,
@@ -155,6 +156,8 @@ const EntryEditor = () => {
         }
     }, [isDragMode, editor]);
 
+    // Infinite canvas
+    // Pan: wheel, Zoom: ctrl + wheel
     const handleWheel = useCallback((e: React.WheelEvent) => {
         e.preventDefault();
         const container = containerRef.current;
@@ -269,34 +272,34 @@ const EntryEditor = () => {
                 }}
             >
                 <CanvasScaleContext.Provider value={transform.scale}>
-                <div
-                    className={styles.canvas}
-                    style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})` }}
-                >
-                    {activeEntry && (
-                        <div
-                            className={styles.paper}
-                            style={{
-                                backgroundImage: pageSettings.backgroundUrl ? `url(${pageSettings.backgroundUrl})` : undefined,
-                                backgroundSize: pageSettings.backgroundUrl ? 'cover' : undefined,
-                                padding: `${pageSettings.paddingTop}px ${pageSettings.paddingRight}px ${pageSettings.paddingBottom}px ${pageSettings.paddingLeft}px`
-                            }}
-                            onClick={(e) => {
-                                if (e.target === e.currentTarget) {
-                                    const selection = window.getSelection();
-                                    if (!selection || selection.isCollapsed) {
-                                        editor?.chain().focus('end').run();
+                    <div
+                        className={styles.canvas}
+                        style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})` }}
+                    >
+                        {activeEntry && (
+                            <div
+                                className={styles.paper}
+                                style={{
+                                    backgroundImage: pageSettings.backgroundUrl ? `url(${pageSettings.backgroundUrl})` : undefined,
+                                    backgroundSize: pageSettings.backgroundUrl ? 'cover' : undefined,
+                                    padding: `${pageSettings.paddingTop}px ${pageSettings.paddingRight}px ${pageSettings.paddingBottom}px ${pageSettings.paddingLeft}px`
+                                }}
+                                onClick={(e) => {
+                                    if (e.target === e.currentTarget) {
+                                        const selection = window.getSelection();
+                                        if (!selection || selection.isCollapsed) {
+                                            editor?.chain().focus('end').run();
+                                        }
                                     }
-                                }
-                            }}
-                        >
-                            <div className={styles.editorContent}>
-                                <EditorContent editor={editor} />
+                                }}
+                            >
+                                <div className={styles.editorContent}>
+                                    <EditorContent editor={editor} />
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                </div>
+                    </div>
                 </CanvasScaleContext.Provider>
             </div>
 
