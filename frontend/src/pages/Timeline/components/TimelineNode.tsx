@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { type TimelineNodeProps } from '../../../types';
 import styles from './TimelineNode.module.css';
-import { MoreHorizontal } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import EntryPreviewModal from './EntryPreviewModal';
 import AddTimelineNodeModal from './AddTimelineNodeModal';
 import { formatDate } from '../../../utils/dateUtils';
@@ -32,6 +32,13 @@ const TimelineNode = ({ entry, side }: TimelineNodeProps) => {
                             <h3 className={styles.title}>{entry.title || 'Untitled'}</h3>
                             {excerpt && <p className={styles.excerpt}>{excerpt}</p>}
                             <span className={styles.date}>{dateStr}</span>
+                            <button
+                                className={styles.editBtn}
+                                onClick={(e) => { e.stopPropagation(); setIsEditOpen(true); }}
+                                aria-label="Edit node appearance"
+                            >
+                                <Settings size={18} />
+                            </button>
                         </div>
                         {imageUrl && (
                             <div className={styles.imageWrapper}>
@@ -39,14 +46,6 @@ const TimelineNode = ({ entry, side }: TimelineNodeProps) => {
                             </div>
                         )}
                     </div>
-
-                    <button
-                        className={styles.editBtn}
-                        onClick={(e) => { e.stopPropagation(); setIsEditOpen(true); }}
-                        aria-label="Edit node appearance"
-                    >
-                        <MoreHorizontal size={18} />
-                    </button>
                 </div>
             </div>
 
