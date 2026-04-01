@@ -101,15 +101,13 @@ const ImageNodeView = (props: any) => {
 
     return (
         <NodeViewWrapper
+            className={styles.nodeWrapper}
             style={{
-                display: 'block',
-                position: 'absolute',
-                top: 0,
-                left: 0,
                 zIndex: selected ? 100 : 1,
                 pointerEvents: selected ? 'auto' : 'none',
             }}
         >
+
             <div
                 ref={targetRef}
                 className={classNames(styles.imageBox, { [styles.selected]: selected })}
@@ -124,6 +122,7 @@ const ImageNodeView = (props: any) => {
                     cursor: selected ? 'move' : 'default',
                 }}
             >
+
                 <img
                     src={src}
                     alt={alt}
@@ -134,8 +133,9 @@ const ImageNodeView = (props: any) => {
                             moveableRef.current.updateRect();
                         }
                     }}
-                    style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover' }}
+                    className={styles.imageContent}
                 />
+
 
                 {selected && (
                     <div

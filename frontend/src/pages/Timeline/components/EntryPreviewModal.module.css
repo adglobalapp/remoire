@@ -1,0 +1,108 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    pointer-events: auto;
+}
+
+.modalContent {
+    background: var(--color-light-beige, #f8f5f2);
+    border-radius: 12px;
+    width: 95%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.modalHeader h2 {
+    font-size: 1.8rem;
+    font-weight: normal;
+    color: var(--color-dark-brown);
+    margin: 0;
+}
+
+.closeBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--color-dark-brown);
+    opacity: 0.6;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, opacity 0.2s;
+}
+
+.editEntryBtn {
+    background-color: var(--color-dark-brown);
+    color: var(--color-light-beige);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.closeBtn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    opacity: 1;
+}
+
+.previewBody {
+    padding: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-dark-beige);
+}
+
+.previewPaper {
+    background-color: transparent;
+    width: 100%;
+    aspect-ratio: 1 / 1.4142;
+    flex-shrink: 0;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
+    background-image: url('../../../assets/images/paper.png');
+    background-size: 100% 100%; /* Stretch to fill exactly */
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    user-select: text;
+}
+
+.modalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.previewPaper :global(.ProseMirror h1) {
+    font-size: 48px;
+}

@@ -50,7 +50,7 @@ export const createEntry = async (title: string): Promise<Entry | null> => {
 
 export const updateEntry = async (
     id: number,
-    data: Partial<Pick<Entry, 'title' | 'date' | 'content'>>
+    data: Partial<Pick<Entry, 'title' | 'date' | 'content' | 'color' | 'cover_image'>>
 ): Promise<Entry | null> => {
     try {
         const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
@@ -76,5 +76,29 @@ export const deleteEntry = async (id: number): Promise<boolean> => {
     } catch (error) {
         console.error('Failed to delete entry:', error);
         return false;
+    }
+};
+
+export const uploadImage = async (file: File): Promise<{ url?: string; error?: string }> => {
+    try {
+        const formData = new FormData();
+        formData.append('image', file);
+        const response = await fetch(`${API_BASE_URL}/upload`, {
+            method: 'POST',
+            body: formData,
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            // Laravel validation errors are usually in data.errors or data.message
+            const errorMessage = data.message || (data.errors ? Object.values(data.errors).flat().join(' ') : `Error: ${response.status}`);
+            throw new Error(errorMessage);
+        }
+        
+        return { url: data.url };
+    } catch (error: any) {
+        console.error('Failed to upload image:', error);
+        return { error: error.message || 'Unknown upload error' };
     }
 };

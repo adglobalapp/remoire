@@ -19,6 +19,8 @@ class EntryController extends Controller
             'date'    => 'required|date',
             'content' => 'nullable|string',
             'user_id' => 'required|integer',
+            'color'   => 'nullable|string',
+            'cover_image' => 'nullable|string',
         ]);
 
         $entry = Entry::create($validated);
@@ -32,6 +34,8 @@ class EntryController extends Controller
             'title'   => 'sometimes|string|max:255',
             'date'    => 'sometimes|date',
             'content' => 'nullable|string',
+            'color'   => 'nullable|string',
+            'cover_image' => 'nullable|string',
         ]);
 
         $entry->update($validated);

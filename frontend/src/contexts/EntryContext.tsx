@@ -1,10 +1,11 @@
-import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { getEntries, createEntry as apiCreateEntry, updateEntry as apiUpdateEntry, deleteEntry as apiDeleteEntry } from '../services/api';
-import { type Entry, type EntryContextValue } from '../types';
+import { type Entry, type EntryContextValue, type EntryProviderProps } from '../types';
 
 export const EntryContext = createContext<EntryContextValue | null>(null);
 
-export const EntryProvider = ({ children }: { children: ReactNode }) => {
+export const EntryProvider = ({ children }: EntryProviderProps) => {
+
     const [entries, setEntries] = useState<Entry[]>([]);
     const [activeEntry, setActiveEntry] = useState<Entry | null>(null);
 
@@ -95,8 +96,24 @@ export const EntryProvider = ({ children }: { children: ReactNode }) => {
         setActiveEntry(prev => prev?.id === id ? { ...prev, title } : prev);
     }, []);
 
+    // update entry date and persist to API
+    const updateEntryDate = useCallback(async (id: number, date: string) => {
+        const updated = await apiUpdateEntry(id, { date });
+        if (!updated) return;
+        setEntries(prev => prev.map(e => e.id === id ? updated : e));
+        setActiveEntry(prev => prev?.id === id ? updated : prev);
+    }, []);
+
+    // update entry metadata like color and cover_image
+    const updateEntryMetadata = useCallback(async (id: number, data: Partial<Entry>) => {
+        const updated = await apiUpdateEntry(id, data);
+        if (!updated) return;
+        setEntries(prev => prev.map(e => e.id === id ? updated : e));
+        setActiveEntry(prev => prev?.id === id ? updated : prev);
+    }, []);
+
     return (
-        <EntryContext.Provider value={{ entries, activeEntry, selectEntry, createEntry, deleteEntry, saveEntry, updateEntryTitle }}>
+        <EntryContext.Provider value={{ entries, activeEntry, selectEntry, createEntry, deleteEntry, saveEntry, updateEntryTitle, updateEntryDate, updateEntryMetadata }}>
             {children}
         </EntryContext.Provider>
     );

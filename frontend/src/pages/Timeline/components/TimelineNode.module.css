@@ -1,0 +1,174 @@
+.nodeWrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    margin-bottom: 60px;
+}
+
+/* Left card: card on the left, dot to the right of center */
+.nodeWrapper.left {
+    flex-direction: row;
+    justify-content: flex-end;
+    padding-right: calc(50% + 36px);
+}
+
+/* Right card: card on the right, dot to the left of center */
+.nodeWrapper.right {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    padding-left: calc(50% + 36px);
+}
+
+.cardContainer {
+    position: relative;
+    display: flex;
+}
+
+.card {
+    background: var(--color-light-beige);
+    border-radius: 10px;
+    box-shadow: var(--shadow-paper);
+    width: 420px;
+    height: 190px;
+    max-width: 450px;
+    border: 1px solid rgba(0,0,0,0.06);
+    transition: box-shadow 0.2s, transform 0.2s;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+}
+
+.cardBody {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.textContent {
+    flex: 1;
+    padding: 18px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow: hidden;
+    height: 100%;
+}
+
+.title {
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--color-dark-brown);
+    line-height: 1.2;
+    margin: 0;
+}
+
+.excerpt {
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    color: var(--color-dark-brown);
+    opacity: 0.75;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0;
+}
+
+.date {
+    font-size: 0.8rem;
+    font-family: var(--font-body);
+    color: var(--color-dark-brown);
+    opacity: 0.55;
+    margin-top: auto;
+    padding-top: 6px;
+}
+
+.imageWrapper {
+    width: 180px;
+    min-width: 180px;
+    height: 100%;
+    padding: 10px 10px 10px 0;
+    flex-shrink: 0;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+}
+
+/* Timeline dot */
+.dot {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: var(--color-burgundy);
+    border: 3px solid var(--color-dark-beige);
+    box-shadow: 0 0 0 2px var(--color-burgundy);
+    flex-shrink: 0;
+    z-index: 2;
+}
+
+/* Connector line from dot to card */
+.nodeWrapper.left::before {
+    content: '';
+    position: absolute;
+    right: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 2px;
+    background-color: var(--color-burgundy);
+    opacity: 0.4;
+}
+
+.nodeWrapper.right::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 2px;
+    background-color: var(--color-burgundy);
+    opacity: 0.4;
+}
+
+.editBtn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-burgundy);
+    opacity: 0;
+    transition: opacity 0.2s;
+    box-shadow: none;
+    z-index: 10;
+}
+
+.card:hover .editBtn {
+    opacity: 1;
+}

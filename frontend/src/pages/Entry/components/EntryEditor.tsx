@@ -1,7 +1,6 @@
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
 import { ResizableImage } from './extensions/ResizableImage';
@@ -15,18 +14,23 @@ import classNames from 'classnames';
 import { useEntryContext } from '../../../contexts/EntryContext';
 import { CanvasScaleContext } from '../../../contexts/CanvasScaleContext';
 import { type PageSettings, DEFAULT_PAGE_SETTINGS } from '../../../types';
+import { useCanvasNavigation } from '../../../hooks/useCanvasNavigation';
 
 const EntryEditor = () => {
     const { activeEntry, saveEntry, updateEntryTitle } = useEntryContext();
 
-    const [transform, setTransform] = useState({ x: 0, y: 0, scale: 1 });
-    const [isDragging, setIsDragging] = useState(false);
+    const {
+        transform,
+        setTransform,
+        isDragging,
+        containerRef,
+        handleMouseDown,
+    } = useCanvasNavigation({ minScale: 0.4, initialTransform: { x: 0, y: 0, scale: 1.15 } });
+
     const [isDragMode, setIsDragMode] = useState(false);
-    const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
-    const [activeEditor, setActiveEditor] = useState<Editor | null>(null);
     const [isColorPicking, setIsColorPicking] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
     const mouseDownTargetRef = useRef<EventTarget | null>(null);
+
 
     const [pageSettings, setPageSettings] = useState<PageSettings>(DEFAULT_PAGE_SETTINGS);
     const pageSettingsRef = useRef<PageSettings>(DEFAULT_PAGE_SETTINGS);
@@ -77,7 +81,6 @@ const EntryEditor = () => {
     const editor = useEditor({
         extensions: [
             StarterKit,
-            Underline,
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
             ResizableImage,
             Placeholder.configure({ placeholder: 'Start writing...' }),
@@ -88,10 +91,7 @@ const EntryEditor = () => {
         ],
         content: getInitialContent(),
         editable: !isDragMode,
-        onCreate: ({ editor }) => {
-            setActiveEditor(editor);
-        },
-        onFocus: ({ editor }) => setActiveEditor(editor),
+        immediatelyRender: false,
         editorProps: {
             transformPastedHTML(html) {
                 const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -132,23 +132,20 @@ const EntryEditor = () => {
         const contentJSON = (stored && typeof stored === 'object' && stored.contentJSON)
             ? stored.contentJSON
             : (typeof stored === 'string' ? stored : '<h1>Untitled</h1><p>Dear Diary...</p>');
-
+        
         let settings = DEFAULT_PAGE_SETTINGS;
         if (stored && typeof stored === 'object' && stored.pageSettings) {
             settings = { ...DEFAULT_PAGE_SETTINGS, ...stored.pageSettings };
         }
-
-        queueMicrotask(() => {
+        
+        // Delay content loading to avoid React life-cycle warnings (flushSync)
+        setTimeout(() => {
+            if (!editor) return;
             setPageSettings(settings);
-        });
-        pageSettingsRef.current = settings;
-
-        if (editor) {
+            pageSettingsRef.current = settings;
             editor.commands.setContent(contentJSON, { emitUpdate: false });
-            setTimeout(() => {
-                editor.commands.blur();
-            }, 10);
-        }
+            editor.commands.blur();
+        }, 0);
     }, [activeEntry, editor, initialEntryId]);
 
     // Drag mode
@@ -159,39 +156,7 @@ const EntryEditor = () => {
         }
     }, [isDragMode, editor]);
 
-    // Infinite canvas
-    // Pan: wheel, Zoom: ctrl + wheel
-    const handleWheel = useCallback((e: React.WheelEvent) => {
-        e.preventDefault();
-        const container = containerRef.current;
-        if (!container) return;
-
-        if (e.ctrlKey) {
-            const rect = container.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
-
-            const sensitivity = 0.001;
-            const delta = e.deltaY * sensitivity;
-
-            setTransform(prev => {
-                const nextScale = Math.min(2, Math.max(0.4, prev.scale - delta));
-                if (nextScale === prev.scale) return prev;
-                const nextX = mouseX - (mouseX - prev.x) * nextScale / prev.scale;
-                const nextY = mouseY - (mouseY - prev.y) * nextScale / prev.scale;
-                return { x: nextX, y: nextY, scale: nextScale };
-            });
-        } else {
-            setTransform(prev => ({
-                ...prev,
-                x: prev.x - e.deltaX,
-                y: prev.y - e.deltaY
-            }));
-        }
-    }, []);
-
-    // Event handlers
-    const handleMouseDown = (e: React.MouseEvent) => {
+    const onMouseDown = (e: React.MouseEvent) => {
         const target = e.target as Element;
         mouseDownTargetRef.current = target;
 
@@ -201,46 +166,19 @@ const EntryEditor = () => {
             e.preventDefault();
         }
 
-        if (e.button === 0 && isDragMode) {
-            e.preventDefault();
-            setIsDragging(true);
-            setLastMousePos({ x: e.clientX, y: e.clientY });
-        }
+        handleMouseDown(e, isDragMode);
     };
 
-    const handleMouseMove = useCallback((e: MouseEvent) => {
-        if (isDragging) {
-            const dx = e.clientX - lastMousePos.x;
-            const dy = e.clientY - lastMousePos.y;
-            setTransform(prev => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
-            setLastMousePos({ x: e.clientX, y: e.clientY });
-        }
-    }, [isDragging, lastMousePos]);
-
-    const handleMouseUp = useCallback(() => setIsDragging(false), []);
 
     useEffect(() => {
-        if (isDragging) {
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('mouseup', handleMouseUp);
+        if (containerRef.current) {
+            const width = containerRef.current.offsetWidth;
+            const initialScale = 1.15;
+            const initialX = (width / 2) * (1 - initialScale);
+            setTransform({ x: initialX, y: 0, scale: initialScale });
         }
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, [isDragging, handleMouseMove, handleMouseUp]);
+    }, [setTransform]);
 
-    useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
-        const onWheel = (e: WheelEvent) => e.preventDefault();
-        container.addEventListener('wheel', onWheel, { passive: false });
-        const width = container.offsetWidth;
-        const initialScale = 1.15;
-        const initialX = (width / 2) * (1 - initialScale);
-        setTransform({ x: initialX, y: 0, scale: initialScale });
-        return () => container.removeEventListener('wheel', onWheel);
-    }, []);
 
     const handlePageSettingsChange = (newSettings: PageSettings) => {
         setPageSettings(newSettings);
@@ -262,8 +200,8 @@ const EntryEditor = () => {
                     [styles.dragMode]: isDragMode,
                     [styles.hideSelection]: isColorPicking
                 })}
-                onWheel={handleWheel}
-                onMouseDown={handleMouseDown}
+                onMouseDown={onMouseDown}
+
                 onClick={(e) => {
                     const target = e.target as Element;
                     const startTarget = mouseDownTargetRef.current as Element;
@@ -308,7 +246,7 @@ const EntryEditor = () => {
             </div>
 
             <EditorToolbar
-                editor={activeEditor}
+                editor={editor}
                 isDragMode={isDragMode}
                 onToggleDragMode={() => setIsDragMode(!isDragMode)}
                 onColorPickerToggle={setIsColorPicking}

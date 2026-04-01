@@ -1,7 +1,21 @@
-import { MapPin, Calendar, Plus } from 'lucide-react';
+import { MapPin, Calendar, Plus, Users } from 'lucide-react';
 import styles from './RightSidebar.module.css';
+import { useEntryContext } from '../../../contexts/EntryContext';
 
 const RightSidebar = () => {
+    const { activeEntry, updateEntryDate } = useEntryContext();
+
+    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (activeEntry) {
+            updateEntryDate(activeEntry.id, e.target.value);
+        }
+    };
+
+    // Format stored date (YYYY-MM-DD) for the date input
+    const dateValue = activeEntry?.date
+        ? activeEntry.date.substring(0, 10)
+        : '';
+
     return (
         <aside className={styles.sidebarContainer}>
 
@@ -20,11 +34,15 @@ const RightSidebar = () => {
                 <label className="text-small">Date</label>
                 <div className={styles.metaValue}>
                     <Calendar size={22} className={styles.iconColor} />
-                    <span>2024. 12. 24.</span>
+                    <input
+                        type="date"
+                        value={dateValue}
+                        onChange={handleDateChange}
+                        onClick={(e) => 'showPicker' in e.target && (e.target as HTMLInputElement).showPicker()}
+                        className={styles.dateInput}
+                        disabled={!activeEntry}
+                    />
                 </div>
-                <button className="btn btn-secondary btn-sm">
-                    <Plus size={14} /> Add Date
-                </button>
             </div>
 
             <div className={styles.metaGroup}>
@@ -41,7 +59,7 @@ const RightSidebar = () => {
                 </div>
 
                 <button className="btn btn-secondary btn-sm">
-                    <Plus size={14} /> Add Participant
+                    <Users size={14} /> Add Participant
                 </button>
             </div>
 

@@ -1,0 +1,80 @@
+.canvasContainer {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    cursor: grab;
+    user-select: none;
+}
+
+.canvasContainer.dragging {
+    cursor: grabbing;
+}
+
+.canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 0 0;
+    will-change: transform;
+    /* Wide enough so nodes can go left/right of center */
+    width: 1000px;
+}
+
+
+.timelineWrapper {
+    position: relative;
+    width: 100%;
+    padding: 40px 0 80px;
+    min-width: 900px;
+}
+
+/* Vertical center line */
+.centerLine {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    transform: translateX(-50%);
+    background: linear-gradient(to bottom, transparent, var(--color-burgundy) 60px, var(--color-burgundy) calc(100% - 60px), transparent);
+    opacity: 0.35;
+    border-radius: 2px;
+}
+
+.emptyTimeline {
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--color-dark-brown);
+    opacity: 0.5;
+}
+
+.emptyTimeline p {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.emptyHint {
+    font-size: 0.9rem;
+    font-family: var(--font-body);
+}
+
+.addButton:disabled {
+    background-color: var(--color-light-brown);
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.addButton {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    z-index: 100;
+    background-color: var(--color-dark-brown);
+    color: var(--color-light-beige);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

@@ -1,0 +1,114 @@
+import { useState, useMemo, useEffect } from 'react';
+import styles from './TimelineCanvas.module.css';
+import TimelineNode from './TimelineNode';
+import { useTimelineContext } from '../../../contexts/TimelineContext';
+import { useEntryContext } from '../../../contexts/EntryContext';
+import { type Entry } from '../../../types';
+import AddTimelineNodeModal from './AddTimelineNodeModal';
+import { Plus } from 'lucide-react';
+import { compareDates } from '../../../utils/dateUtils';
+import { useCanvasNavigation } from '../../../hooks/useCanvasNavigation';
+
+const TimelineCanvas = () => {
+    const { activeTimeline } = useTimelineContext();
+    const { entries } = useEntryContext();
+
+    const {
+        transform,
+        setTransform,
+        isDragging,
+        containerRef,
+        handleMouseDown,
+    } = useCanvasNavigation({ minScale: 0.3 });
+
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+    // Initial centering (override the default hook transform)
+    useEffect(() => {
+        if (containerRef.current) {
+            const width = containerRef.current.offsetWidth;
+            // width / 2 centers the top-left, so we subtract 500 (half of canvas width) to center the content
+            setTransform({ x: (width / 2) - 500, y: 60, scale: 1 });
+        }
+    }, [setTransform]);
+
+
+    // Filter and sort entries for the active timeline, ordered by entry.date
+    const visibleEntries: Entry[] = useMemo(() => {
+        if (!activeTimeline) return [];
+
+        let filtered: Entry[];
+        if (activeTimeline.isDefault) {
+            filtered = [...entries];
+        } else {
+            filtered = entries.filter(e => activeTimeline.entryIds.includes(e.id));
+        }
+
+        // Sort by entry.date (YYYY-MM-DD), falling back to created_at
+        return filtered.sort((a, b) => compareDates(a.date || a.created_at, b.date || b.created_at));
+    }, [activeTimeline, entries]);
+
+    const onMouseDown = (e: React.MouseEvent) => {
+        const target = e.target as HTMLElement;
+        const isNode = !!target.closest(`[class*="card"]`);
+        const isButton = !!target.closest('button');
+        const isInsideCanvas = !!target.closest(`.${styles.canvas}`) || target === containerRef.current;
+
+        handleMouseDown(e, isInsideCanvas && !isNode && !isButton);
+    };
+
+    return (
+        <div
+            ref={containerRef}
+            className={`${styles.canvasContainer} ${isDragging ? styles.dragging : ''}`}
+            onMouseDown={onMouseDown}
+        >
+            <div
+                className={styles.canvas}
+                style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})` }}
+            >
+                {visibleEntries.length === 0 ? (
+                    <div className={styles.emptyTimeline}>
+                        <p>No entries on this timeline yet.</p>
+                    </div>
+                ) : (
+                    <div className={styles.timelineWrapper}>
+                        {/* Vertical center line */}
+                        <div className={styles.centerLine} />
+
+                        {/* Year labels */}
+                        {visibleEntries.map((entry, index) => {
+                            const side: 'left' | 'right' = index % 2 === 0 ? 'left' : 'right';
+                            return (
+                                <TimelineNode
+                                    key={entry.id}
+                                    entry={entry}
+                                    side={side}
+                                />
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+
+            {/* Add Node Button in Top Right */}
+            {activeTimeline && (
+                <button
+                    onClick={() => setIsAddModalOpen(true)}
+                    className={`btn ${styles.addButton}`}
+                    disabled={activeTimeline.isDefault}
+                    title={activeTimeline.isDefault ? "Default timeline is not modifiable" : ""}
+                >
+                    <Plus size={18} /> Add Entry
+                </button>
+            )}
+
+
+            {isAddModalOpen && (
+                <AddTimelineNodeModal onClose={() => setIsAddModalOpen(false)} />
+            )}
+        </div>
+    );
+};
+
+export default TimelineCanvas;

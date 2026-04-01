@@ -48,6 +48,15 @@
     transform: scale(1.1);
 }
 
+.link.active {
+    color: var(--color-burgundy);
+    font-weight: 500;
+}
+
+.link.active svg {
+    transform: scale(1.05);
+}
+
 .authButtons {
     display: flex;
     align-items: center;
