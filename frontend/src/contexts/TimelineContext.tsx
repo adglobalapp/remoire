@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import toast from 'react-hot-toast';
 import * as api from '../services/api';
 import { type Timeline, type TimelineContextValue, type TimelineProviderProps } from '../types';
 
@@ -32,8 +31,6 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
                     // For now just keep the local one
                     setTimelines([DEFAULT_TIMELINE]);
                 }
-            } catch (error) {
-                toast.error('Failed to load timelines.');
             } finally {
                 setIsLoading(false);
             }
@@ -51,10 +48,9 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
             if (newTimeline) {
                 setTimelines(prev => [...prev, newTimeline]);
                 setActiveTimeline(newTimeline);
-                toast.success('Timeline created!');
             }
         } catch (error) {
-            toast.error('Failed to create timeline.');
+            throw error;
         }
     }, []);
 
@@ -73,10 +69,9 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
                     });
                     return next;
                 });
-                toast.success('Timeline deleted.');
             }
         } catch (error) {
-            toast.error('Failed to delete timeline.');
+            throw error;
         }
     }, [timelines]);
 
@@ -97,10 +92,9 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
                         ? { ...curr, entryIds: [...curr.entryIds, entryId] }
                         : curr
                 );
-                toast.success('Entry added to timeline.');
             }
         } catch (error) {
-            toast.error('Failed to add entry.');
+            throw error;
         }
     }, [timelines]);
 
@@ -121,10 +115,9 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
                         ? { ...curr, entryIds: curr.entryIds.filter(id => id !== entryId) }
                         : curr
                 );
-                toast.success('Entry removed.');
             }
         } catch (error) {
-            toast.error('Failed to remove entry.');
+            throw error;
         }
     }, [timelines]);
 

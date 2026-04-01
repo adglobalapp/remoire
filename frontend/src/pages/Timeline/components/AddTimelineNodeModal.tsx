@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Upload, Palette, ChevronDown, Plus } from 'lucide-react';
+import { X, Upload, Palette, ChevronDown, Plus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadImage } from '../../../services/api';
 import { useEntryContext } from '../../../contexts/EntryContext';
 import { useTimelineContext } from '../../../contexts/TimelineContext';
+import DeleteConfirmationModal from '../../../components/common/DeleteConfirmationModal';
 import { type AddTimelineNodeModalProps } from '../../../types';
 import styles from './AddTimelineNodeModal.module.css';
 
@@ -20,12 +21,14 @@ const COLORS = [
 
 const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProps) => {
     const { entries, updateEntryMetadata } = useEntryContext();
-    const { activeTimeline, addEntryToTimeline } = useTimelineContext();
+    const { activeTimeline, addEntryToTimeline, removeEntryFromTimeline } = useTimelineContext();
 
     const [selectedEntryId, setSelectedEntryId] = useState<number | ''>(entryToEdit?.id || '');
     const [color, setColor] = useState<string>(entryToEdit?.color || '');
     const [coverImage, setCoverImage] = useState<string>(entryToEdit?.cover_image || '');
     const [isSaving, setIsSaving] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -90,11 +93,13 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
             });
 
             if (!entryToEdit && activeTimeline && !activeTimeline.isDefault) {
-                addEntryToTimeline(activeTimeline.id, Number(selectedEntryId));
+                await addEntryToTimeline(activeTimeline.id, Number(selectedEntryId));
+                toast.success('Entry added to timeline.');
+            } else {
+                toast.success(entryToEdit ? 'Changes saved.' : 'Entry appearance updated.');
             }
 
             onClose();
-            toast.success(entryToEdit ? 'Changes saved.' : 'Entry added.');
         } catch (error) {
             toast.error('Failed to save.');
         } finally {
@@ -102,157 +107,199 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
         }
     };
 
+    const handleConfirmDelete = async () => {
+        if (!entryToEdit || !activeTimeline || activeTimeline.isDefault) return;
+        
+        setIsDeleting(true);
+        try {
+            await removeEntryFromTimeline(activeTimeline.id, entryToEdit.id);
+            toast.success('Entry removed from timeline.');
+            onClose();
+        } catch (error) {
+            toast.error('Failed to remove entry.');
+        } finally {
+            setIsDeleting(false);
+            setIsConfirmOpen(false);
+        }
+    };
+
     return createPortal(
-        <div
-            className={styles.modalOverlay}
-            onClick={onClose}
-            onWheel={(e) => e.stopPropagation()}
-            onMouseDown={(e) => e.stopPropagation()}
-        >
-            <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-                <div className={styles.modalHeader}>
-                    <h2>{entryToEdit ? 'Edit Entry Appearance' : 'Add Entry to Timeline'}</h2>
-                    <button className="modal-close-btn" onClick={onClose} aria-label="Close">
-                        <X size={20} />
-                    </button>
-                </div>
-
-                {!entryToEdit && (
-                    <div className={styles.formGroup} ref={dropdownRef}>
-                        <label>Select Entry</label>
-                        <div
-                            className={styles.selectTrigger}
-                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        >
-                            {selectedEntry ? (
-                                <div className={styles.selectedEntryRow}>
-                                    <span className={styles.selectedTitle}>{selectedEntry.title || 'Untitled'}</span>
-                                    <span className={styles.selectedDate}>{new Date(selectedEntry.date || selectedEntry.created_at).toLocaleDateString('hu-HU')}</span>
-                                </div>
-                            ) : (
-                                <span className={styles.placeholder}>-- Choose an entry --</span>
-                            )}
-                            <ChevronDown size={18} className={`${styles.chevron} ${isDropdownOpen ? styles.chevronOpen : ''}`} />
-                        </div>
-
-                        {isDropdownOpen && (
-                            <div className={styles.dropdownMenu}>
-                                {availableEntries.length === 0 ? (
-                                    <p className={styles.emptyState}>No more entries available.</p>
-                                ) : (
-                                    availableEntries.map(e => (
-                                        <div
-                                            key={e.id}
-                                            className={`${styles.entryListItem} ${selectedEntryId === e.id ? styles.entryListItemActive : ''}`}
-                                            onClick={() => handleEntrySelect(e.id)}
-                                        >
-                                            <div className={styles.entryInfoLeft}>
-                                                <span className={styles.entryTitle}>{e.title || 'Untitled'}</span>
-                                            </div>
-                                            <div className={styles.entryInfoRight}>
-                                                <span className={styles.entryDate}>
-                                                    {new Date(e.date || e.created_at).toLocaleDateString('hu-HU')}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        )}
+        <>
+            <div
+                className={styles.modalOverlay}
+                onClick={onClose}
+                onWheel={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+            >
+                <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+                    <div className={styles.modalHeader}>
+                        <h2>{entryToEdit ? 'Edit Entry Appearance' : 'Add Entry to Timeline'}</h2>
+                        <button className="modal-close-btn" onClick={onClose} aria-label="Close">
+                            <X size={20} />
+                        </button>
                     </div>
-                )}
 
-                <div className={styles.formGroup}>
-                    <label><Palette size={16} className={styles.iconInfo} /> Entry Accent Color</label>
-                    <div className={styles.colorPalette}>
-                        {COLORS.map(c => (
+                    {!entryToEdit && (
+                        <div className={styles.formGroup} ref={dropdownRef}>
+                            <label>Select Entry</label>
+                            <div
+                                className={styles.selectTrigger}
+                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            >
+                                {selectedEntry ? (
+                                    <div className={styles.selectedEntryRow}>
+                                        <span className={styles.selectedTitle}>{selectedEntry.title || 'Untitled'}</span>
+                                        <span className={styles.selectedDate}>{new Date(selectedEntry.date || selectedEntry.created_at).toLocaleDateString('hu-HU')}</span>
+                                    </div>
+                                ) : (
+                                    <span className={styles.placeholder}>-- Choose an entry --</span>
+                                )}
+                                <ChevronDown size={18} className={`${styles.chevron} ${isDropdownOpen ? styles.chevronOpen : ''}`} />
+                            </div>
+
+                            {isDropdownOpen && (
+                                <div className={styles.dropdownMenu}>
+                                    {availableEntries.length === 0 ? (
+                                        <p className={styles.emptyState}>No more entries available.</p>
+                                    ) : (
+                                        availableEntries.map(e => (
+                                            <div
+                                                key={e.id}
+                                                className={`${styles.entryListItem} ${selectedEntryId === e.id ? styles.entryListItemActive : ''}`}
+                                                onClick={() => handleEntrySelect(e.id)}
+                                            >
+                                                <div className={styles.entryInfoLeft}>
+                                                    <span className={styles.entryTitle}>{e.title || 'Untitled'}</span>
+                                                </div>
+                                                <div className={styles.entryInfoRight}>
+                                                    <span className={styles.entryDate}>
+                                                        {new Date(e.date || e.created_at).toLocaleDateString('hu-HU')}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    <div className={styles.formGroup}>
+                        <label><Palette size={16} className={styles.iconInfo} /> Entry Accent Color</label>
+                        <div className={styles.colorPalette}>
+                            {COLORS.map(c => (
+                                <button
+                                    key={c.value}
+                                    type="button"
+                                    className={`${styles.colorBtn} ${color === c.value ? styles.colorBtnActive : ''}`}
+                                    style={{ backgroundColor: c.value }}
+                                    onClick={() => {
+                                        setColor(c.value === color ? '' : c.value);
+                                        setCustomColor('');
+                                    }}
+                                    title={c.label}
+                                />
+                            ))}
+                            
                             <button
-                                key={c.value}
                                 type="button"
-                                className={`${styles.colorBtn} ${color === c.value ? styles.colorBtnActive : ''}`}
-                                style={{ backgroundColor: c.value }}
-                                onClick={() => {
-                                    setColor(c.value === color ? '' : c.value);
-                                    setCustomColor('');
-                                }}
-                                title={c.label}
-                            />
-                        ))}
-                        
+                                className={`${styles.colorBtn} ${styles.customColorBtn} ${customColor ? styles.colorBtnActive : ''}`}
+                                style={{ backgroundColor: customColor || 'transparent' }}
+                                onClick={() => colorPickerRef.current?.click()}
+                                title="Custom Color"
+                            >
+                                {!customColor && <Plus size={16} />}
+                                <input
+                                    ref={colorPickerRef}
+                                    type="color"
+                                    value={customColor || '#742121'}
+                                    onChange={handleCustomColorChange}
+                                    className={styles.hiddenColorInput}
+                                />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label><Upload size={16} className={styles.iconInfo} /> Cover Image</label>
+
+                        {coverImage ? (
+                            <div className={styles.imagePreviewContainer}>
+                                <img src={coverImage} alt="Cover" className={styles.previewThumbnail} />
+                                <button type="button" className="btn btn-secondary" onClick={() => setCoverImage('')}>Remove</button>
+                            </div>
+                        ) : (
+                            <label className={`btn btn-secondary ${styles.uploadLabel}`}>
+                                <span>{isUploading ? 'Uploading...' : 'Choose Image...'}</span>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={async (e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            setIsUploading(true);
+                                            setUploadError(null);
+                                            const result = await uploadImage(file);
+                                            if (result.url) {
+                                                setCoverImage(result.url);
+                                                toast.success('Image uploaded!');
+                                            } else if (result.error) {
+                                                setUploadError(result.error);
+                                                toast.error(`Upload error: ${result.error}`);
+                                            }
+                                            setIsUploading(false);
+                                        }
+                                    }}
+                                    className={styles.hiddenInput}
+                                    disabled={isUploading}
+                                />
+                            </label>
+                        )}
+
+                        {uploadError && <p className={styles.errorText}>{uploadError}</p>}
+                        <p className={styles.helpText}>Leave empty to use main image from content automatically.</p>
+                    </div>
+
+                    <div className={styles.modalFooter}>
+                        {entryToEdit && activeTimeline && !activeTimeline.isDefault && (
+                            <button
+                                type="button"
+                                className={`btn ${styles.deleteBtn}`}
+                                onClick={() => setIsConfirmOpen(true)}
+                                disabled={isSaving || isDeleting || isUploading}
+                                title="Remove from timeline"
+                            >
+                                <Trash2 size={16} />
+                                <span>Remove</span>
+                            </button>
+                        )}
+                        <button type="button" className={`btn btn-secondary`} onClick={onClose}>
+                            Cancel
+                        </button>
                         <button
                             type="button"
-                            className={`${styles.colorBtn} ${styles.customColorBtn} ${customColor ? styles.colorBtnActive : ''}`}
-                            style={{ backgroundColor: customColor || 'transparent' }}
-                            onClick={() => colorPickerRef.current?.click()}
-                            title="Custom Color"
+                            className={`btn ${styles.saveBtn}`}
+                            disabled={!selectedEntryId || isSaving || isDeleting || isUploading}
+                            onClick={handleSave}
                         >
-                            {!customColor && <Plus size={16} />}
-                            <input
-                                ref={colorPickerRef}
-                                type="color"
-                                value={customColor || '#742121'}
-                                onChange={handleCustomColorChange}
-                                className={styles.hiddenColorInput}
-                            />
+                            {isSaving ? 'Saving...' : 'Save'}
                         </button>
                     </div>
                 </div>
-
-                <div className={styles.formGroup}>
-                    <label><Upload size={16} className={styles.iconInfo} /> Cover Image</label>
-
-                    {coverImage ? (
-                        <div className={styles.imagePreviewContainer}>
-                            <img src={coverImage} alt="Cover" className={styles.previewThumbnail} />
-                            <button type="button" className="btn btn-secondary" onClick={() => setCoverImage('')}>Remove</button>
-                        </div>
-                    ) : (
-                        <label className={`btn btn-secondary ${styles.uploadLabel}`}>
-                            <span>{isUploading ? 'Uploading...' : 'Choose Image...'}</span>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={async (e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                        setIsUploading(true);
-                                        setUploadError(null);
-                                        const result = await uploadImage(file);
-                                        if (result.url) {
-                                            setCoverImage(result.url);
-                                            toast.success('Image uploaded!');
-                                        } else if (result.error) {
-                                            setUploadError(result.error);
-                                            toast.error(`Upload error: ${result.error}`);
-                                        }
-                                        setIsUploading(false);
-                                    }
-                                }}
-                                className={styles.hiddenInput}
-                                disabled={isUploading}
-                            />
-                        </label>
-                    )}
-
-                    {uploadError && <p className={styles.errorText}>{uploadError}</p>}
-                    <p className={styles.helpText}>Leave empty to use main image from content automatically.</p>
-                </div>
-
-                <div className={styles.modalFooter}>
-                    <button type="button" className={`btn btn-secondary`} onClick={onClose}>
-                        Cancel
-                    </button>
-                    <button
-                        type="button"
-                        className={`btn ${styles.saveBtn}`}
-                        disabled={!selectedEntryId || isSaving || isUploading}
-                        onClick={handleSave}
-                    >
-                        {isSaving ? 'Saving...' : (entryToEdit ? 'Save Changes' : 'Add to Timeline')}
-                    </button>
-                </div>
             </div>
-        </div>,
+
+            <DeleteConfirmationModal
+                isOpen={isConfirmOpen}
+                onClose={() => setIsConfirmOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="Remove from Timeline"
+                message={
+                    <span>
+                        Are you sure you want to remove <strong>{entryToEdit?.title || 'this entry'}</strong> from the timeline? It will only be removed from this timeline and will not be permanently deleted.
+                    </span>
+                }
+            />
+        </>,
         document.body
     );
 };

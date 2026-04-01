@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Trash2, Plus, Search, PanelLeft, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 import DeleteConfirmationModal from '../../../components/common/DeleteConfirmationModal';
 import { useTimelineContext } from '../../../contexts/TimelineContext';
 import { usePage } from '../../../App';
@@ -48,10 +49,15 @@ const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
         t.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const handleCreate = () => {
+    const handleCreate = async () => {
         const name = newName.trim();
         if (name) {
-            createTimeline(name);
+            try {
+                await createTimeline(name);
+                toast.success('Timeline created!');
+            } catch (error) {
+                toast.error('Failed to create timeline.');
+            }
         }
         setNewName('');
         setIsCreating(false);
@@ -62,9 +68,14 @@ const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
         setItemToDelete(id);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (itemToDelete !== null) {
-            deleteTimeline(itemToDelete);
+            try {
+                await deleteTimeline(itemToDelete);
+                toast.success('Timeline deleted.');
+            } catch (error) {
+                toast.error('Failed to delete timeline.');
+            }
             setItemToDelete(null);
         }
     };

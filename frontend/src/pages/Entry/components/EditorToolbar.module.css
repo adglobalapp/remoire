@@ -26,6 +26,7 @@
     display: flex;
     align-items: center;
     overflow-x: auto;
+    overflow-y: visible;
     scrollbar-width: none;
     -ms-overflow-style: none;
     scroll-behavior: smooth;
@@ -370,5 +371,4 @@
     align-items: center;
     gap: 0.1rem;
     flex-shrink: 0;
-    margin-left: auto;
-}
+}

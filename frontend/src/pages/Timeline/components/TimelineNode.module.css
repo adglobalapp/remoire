@@ -26,13 +26,12 @@
 }
 
 .card {
-    background: var(--color-light-beige);
-    border-radius: 10px;
+    background: white;
     box-shadow: var(--shadow-paper);
     width: 420px;
     height: 190px;
     max-width: 450px;
-    border: 1px solid rgba(0,0,0,0.06);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     transition: box-shadow 0.2s, transform 0.2s;
     cursor: pointer;
     display: flex;
@@ -40,7 +39,7 @@
 }
 
 .card:hover {
-    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
     transform: translateY(-2px);
 }
 

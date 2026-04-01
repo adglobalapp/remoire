@@ -38,7 +38,7 @@ input,
 
 .btn,
 button {
-  font-family: var(--font-ui);
+  font-family: var(--font-ui), serif !important;
   font-weight: 400;
   font-size: 1.4rem;
   line-height: 1;
@@ -52,6 +52,10 @@ button {
   transition: all 0.2s ease;
   border: 2px solid transparent;
   text-decoration: none;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
 }
 
 .btn-primary {
@@ -352,6 +356,7 @@ button {
 .sidebar-btn-add:hover {
   background-color: #1e1c26;
   border-color: #1e1c26;
+  transform: translateY(-1px);
 }
 
 .sidebar-search-box {

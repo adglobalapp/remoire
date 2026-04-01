@@ -294,6 +294,11 @@
     color: var(--color-light-beige);
 }
 
+.saveBtn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 .saveBtn:disabled {
     background-color: var(--color-light-brown);
     opacity: 0.5;
@@ -303,15 +308,42 @@
 .errorText {
     margin: 0;
     font-size: 1rem;
-    color: #dc3545;
+    color: var(--color-error);
     font-weight: 500;
 }
 
 .modalFooter {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     gap: 12px;
     margin-top: auto;
     padding-top: 20px;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.deleteBtn {
+    background-color: var(--color-error);
+    color: white;
+    border: 2px solid transparent;
+    margin-right: auto;
+    font-size: 1.4rem !important;
+    padding: 0.2rem 1.1rem !important;
+    line-height: 1 !important;
+    font-family: var(--font-ui), serif !important;
+}
+
+.deleteBtn:hover:not(:disabled) {
+    background-color: var(--color-error-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(187, 53, 53, 0.2);
+}
+
+.deleteBtn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.deleteBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
