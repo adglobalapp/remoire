@@ -70,7 +70,7 @@ const EntryPreviewModal = ({ entry, onClose }: EntryPreviewModalProps) => {
             <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
                     <h2>Preview Entry</h2>
-                    <button className={styles.closeBtn} onClick={onClose}>
+                    <button className="modal-close-btn" onClick={onClose}>
                         <X size={20} />
                     </button>
                 </div>

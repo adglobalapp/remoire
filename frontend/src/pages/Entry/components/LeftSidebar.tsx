@@ -3,11 +3,14 @@ import { Trash2, Plus, Search } from 'lucide-react';
 import styles from './LeftSidebar.module.css';
 import { useEntryContext } from '../../../contexts/EntryContext';
 import { formatDateTime } from '../../../utils/dateUtils';
+import DeleteConfirmationModal from '../../../components/common/DeleteConfirmationModal';
 
 const LeftSidebar = () => {
     const { entries, activeEntry, selectEntry, createEntry, deleteEntry } = useEntryContext();
     const [activeFilter, setActiveFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
+    const [itemToDelete, setItemToDelete] = useState<number | null>(null);
+
     const filteredEntries = entries.filter(entry => {
         const matchesSearch = entry.title.toLowerCase().includes(searchQuery.toLowerCase());
         if (activeFilter === 'all') return matchesSearch;
@@ -30,8 +33,15 @@ const LeftSidebar = () => {
     });
 
     const handleDelete = (e: React.MouseEvent, id: number) => {
-        e.stopPropagation(); // dont select entry on delete
-        deleteEntry(id);
+        e.stopPropagation();
+        setItemToDelete(id);
+    };
+
+    const confirmDelete = () => {
+        if (itemToDelete !== null) {
+            deleteEntry(itemToDelete);
+            setItemToDelete(null);
+        }
     };
 
     return (
@@ -47,16 +57,15 @@ const LeftSidebar = () => {
                         className={`sidebar-item ${activeEntry?.id === entry.id ? 'active' : ''}`}
                         onClick={() => selectEntry(entry)}
                     >
-                        <div className={styles.entryInfo}>
-                            <span className={styles.entryTitle}>{entry.title || 'Untitled'}</span>
-                            <span className={styles.entryDate}>{formatDateTime(entry.created_at)}</span>
-
+                        <div className="sidebar-item-info">
+                            <span className="sidebar-item-title">{entry.title || 'Untitled'}</span>
+                            <span className="sidebar-item-meta">{formatDateTime(entry.created_at)}</span>
                         </div>
                         <button
                             className="sidebar-delete-btn"
                             onClick={(e) => handleDelete(e, entry.id)}
                         >
-                            <Trash2 size={18} />
+                            <Trash2 size={16} />
                         </button>
                     </div>
                 ))}
@@ -96,6 +105,18 @@ const LeftSidebar = () => {
                     ))}
                 </div>
             </div>
+
+            <DeleteConfirmationModal
+                isOpen={itemToDelete !== null}
+                onClose={() => setItemToDelete(null)}
+                onConfirm={confirmDelete}
+                title="Delete Entry"
+                message={
+                    <span>
+                        Are you sure you want to delete <strong>{entries.find(e => e.id === itemToDelete)?.title || 'Untitled'}</strong>? This action cannot be undone.
+                    </span>
+                }
+            />
         </aside>
 
     );

@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { Trash2, Plus, Search } from 'lucide-react';
 import styles from './LeftSidebar.module.css';
 import { useTimelineContext } from '../../../contexts/TimelineContext';
+import DeleteConfirmationModal from '../../../components/common/DeleteConfirmationModal';
 
 const LeftSidebar = () => {
     const { timelines, activeTimeline, selectTimeline, createTimeline, deleteTimeline } = useTimelineContext();
     const [searchQuery, setSearchQuery] = useState('');
     const [isCreating, setIsCreating] = useState(false);
     const [newName, setNewName] = useState('');
+    const [itemToDelete, setItemToDelete] = useState<number | null>(null);
 
     const filtered = timelines.filter(t =>
         t.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -24,7 +26,14 @@ const LeftSidebar = () => {
 
     const handleDelete = (e: React.MouseEvent, id: number) => {
         e.stopPropagation();
-        deleteTimeline(id);
+        setItemToDelete(id);
+    };
+
+    const confirmDelete = () => {
+        if (itemToDelete !== null) {
+            deleteTimeline(itemToDelete);
+            setItemToDelete(null);
+        }
     };
 
     return (
@@ -40,10 +49,10 @@ const LeftSidebar = () => {
                         className={`sidebar-item ${activeTimeline?.id === timeline.id ? 'active' : ''}`}
                         onClick={() => selectTimeline(timeline)}
                     >
-                        <div className={styles.timelineInfo}>
-                            <span className={styles.timelineName}>{timeline.name}</span>
+                        <div className="sidebar-item-info">
+                            <span className="sidebar-item-title">{timeline.name}</span>
                             {timeline.isDefault && (
-                                <span className={styles.defaultBadge}>default</span>
+                                <span className="sidebar-item-meta">default</span>
                             )}
                         </div>
                         {!timeline.isDefault && (
@@ -98,6 +107,18 @@ const LeftSidebar = () => {
                     <Search size={16} className="sidebar-search-icon" />
                 </div>
             </div>
+
+            <DeleteConfirmationModal
+                isOpen={itemToDelete !== null}
+                onClose={() => setItemToDelete(null)}
+                onConfirm={confirmDelete}
+                title="Delete Timeline"
+                message={
+                    <span>
+                        Are you sure you want to delete <strong>{timelines.find(t => t.id === itemToDelete)?.name}</strong>? This action cannot be undone.
+                    </span>
+                }
+            />
         </aside>
 
     );

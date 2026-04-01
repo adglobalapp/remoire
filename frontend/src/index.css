@@ -212,6 +212,35 @@ button {
   padding-left: calc(1.2rem - 6px);
 }
 
+.sidebar-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-item-title {
+  font-weight: 400;
+  font-size: 1.5rem;
+  color: var(--color-dark-brown);
+  line-height: 1.1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+.sidebar-item-meta {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  font-family: var(--font-body);
+  letter-spacing: 0.02em;
+}
+
 .sidebar-footer {
   padding: 1rem;
   background-color: var(--color-light-beige);
@@ -282,4 +311,23 @@ button {
   opacity: 0.5;
   font-size: 0.9rem;
   font-family: var(--font-body);
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-dark-brown);
+  opacity: 0.4;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close-btn:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.06);
 }

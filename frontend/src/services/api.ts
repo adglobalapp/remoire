@@ -87,15 +87,14 @@ export const uploadImage = async (file: File): Promise<{ url?: string; error?: s
             method: 'POST',
             body: formData,
         });
-        
+
         const data = await response.json();
-        
+
         if (!response.ok) {
-            // Laravel validation errors are usually in data.errors or data.message
             const errorMessage = data.message || (data.errors ? Object.values(data.errors).flat().join(' ') : `Error: ${response.status}`);
             throw new Error(errorMessage);
         }
-        
+
         return { url: data.url };
     } catch (error: any) {
         console.error('Failed to upload image:', error);

@@ -11,6 +11,7 @@
     z-index: 1000;
     backdrop-filter: blur(4px);
     pointer-events: auto;
+    animation: fadeIn 0.2s ease-out;
 }
 
 .modalContent {
@@ -22,8 +23,31 @@
     display: flex;
     flex-direction: column;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     overflow: hidden;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .modalHeader {
@@ -31,7 +55,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px 24px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .modalHeader h2 {
@@ -41,31 +65,12 @@
     margin: 0;
 }
 
-.closeBtn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--color-dark-brown);
-    opacity: 0.6;
-    padding: 4px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s, opacity 0.2s;
-}
-
 .editEntryBtn {
     background-color: var(--color-dark-brown);
     color: var(--color-light-beige);
     display: flex;
     align-items: center;
     gap: 8px;
-}
-
-.closeBtn:hover {
-    background: rgba(0, 0, 0, 0.05);
-    opacity: 1;
 }
 
 .previewBody {
@@ -85,7 +90,7 @@
     flex-shrink: 0;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
     background-image: url('../../../assets/images/paper.png');
-    background-size: 100% 100%; /* Stretch to fill exactly */
+    background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
     display: flex;
@@ -99,8 +104,7 @@
     justify-content: flex-end;
     gap: 12px;
     padding: 16px 24px;
-    border-top: 1px solid rgba(0,0,0,0.05);
-    background: rgba(255, 255, 255, 0.3);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .previewPaper :global(.ProseMirror h1) {

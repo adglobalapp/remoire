@@ -1,29 +1,3 @@
-.entryInfo {
-    display: flex;
-    flex-direction: column;
-}
-
-.entryTitle {
-    font-weight: 400;
-    font-size: 1.6rem;
-    color: var(--color-dark-brown);
-    line-height: 1.1;
-    padding-bottom: 0.5rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    word-break: break-word;
-}
-
-.entryDate {
-    font-size: 0.85rem;
-    opacity: 0.6;
-    font-family: var(--font-body);
-}
-
 .filterRow {
     display: flex;
     justify-content: space-between;
@@ -46,13 +20,4 @@
 .filterItem.active {
     opacity: 1;
     color: var(--color-burgundy);
-}
-
-.emptyState {
-    padding: 2rem 1rem;
-    text-align: center;
-    color: var(--color-dark-brown);
-    opacity: 0.5;
-    font-size: 0.9rem;
-    font-family: var(--font-body);
 }

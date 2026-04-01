@@ -10,6 +10,7 @@
     justify-content: center;
     align-items: center;
     z-index: 999999;
+    animation: fadeIn 0.2s ease-out;
 }
 
 .modalContent {
@@ -17,12 +18,38 @@
     border-radius: 12px;
     width: 90%;
     max-width: 480px;
+    min-height: 480px;
     padding: 24px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     gap: 20px;
     border: 1px solid rgba(0, 0, 0, 0.05);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: visible;
+    position: relative;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .modalHeader {
@@ -38,29 +65,11 @@
     margin: 0;
 }
 
-.closeBtn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--color-dark-brown);
-    opacity: 0.6;
-    padding: 4px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s, opacity 0.2s;
-}
-
-.closeBtn:hover {
-    background: rgba(0, 0, 0, 0.05);
-    opacity: 1;
-}
-
 .formGroup {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    position: relative;
 }
 
 .formGroup label {
@@ -76,46 +85,123 @@
     color: inherit;
 }
 
-.select,
-.input {
+.selectTrigger {
     width: 100%;
-    padding: 6px 14px;
+    padding: 8px 14px;
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 8px;
     background: white;
     font-size: 1.4rem;
-    /* Force inherit scaling */
     color: var(--color-dark-brown);
-    font-family: inherit;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.select {
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a3627' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 18px center;
-    background-size: 20px;
-    padding-right: 52px;
     cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.2s;
+    user-select: none;
+    position: relative;
 }
 
-.select:hover {
+.selectTrigger:hover {
     border-color: rgba(0, 0, 0, 0.3);
 }
 
-.select:focus,
-.input:focus {
-    outline: none;
-    border-color: var(--color-burgundy);
+.selectedEntryRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-right: 10px;
 }
 
-.select option {
+.selectedDate {
+    font-size: 1.2rem;
+    opacity: 0.4;
+    margin-left: 12px;
+}
+
+.placeholder {
+    opacity: 0.5;
+}
+
+.chevron {
+    flex-shrink: 0;
+    transition: transform 0.2s;
+    opacity: 0.6;
+}
+
+.chevronOpen {
+    transform: rotate(180deg);
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    max-height: 250px;
+    overflow-y: auto;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.entryListContainer {
+    display: none;
+}
+
+.entryListItem {
+    padding: 6px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     font-size: 1.4rem;
-    padding: 10px;
-    background: var(--color-white, #fff);
+}
+
+.entryListItem:last-child {
+    border-bottom: none;
+}
+
+.entryListItem:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.entryListItemActive {
+    background: rgba(var(--color-burgundy-rgb), 0.05) !important;
+    border-left: 3px solid var(--color-burgundy);
+}
+
+.entryInfoLeft {
+    display: flex;
+    flex-direction: column;
+}
+
+.entryTitle {
+    font-weight: 500;
     color: var(--color-dark-brown);
+}
+
+.entryInfoRight {
+    text-align: right;
+}
+
+.entryDate {
+    font-size: 1.2rem;
+    color: var(--color-dark-brown);
+    opacity: 0.4;
+}
+
+.emptyState {
+    padding: 20px;
+    text-align: center;
+    opacity: 0.5;
 }
 
 .colorPalette {
@@ -200,7 +286,7 @@
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    margin-top: 10px;
+    margin-top: auto;
     padding-top: 20px;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
 }

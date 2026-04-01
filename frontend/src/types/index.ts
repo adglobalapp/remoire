@@ -111,3 +111,10 @@ export interface EntryPreviewModalProps {
     onClose: () => void;
 }
 
+export interface DeleteConfirmationModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    title: string;
+    message: ReactNode;
+}
