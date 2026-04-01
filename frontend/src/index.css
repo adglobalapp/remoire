@@ -58,6 +58,12 @@ button {
   transform: translateY(-1px);
 }
 
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
 .btn-primary {
   background-color: var(--color-burgundy);
   color: var(--color-light-beige);

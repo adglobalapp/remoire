@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
     Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight,
     AlignJustify, Image as ImageIcon, Undo, Redo, List, ListOrdered,
@@ -343,18 +344,149 @@ const EditorToolbar = ({
                         <option value="64px">64px</option>
                         <option value="72px">72px</option>
                     </select>
-
-                    <div className={styles.divider} />
                 </div>
 
                 <div className={styles.divider} />
 
                 <div className={styles.toolbarGroup}>
+                    <div className={styles.paletteContainer} ref={paletteRef}>
+                        <button
+                            type="button"
+                            disabled={isDragMode}
+                            className={classNames(styles.actionButton, styles.paletteTrigger, { [styles.isActive]: showPalette })}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setShowPalette(!showPalette);
+                            }}
+                            title="Color Palette"
+                        >
+                            <Palette size={18} />
+                        </button>
+
+                        {showPalette && createPortal(
+                            <div
+                                className={styles.palettePopup}
+                                onMouseDown={(e) => e.stopPropagation()}
+                                style={{
+                                    position: 'fixed',
+                                    bottom: `${window.innerHeight - (paletteRef.current?.getBoundingClientRect().top ?? 0) + 8}px`,
+                                    left: `${(paletteRef.current?.getBoundingClientRect().left ?? 0) + ((paletteRef.current?.getBoundingClientRect().width ?? 0) / 2)}px`,
+                                    transform: 'translateX(-50%)',
+                                    zIndex: 10000
+                                }}
+                            >
+                                <div className={styles.paletteSection}>
+                                    <div className={styles.paletteLabel}>Preset Colors</div>
+                                    <div className={styles.colorGrid}>
+                                        {presetColors.map((color) => (
+                                            <button
+                                                key={color}
+                                                type="button"
+                                                className={styles.colorSquare}
+                                                style={{ backgroundColor: color }}
+                                                onClick={() => applyColor(color)}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {recentColors.length > 0 && (
+                                    <div className={styles.paletteSection}>
+                                        <div className={styles.paletteLabel}>Recent in Document</div>
+                                        <div className={styles.colorGrid}>
+                                            {recentColors.map((color) => (
+                                                <button
+                                                    key={color}
+                                                    type="button"
+                                                    className={styles.colorSquare}
+                                                    style={{ backgroundColor: color }}
+                                                    onClick={() => applyColor(color)}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className={styles.paletteDivider} />
+
+                                <div className={styles.customColorSection}>
+                                    <div className={styles.paletteLabel}>Custom Color</div>
+                                    <div className={styles.colorInputWrapper}>
+                                        <input
+                                            type="color"
+                                            className={styles.colorPicker}
+                                            value={currentColor}
+                                            ref={(node) => {
+                                                if (node) {
+                                                    if (!(node as any)._hasChangeHandler) {
+                                                        (node as any)._hasChangeHandler = true;
+                                                        node.addEventListener('change', (e) => {
+                                                            const val = (e.target as HTMLInputElement).value;
+                                                            if (originalColorRef.current !== null) {
+                                                                const { from, to } = editor.state.selection;
+                                                                const tr = editor.state.tr.setMeta('addToHistory', false);
+                                                                const markType = editor.schema.marks.textStyle;
+                                                                editor.state.doc.nodesBetween(from, to, (node, pos) => {
+                                                                    if (!node.isText) return;
+                                                                    const existingMark = node.marks.find(m => m.type === markType);
+                                                                    const newAttrs = existingMark ? { ...existingMark.attrs, color: originalColorRef.current } : { color: originalColorRef.current };
+                                                                    tr.addMark(Math.max(from, pos), Math.min(to, pos + node.nodeSize), markType.create(newAttrs));
+                                                                });
+                                                                editor.view.dispatch(tr);
+                                                            }
+                                                            editor.chain().setColor(val).run();
+                                                            originalColorRef.current = null;
+                                                            isPickingColorRef.current = false;
+                                                            onColorPickerToggle?.(false);
+                                                        });
+                                                    }
+                                                }
+                                            }}
+                                            onFocus={() => {
+                                                isPickingColorRef.current = true;
+                                                originalColorRef.current = editor.getAttributes('textStyle').color || '#493627';
+                                                onColorPickerToggle?.(true);
+                                            }}
+                                            onInput={(e) => {
+                                                const val = (e.target as HTMLInputElement).value;
+                                                setCurrentColor(val);
+                                                const now = Date.now();
+                                                if (now - lastPreviewTimeRef.current > 32) {
+                                                    lastPreviewTimeRef.current = now;
+                                                    const { from, to } = editor.state.selection;
+                                                    const tr = editor.state.tr.setMeta('addToHistory', false).setMeta('isColorPreview', true);
+                                                    const markType = editor.schema.marks.textStyle;
+                                                    editor.state.doc.nodesBetween(from, to, (node, pos) => {
+                                                        if (!node.isText) return;
+                                                        const existingMark = node.marks.find(m => m.type === markType);
+                                                        const newAttrs = existingMark ? { ...existingMark.attrs, color: val } : { color: val };
+                                                        tr.addMark(Math.max(from, pos), Math.min(to, pos + node.nodeSize), markType.create(newAttrs));
+                                                    });
+                                                    editor.view.dispatch(tr);
+                                                }
+                                            }}
+                                            onClick={() => {
+                                                isPickingColorRef.current = true;
+                                                originalColorRef.current = editor.getAttributes('textStyle').color || '#493627';
+                                                onColorPickerToggle?.(true);
+                                            }}
+                                        />
+                                        <span className={styles.colorHex}>{currentColor.toUpperCase()}</span>
+                                    </div>
+                                </div>
+                            </div>,
+                            document.body
+                        )}
+                    </div>
+
+                    <div className={styles.divider} />
+
                     <button
                         type="button"
                         onClick={() => editor.chain().focus().toggleBold().run()}
                         disabled={isDragMode || !editor.can().chain().focus().toggleBold().run()}
                         className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive('bold') })}
+                        title="Bold"
                     >
                         <Bold size={18} />
                     </button>
@@ -363,6 +495,7 @@ const EditorToolbar = ({
                         onClick={() => editor.chain().focus().toggleItalic().run()}
                         disabled={isDragMode || !editor.can().chain().focus().toggleItalic().run()}
                         className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive('italic') })}
+                        title="Italic"
                     >
                         <Italic size={18} />
                     </button>
@@ -371,6 +504,7 @@ const EditorToolbar = ({
                         onClick={() => editor.chain().focus().toggleUnderline().run()}
                         disabled={isDragMode || !editor.can().chain().focus().toggleUnderline().run()}
                         className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive('underline') })}
+                        title="Underline"
                     >
                         <Underline size={18} />
                     </button>
@@ -464,127 +598,6 @@ const EditorToolbar = ({
                     />
                 </div>
 
-            </div>
-
-            <div className={styles.fixedGroup}>
-                <div className={styles.divider} />
-
-                <div className={styles.paletteContainer} ref={paletteRef}>
-                    <button
-                        type="button"
-                        disabled={isDragMode}
-                        className={classNames(styles.actionButton, styles.paletteTrigger, { [styles.isActive]: showPalette })}
-                        onClick={() => setShowPalette(!showPalette)}
-                        title="Color Palette"
-                    >
-                        <Palette size={18} />
-                    </button>
-
-                    {showPalette && (
-                        <div className={styles.palettePopup}>
-                            <div className={styles.paletteSection}>
-                                <div className={styles.paletteLabel}>Preset Colors</div>
-                                <div className={styles.colorGrid}>
-                                    {presetColors.map((color) => (
-                                        <button
-                                            key={color}
-                                            type="button"
-                                            className={styles.colorSquare}
-                                            style={{ backgroundColor: color }}
-                                            onClick={() => applyColor(color)}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-
-                            {recentColors.length > 0 && (
-                                <div className={styles.paletteSection}>
-                                    <div className={styles.paletteLabel}>Recent in Document</div>
-                                    <div className={styles.colorGrid}>
-                                        {recentColors.map((color) => (
-                                            <button
-                                                key={color}
-                                                type="button"
-                                                className={styles.colorSquare}
-                                                style={{ backgroundColor: color }}
-                                                onClick={() => applyColor(color)}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className={styles.paletteDivider} />
-
-                            <div className={styles.customColorSection}>
-                                <div className={styles.paletteLabel}>Custom Color</div>
-                                <div className={styles.colorInputWrapper}>
-                                    <input
-                                        type="color"
-                                        className={styles.colorPicker}
-                                        value={currentColor}
-                                        ref={(node) => {
-                                            if (node) {
-                                                if (!(node as any)._hasChangeHandler) {
-                                                    (node as any)._hasChangeHandler = true;
-                                                    node.addEventListener('change', (e) => {
-                                                        const val = (e.target as HTMLInputElement).value;
-                                                        if (originalColorRef.current !== null) {
-                                                            const { from, to } = editor.state.selection;
-                                                            const tr = editor.state.tr.setMeta('addToHistory', false);
-                                                            const markType = editor.schema.marks.textStyle;
-                                                            editor.state.doc.nodesBetween(from, to, (node, pos) => {
-                                                                if (!node.isText) return;
-                                                                const existingMark = node.marks.find(m => m.type === markType);
-                                                                const newAttrs = existingMark ? { ...existingMark.attrs, color: originalColorRef.current } : { color: originalColorRef.current };
-                                                                tr.addMark(Math.max(from, pos), Math.min(to, pos + node.nodeSize), markType.create(newAttrs));
-                                                            });
-                                                            editor.view.dispatch(tr);
-                                                        }
-                                                        editor.chain().setColor(val).run();
-                                                        originalColorRef.current = null;
-                                                        isPickingColorRef.current = false;
-                                                        onColorPickerToggle?.(false);
-                                                    });
-                                                }
-                                            }
-                                        }}
-                                        onFocus={() => {
-                                            isPickingColorRef.current = true;
-                                            originalColorRef.current = editor.getAttributes('textStyle').color || '#493627';
-                                            onColorPickerToggle?.(true);
-                                        }}
-                                        onInput={(e) => {
-                                            const val = (e.target as HTMLInputElement).value;
-                                            setCurrentColor(val);
-                                            const now = Date.now();
-                                            if (now - lastPreviewTimeRef.current > 32) {
-                                                lastPreviewTimeRef.current = now;
-                                                const { from, to } = editor.state.selection;
-                                                const tr = editor.state.tr.setMeta('addToHistory', false).setMeta('isColorPreview', true);
-                                                const markType = editor.schema.marks.textStyle;
-                                                editor.state.doc.nodesBetween(from, to, (node, pos) => {
-                                                    if (!node.isText) return;
-                                                    const existingMark = node.marks.find(m => m.type === markType);
-                                                    const newAttrs = existingMark ? { ...existingMark.attrs, color: val } : { color: val };
-                                                    tr.addMark(Math.max(from, pos), Math.min(to, pos + node.nodeSize), markType.create(newAttrs));
-                                                });
-                                                editor.view.dispatch(tr);
-                                            }
-                                        }}
-                                        onClick={() => {
-                                            isPickingColorRef.current = true;
-                                            originalColorRef.current = editor.getAttributes('textStyle').color || '#493627';
-                                            onColorPickerToggle?.(true);
-                                        }}
-                                    />
-                                    <span className={styles.colorHex}>{currentColor.toUpperCase()}</span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
                 <div className={styles.divider} />
 
                 <div className={styles.settingsContainer} ref={settingsRef}>
@@ -598,8 +611,18 @@ const EditorToolbar = ({
                         <Settings size={18} />
                     </button>
 
-                    {showSettings && pageSettings && onPageSettingsChange && (
-                        <div className={styles.settingsPopup}>
+                    {showSettings && pageSettings && onPageSettingsChange && createPortal(
+                        <div
+                            className={styles.settingsPopup}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            style={{
+                                position: 'fixed',
+                                bottom: `${window.innerHeight - (settingsRef.current?.getBoundingClientRect().top ?? 0) + 8}px`,
+                                left: `${(settingsRef.current?.getBoundingClientRect().left ?? 0) + ((settingsRef.current?.getBoundingClientRect().width ?? 0) / 2)}px`,
+                                transform: 'translateX(-50%)',
+                                zIndex: 10000
+                            }}
+                        >
                             <div className={styles.settingsSection}>
                                 <div className={styles.settingsLabel}>Background Image</div>
                                 <div className={styles.bgActions}>
@@ -649,7 +672,8 @@ const EditorToolbar = ({
                                     </label>
                                 </div>
                             </div>
-                        </div>
+                        </div>,
+                        document.body
                     )}
                 </div>
 

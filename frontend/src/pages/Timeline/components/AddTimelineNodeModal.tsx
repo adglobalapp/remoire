@@ -109,7 +109,7 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
 
     const handleConfirmDelete = async () => {
         if (!entryToEdit || !activeTimeline || activeTimeline.isDefault) return;
-        
+
         setIsDeleting(true);
         try {
             await removeEntryFromTimeline(activeTimeline.id, entryToEdit.id);
@@ -200,7 +200,7 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
                                     title={c.label}
                                 />
                             ))}
-                            
+
                             <button
                                 type="button"
                                 className={`${styles.colorBtn} ${styles.customColorBtn} ${customColor ? styles.colorBtnActive : ''}`}
@@ -261,13 +261,13 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
                     </div>
 
                     <div className={styles.modalFooter}>
-                        {entryToEdit && activeTimeline && !activeTimeline.isDefault && (
+                        {entryToEdit && activeTimeline && (
                             <button
                                 type="button"
                                 className={`btn ${styles.deleteBtn}`}
                                 onClick={() => setIsConfirmOpen(true)}
-                                disabled={isSaving || isDeleting || isUploading}
-                                title="Remove from timeline"
+                                disabled={isSaving || isDeleting || isUploading || activeTimeline.isDefault}
+                                title={activeTimeline.isDefault ? "Cannot remove from default timeline" : undefined}
                             >
                                 <Trash2 size={16} />
                                 <span>Remove</span>
