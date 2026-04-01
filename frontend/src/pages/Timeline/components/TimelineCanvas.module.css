@@ -29,6 +29,12 @@
     min-width: 900px;
 }
 
+@media (max-width: 1024px) {
+    .timelineWrapper {
+        padding-top: 20px;
+    }
+}
+
 /* Vertical center line */
 .centerLine {
     position: absolute;

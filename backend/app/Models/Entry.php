@@ -16,4 +16,9 @@ class Entry extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function timelines()
+    {
+        return $this->belongsToMany(Timeline::class);
+    }
 }

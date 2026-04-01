@@ -1,20 +1,20 @@
-import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import { useState, useRef, useEffect } from 'react';
+import { useEditor, EditorContent, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
-import { ResizableImage } from './extensions/ResizableImage';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { Color } from '@tiptap/extension-color';
-import { FontSize } from './extensions/FontSize';
-import EditorToolbar from './EditorToolbar';
-import styles from './EntryEditor.module.css';
 import classNames from 'classnames';
+import EditorToolbar from './EditorToolbar';
+import { ResizableImage } from './extensions/ResizableImage';
+import { FontSize } from './extensions/FontSize';
 import { useEntryContext } from '../../../contexts/EntryContext';
 import { CanvasScaleContext } from '../../../contexts/CanvasScaleContext';
-import { type PageSettings, DEFAULT_PAGE_SETTINGS } from '../../../types';
 import { useCanvasNavigation } from '../../../hooks/useCanvasNavigation';
+import { type PageSettings, DEFAULT_PAGE_SETTINGS } from '../../../types';
+import styles from './EntryEditor.module.css';
 
 const EntryEditor = () => {
     const { activeEntry, saveEntry, updateEntryTitle } = useEntryContext();
@@ -25,13 +25,12 @@ const EntryEditor = () => {
         isDragging,
         containerRef,
         handleMouseDown,
+        handleTouchStart,
     } = useCanvasNavigation({ minScale: 0.4, initialTransform: { x: 0, y: 0, scale: 1.15 } });
 
     const [isDragMode, setIsDragMode] = useState(false);
     const [isColorPicking, setIsColorPicking] = useState(false);
     const mouseDownTargetRef = useRef<EventTarget | null>(null);
-
-
     const [pageSettings, setPageSettings] = useState<PageSettings>(DEFAULT_PAGE_SETTINGS);
     const pageSettingsRef = useRef<PageSettings>(DEFAULT_PAGE_SETTINGS);
 
@@ -132,12 +131,12 @@ const EntryEditor = () => {
         const contentJSON = (stored && typeof stored === 'object' && stored.contentJSON)
             ? stored.contentJSON
             : (typeof stored === 'string' ? stored : '<h1>Untitled</h1><p>Dear Diary...</p>');
-        
+
         let settings = DEFAULT_PAGE_SETTINGS;
         if (stored && typeof stored === 'object' && stored.pageSettings) {
             settings = { ...DEFAULT_PAGE_SETTINGS, ...stored.pageSettings };
         }
-        
+
         // Delay content loading to avoid React life-cycle warnings (flushSync)
         setTimeout(() => {
             if (!editor) return;
@@ -169,11 +168,22 @@ const EntryEditor = () => {
         handleMouseDown(e, isDragMode);
     };
 
+    const onTouchStart = (e: React.TouchEvent) => {
+        const target = e.target as Element;
+        const isBackdrop = target === containerRef.current || target?.classList?.contains(styles.canvas);
+
+        if (isDragMode || isBackdrop || e.touches.length >= 2) {
+            handleTouchStart(e, true);
+        }
+    };
 
     useEffect(() => {
         if (containerRef.current) {
             const width = containerRef.current.offsetWidth;
-            const initialScale = 1.15;
+            const sidebarSpace = width > 1400 ? 660 : 32;
+            const idealScale = (width - sidebarSpace) / 800;
+            const initialScale = Math.min(1.0, idealScale);
+
             const initialX = (width / 2) * (1 - initialScale);
             setTransform({ x: initialX, y: 0, scale: initialScale });
         }
@@ -201,6 +211,7 @@ const EntryEditor = () => {
                     [styles.hideSelection]: isColorPicking
                 })}
                 onMouseDown={onMouseDown}
+                onTouchStart={onTouchStart}
 
                 onClick={(e) => {
                     const target = e.target as Element;

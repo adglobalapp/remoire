@@ -21,3 +21,38 @@
     opacity: 1;
     color: var(--color-burgundy);
 }
+
+/* ── Mobile toggle ─────────────────────────── */
+.mobileToggle {
+    display: none;
+}
+
+.mobileHidden,
+.mobileVisible {
+    height: 100%;
+}
+
+.mobileToggle {
+    left: 0;
+    border-radius: 0 8px 8px 0;
+    background-color: var(--color-dark-blue);
+}
+
+/* Universal Hiding Logic */
+.mobileHidden :global(.sidebar-container) {
+    transform: translateX(-110%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+}
+
+.mobileVisible :global(.sidebar-container) {
+    transform: translateX(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+}
+
+.mobileVisible .mobileToggle {
+    transform: translateX(260px);
+    opacity: 0;
+    pointer-events: none;
+}

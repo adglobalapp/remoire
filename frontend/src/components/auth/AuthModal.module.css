@@ -1,0 +1,192 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modalContent {
+    background: var(--color-light-beige, #f8f5f2);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    padding: 32px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modalHeader h2 {
+    font-size: 1.8rem;
+    font-weight: 500;
+    color: var(--color-dark-brown);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.closeBtn:hover {
+    color: var(--color-burgundy);
+}
+
+.authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.formGroup label {
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--color-dark-brown);
+    opacity: 0.75;
+}
+
+.formGroup input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background: white;
+    font-size: 0.95rem;
+    color: var(--color-dark-brown);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.formGroup input::placeholder {
+    font-size: 0.9rem;
+    opacity: 0.5;
+}
+
+.formGroup input:focus {
+    outline: none;
+    border-color: var(--color-burgundy);
+    box-shadow: 0 0 0 4px rgba(116, 33, 33, 0.1);
+}
+
+.errorMessage {
+    color: var(--color-error);
+    font-size: 1.2rem;
+    margin-top: 1px;
+    margin-left: 2px;
+    line-height: 1;
+}
+
+.inputError {
+    border-color: var(--color-error) !important;
+}
+
+.inputError:focus {
+    box-shadow: 0 0 0 4px rgba(var(--color-error-rgb), 0.1) !important;
+}
+
+.submitBtn {
+    width: 100%;
+    padding: 14px;
+    background: var(--color-burgundy);
+    color: var(--color-light-beige);
+    border: none;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 8px;
+}
+
+.submitBtn:hover {
+    background: var(--color-burgundy-hover);
+}
+
+.submitBtn:active {
+    transform: scale(0.98);
+}
+
+.submitBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.modalFooter {
+    text-align: center;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: 20px;
+}
+
+.modalFooter p {
+    font-size: 0.95rem;
+    color: rgba(0, 0, 0, 0.5);
+    margin: 0;
+}
+
+.modalFooter button {
+    background: none;
+    border: none;
+    color: var(--color-burgundy);
+    font-weight: 400;
+    cursor: pointer;
+    padding: 0 4px;
+    text-decoration: none;
+    font-size: 1.4rem;
+    transition: color 0.2s;
+}
+
+.modalFooter button:hover {
+    color: var(--color-burgundy-hover);
+    text-decoration: none;
+}

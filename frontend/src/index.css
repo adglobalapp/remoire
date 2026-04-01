@@ -27,7 +27,7 @@ input,
 .text-body,
 .text-small {
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 0.8rem;
 }
 
 .font-logo {
@@ -117,8 +117,10 @@ button {
   pointer-events: none;
 }
 
-.sidebar-left>*,
-.sidebar-right>* {
+.sidebar-left .sidebar-container,
+.sidebar-right .sidebar-container,
+.sidebar-left button,
+.sidebar-right button {
   pointer-events: auto;
 }
 
@@ -137,30 +139,89 @@ button {
   box-shadow: var(--shadow-paper);
   display: flex;
   flex-direction: column;
-  margin: 25px 0 25px 25px;
-  height: calc(100% - 50px);
-  width: 280px;
+  margin: 12px 0 12px 12px;
+  height: calc(100% - 24px);
+  width: 260px;
   overflow: hidden;
   min-height: 0;
 }
 
+.sidebar-burgundy .sidebar-header {
+  background-color: var(--color-burgundy);
+}
+
+.sidebar-burgundy :global(.sidebar-item.active),
+.sidebar-burgundy .active {
+  color: var(--color-burgundy);
+}
+
 .sidebar-right .sidebar-container {
-  margin: 25px 25px 25px 0;
+  margin: 12px 12px 12px 0;
 }
 
 .sidebar-header {
   background-color: var(--color-dark-blue);
   color: var(--color-light-beige);
-  padding: 0.5rem;
-  text-align: center;
-  font-size: 1.3rem;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
   z-index: 10;
   flex-shrink: 0;
+  height: 50px;
 }
 
 .sidebar-header h3 {
   font-weight: 400;
   margin: 0;
+  font-size: 1.6rem !important;
+}
+
+.sidebar-toggle-fab {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 68px;
+  width: 42px;
+  height: 50px;
+  color: white;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  z-index: 50;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s, background-color 0.2s;
+}
+
+@media (max-width: 1400px) {
+  .sidebar-container {
+    width: 260px;
+  }
+}
+
+.sidebar-close-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--color-light-beige);
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.sidebar-close-btn:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .sidebar-list {
@@ -232,6 +293,38 @@ button {
   overflow: hidden;
   text-overflow: ellipsis;
   word-break: break-word;
+}
+
+[data-reloading] {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Toaster refinements */
+.custom-toast {
+  background: var(--color-light-beige) !important;
+  color: var(--color-dark-brown) !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.9rem !important;
+  padding: 12px 20px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  max-width: 350px !important;
+  z-index: 10000001 !important;
+}
+
+.custom-toast-success {
+  border-bottom: 3px solid var(--color-success) !important;
+}
+
+.custom-toast-error {
+  border-bottom: 3px solid var(--color-error) !important;
+}
+
+.react-hot-toast-icon {
+  transform: scale(0.85);
+  margin-right: -4px;
 }
 
 .sidebar-item-meta {
@@ -330,4 +423,48 @@ button {
 .modal-close-btn:hover {
   opacity: 1;
   background-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Loading Screen */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--color-light-beige);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999999;
+}
+
+.loading-icon {
+  color: var(--color-light-brown);
+  animation: spinner 1.2s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes spinner {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Responsive ─────────────────────────────── */
+@media (max-width: 1400px) {
+  .sidebar-container {
+    margin: 12px 0 12px 12px;
+    width: 260px;
+    height: calc(100% - 24px);
+    /* fill height minus top/bottom margins */
+  }
+
+  .sidebar-right .sidebar-container {
+    margin: 12px 12px 12px 0;
+  }
 }

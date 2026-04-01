@@ -1,11 +1,11 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import toast from 'react-hot-toast';
 import { getEntries, createEntry as apiCreateEntry, updateEntry as apiUpdateEntry, deleteEntry as apiDeleteEntry } from '../services/api';
 import { type Entry, type EntryContextValue, type EntryProviderProps } from '../types';
 
 export const EntryContext = createContext<EntryContextValue | null>(null);
 
 export const EntryProvider = ({ children }: EntryProviderProps) => {
-
     const [entries, setEntries] = useState<Entry[]>([]);
     const [activeEntry, setActiveEntry] = useState<Entry | null>(null);
 
@@ -34,23 +34,30 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
 
     const createEntry = useCallback(async () => {
         const newEntry = await apiCreateEntry('Untitled');
-        if (!newEntry) return;
+        if (!newEntry) {
+            toast.error('Failed to create entry.');
+            return;
+        }
         setEntries(prev => [newEntry, ...prev]);
-        setActiveEntry(newEntry); // new entry becomes active
+        setActiveEntry(newEntry);
+        toast.success('New entry created!');
     }, []);
 
     const deleteEntry = useCallback(async (id: number) => {
         const ok = await apiDeleteEntry(id);
-        if (!ok) return;
+        if (!ok) {
+            toast.error('Failed to delete entry.');
+            return;
+        }
         setEntries(prev => {
             const next = prev.filter(e => e.id !== id);
             setActiveEntry(curr => {
-                // if we delete the active entry, show the next one, or null if no entries left
                 if (curr?.id === id) return next.length > 0 ? next[0] : null;
                 return curr;
             });
             return next;
         });
+        toast.success('Entry deleted.');
     }, []);
 
     // Auto-save logic
@@ -77,7 +84,7 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
                 setActiveEntry(prev => prev?.id === id ? updated : prev);
             }
         } catch (error) {
-            console.error('Save failed:', error);
+            toast.error('Failed to save changes.', { id: 'save-error' });
         } finally {
             savingRef.current = false;
             processQueue();

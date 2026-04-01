@@ -46,7 +46,7 @@
 }
 
 .warningIcon {
-    color: var(--color-burgundy);
+    color: var(--color-error);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -81,13 +81,13 @@
 }
 
 .deleteBtn {
-    background-color: var(--color-burgundy) !important;
+    background-color: var(--color-error) !important;
     color: white !important;
-    border-color: var(--color-burgundy) !important;
+    border-color: var(--color-error) !important;
 }
 
 .deleteBtn:hover {
-    background-color: var(--color-burgundy-hover) !important;
+    background-color: var(--color-error-hover) !important;
     transform: translateY(-1px);
 }
 

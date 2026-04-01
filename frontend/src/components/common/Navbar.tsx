@@ -1,0 +1,115 @@
+import { useState } from 'react';
+import { BookMarked, Users, Map, StickyNote, NotebookText, TrendingUp, LogOut, User, Menu, X } from 'lucide-react';
+import styles from './Navbar.module.css';
+import { usePage } from '../../App';
+import { useAuth } from '../../contexts/AuthContext';
+
+const Navbar = () => {
+    const { page, setPage } = usePage();
+    const { user, logout } = useAuth();
+    const [menuOpen, setMenuOpen] = useState(false);
+
+    const handleNav = (p: Parameters<typeof setPage>[0]) => {
+        setPage(p);
+        setMenuOpen(false);
+    };
+
+    return (
+        <nav className={styles.navbar}>
+            <div className={styles.logoSection} onClick={() => handleNav('entries')} style={{ cursor: 'pointer' }}>
+                <BookMarked size={25} />
+                <span className="font-logo">Remoire</span>
+            </div>
+
+            {/* Desktop menu */}
+            <div className={styles.menuItems}>
+                <a
+                    href="#"
+                    className={`${styles.link} ${page === 'entries' ? styles.active : ''}`}
+                    onClick={(e) => { e.preventDefault(); handleNav('entries'); }}
+                >
+                    <NotebookText size={20} /> Entries
+                </a>
+
+                <a
+                    href="#"
+                    className={`${styles.link} ${page === 'timelines' ? styles.active : ''}`}
+                    onClick={(e) => { e.preventDefault(); handleNav('timelines'); }}
+                >
+                    <TrendingUp size={20} /> Timelines
+                </a>
+                <a href="#" className={styles.link}>
+                    <Users size={20} /> Friendlist
+                </a>
+                <a href="#" className={styles.link}>
+                    <StickyNote size={20} /> Notes
+                </a>
+                <a href="#" className={styles.link}>
+                    <Map size={20} /> Map
+                </a>
+            </div>
+
+            <div className={styles.authSection}>
+                {user && (
+                    <div className={styles.userInfo}>
+                        <div className={styles.userBadge}>
+                            <User size={16} />
+                            <span>{user.name}</span>
+                        </div>
+                        <button onClick={logout} className={styles.logoutBtn} title="Logout">
+                            <LogOut size={18} />
+                        </button>
+                    </div>
+                )}
+
+                {/* Hamburger button – only on mobile */}
+                <button
+                    className={styles.hamburger}
+                    onClick={() => setMenuOpen(o => !o)}
+                    aria-label="Toggle menu"
+                >
+                    {menuOpen ? <X size={20} /> : <Menu size={20} />}
+                </button>
+            </div>
+
+            {/* Mobile dropdown – absolute overlay so it doesn't shift content */}
+            {menuOpen && (
+                <div className={styles.mobileMenu}>
+                    <a href="#" className={`${styles.mobileLink} ${page === 'entries' ? styles.active : ''}`}
+                        onClick={(e) => { e.preventDefault(); handleNav('entries'); }}>
+                        <NotebookText size={18} /> Entries
+                    </a>
+                    <a href="#" className={`${styles.mobileLink} ${page === 'timelines' ? styles.active : ''}`}
+                        onClick={(e) => { e.preventDefault(); handleNav('timelines'); }}>
+                        <TrendingUp size={18} /> Timelines
+                    </a>
+                    <a href="#" className={styles.mobileLink}>
+                        <Users size={18} /> Friendlist
+                    </a>
+                    <a href="#" className={styles.mobileLink}>
+                        <StickyNote size={18} /> Notes
+                    </a>
+                    <a href="#" className={styles.mobileLink}>
+                        <Map size={18} /> Map
+                    </a>
+                    {user && (
+                        <>
+                            <div className={styles.mobileUserBadge}>
+                                <User size={18} />
+                                <span>{user.name}</span>
+                            </div>
+                            <button
+                                className={`${styles.mobileLink} ${styles.mobileLinkLogout}`}
+                                onClick={() => { logout(); setMenuOpen(false); }}
+                            >
+                                <LogOut size={18} className={styles.logoutIconRed} /> Sign out
+                            </button>
+                        </>
+                    )}
+                </div>
+            )}
+        </nav>
+    );
+};
+
+export default Navbar;

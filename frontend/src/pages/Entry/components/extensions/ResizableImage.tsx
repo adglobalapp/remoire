@@ -3,9 +3,9 @@ import { ReactNodeViewRenderer, NodeViewWrapper } from '@tiptap/react';
 import { useRef, useEffect, useCallback } from 'react';
 import { Trash2 } from 'lucide-react';
 import Moveable from 'react-moveable';
+import classNames from 'classnames';
 import { useCanvasScale } from '../../../../contexts/CanvasScaleContext';
 import styles from './ResizableImage.module.css';
-import classNames from 'classnames';
 
 const ImageNodeView = (props: any) => {
     const { node, updateAttributes, selected } = props;
@@ -107,7 +107,6 @@ const ImageNodeView = (props: any) => {
                 pointerEvents: selected ? 'auto' : 'none',
             }}
         >
-
             <div
                 ref={targetRef}
                 className={classNames(styles.imageBox, { [styles.selected]: selected })}
@@ -122,7 +121,6 @@ const ImageNodeView = (props: any) => {
                     cursor: selected ? 'move' : 'default',
                 }}
             >
-
                 <img
                     src={src}
                     alt={alt}
@@ -135,7 +133,6 @@ const ImageNodeView = (props: any) => {
                     }}
                     className={styles.imageContent}
                 />
-
 
                 {selected && (
                     <div

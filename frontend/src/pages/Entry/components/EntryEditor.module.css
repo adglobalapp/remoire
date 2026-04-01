@@ -44,6 +44,12 @@
     -webkit-user-select: text;
 }
 
+@media (max-width: 1024px) {
+    .canvas {
+        padding-top: 60px;
+    }
+}
+
 .paper {
     background-color: transparent;
     width: 210mm;
@@ -110,6 +116,7 @@
 
 .editorContent :global(.ProseMirror p) {
     font-family: var(--font-handwriting);
+    font-size: inherit;
 }
 
 .editorContent :global(.ProseMirror p.is-editor-empty:first-child::before) {

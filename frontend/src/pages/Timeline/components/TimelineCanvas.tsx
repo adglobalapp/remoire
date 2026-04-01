@@ -1,16 +1,16 @@
 import { useState, useMemo, useEffect } from 'react';
-import styles from './TimelineCanvas.module.css';
+import { Plus } from 'lucide-react';
+import AddTimelineNodeModal from './AddTimelineNodeModal';
 import TimelineNode from './TimelineNode';
 import { useTimelineContext } from '../../../contexts/TimelineContext';
 import { useEntryContext } from '../../../contexts/EntryContext';
-import { type Entry } from '../../../types';
-import AddTimelineNodeModal from './AddTimelineNodeModal';
-import { Plus } from 'lucide-react';
-import { compareDates } from '../../../utils/dateUtils';
 import { useCanvasNavigation } from '../../../hooks/useCanvasNavigation';
+import { compareDates } from '../../../utils/dateUtils';
+import { type Entry } from '../../../types';
+import styles from './TimelineCanvas.module.css';
 
 const TimelineCanvas = () => {
-    const { activeTimeline } = useTimelineContext();
+    const { activeTimeline, isLoading } = useTimelineContext();
     const { entries } = useEntryContext();
 
     const {
@@ -19,6 +19,7 @@ const TimelineCanvas = () => {
         isDragging,
         containerRef,
         handleMouseDown,
+        handleTouchStart,
     } = useCanvasNavigation({ minScale: 0.3 });
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -27,11 +28,12 @@ const TimelineCanvas = () => {
     useEffect(() => {
         if (containerRef.current) {
             const width = containerRef.current.offsetWidth;
-            // width / 2 centers the top-left, so we subtract 500 (half of canvas width) to center the content
-            setTransform({ x: (width / 2) - 500, y: 60, scale: 1 });
+            const sidebarSpace = width > 1400 ? 660 : 32;
+            const idealScale = (width - sidebarSpace) / 920;
+            const initialScale = Math.min(1, idealScale);
+            setTransform({ x: (width / 2) - (500 * initialScale), y: 60, scale: initialScale });
         }
     }, [setTransform]);
-
 
     // Filter and sort entries for the active timeline, ordered by entry.date
     const visibleEntries: Entry[] = useMemo(() => {
@@ -57,17 +59,32 @@ const TimelineCanvas = () => {
         handleMouseDown(e, isInsideCanvas && !isNode && !isButton);
     };
 
+    const onTouchStart = (e: React.TouchEvent) => {
+        const target = e.target as HTMLElement;
+        const isNode = !!target.closest(`[class*="card"]`);
+        const isButton = !!target.closest('button');
+        const isInsideCanvas = !!target.closest(`.${styles.canvas}`) || target === containerRef.current;
+
+        const canDrag = (isInsideCanvas && !isNode && !isButton) || e.touches.length >= 2;
+        handleTouchStart(e, canDrag);
+    };
+
     return (
         <div
             ref={containerRef}
             className={`${styles.canvasContainer} ${isDragging ? styles.dragging : ''}`}
             onMouseDown={onMouseDown}
+            onTouchStart={onTouchStart}
         >
             <div
                 className={styles.canvas}
                 style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})` }}
             >
-                {visibleEntries.length === 0 ? (
+                {isLoading ? (
+                    <div className={styles.emptyTimeline}>
+                        <p>Loading timeline...</p>
+                    </div>
+                ) : visibleEntries.length === 0 ? (
                     <div className={styles.emptyTimeline}>
                         <p>No entries on this timeline yet.</p>
                     </div>
@@ -102,7 +119,6 @@ const TimelineCanvas = () => {
                     <Plus size={18} /> Add Entry
                 </button>
             )}
-
 
             {isAddModalOpen && (
                 <AddTimelineNodeModal onClose={() => setIsAddModalOpen(false)} />

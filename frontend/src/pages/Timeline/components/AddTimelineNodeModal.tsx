@@ -1,21 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { X, Upload, Palette, ChevronDown, Plus } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { uploadImage } from '../../../services/api';
 import { useEntryContext } from '../../../contexts/EntryContext';
 import { useTimelineContext } from '../../../contexts/TimelineContext';
-import { createPortal } from 'react-dom';
+import { type AddTimelineNodeModalProps } from '../../../types';
 import styles from './AddTimelineNodeModal.module.css';
-import type { AddTimelineNodeModalProps } from '../../../types';
-import { X, Upload, Palette, ChevronDown } from 'lucide-react';
 
 const COLORS = [
-    { value: '#eab8b8', label: 'Dusty Rose' },
-    { value: '#c7d5c8', label: 'Sage Green' },
-    { value: '#d5c7b8', label: 'Sand' },
-    { value: '#b8cdd5', label: 'Dusty Blue' },
-    { value: '#d5b8c7', label: 'Mauve' },
-    { value: '#c7b8d5', label: 'Lavender' },
-    { value: '#795548', label: 'Brown' },
-    { value: '#9e9e9e', label: 'Grey' },
+    { value: '#f8a5c2', label: 'Soft Coral' },
+    { value: '#f9e2af', label: 'Sunny Yellow' },
+    { value: '#a6e3a1', label: 'Minty Green' },
+    { value: '#89dceb', label: 'Sky Blue' },
+    { value: '#cba6f7', label: 'Soft Lavender' },
+    { value: '#fab387', label: 'Peach' },
+    { value: '#f5e0dc', label: 'Warm Sand' },
 ];
 
 const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProps) => {
@@ -29,7 +29,11 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [customColor, setCustomColor] = useState<string>(
+        COLORS.some(c => c.value === (entryToEdit?.color || '')) ? '' : (entryToEdit?.color || '')
+    );
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const colorPickerRef = useRef<HTMLInputElement>(null);
 
     // Close dropdown on outside click
     useEffect(() => {
@@ -56,10 +60,24 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
         setSelectedEntryId(id);
         const entry = entries.find(ent => ent.id === id);
         if (entry) {
-            setColor(entry.color || '');
+            const entryColor = entry.color || '';
+            const isPreset = COLORS.some(c => c.value === entryColor);
+            setColor(isPreset ? entryColor : '');
+            setCustomColor(isPreset ? '' : entryColor);
             setCoverImage(entry.cover_image || '');
         }
         setIsDropdownOpen(false);
+    };
+
+    const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        setCustomColor(val);
+        setColor(''); // Clear preset selection
+    };
+
+    const handleColorSave = () => {
+        // The actual value to save is either 'color' (preset) or 'customColor'
+        return color || customColor || null;
     };
 
     const handleSave = async () => {
@@ -67,7 +85,7 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
         setIsSaving(true);
         try {
             await updateEntryMetadata(Number(selectedEntryId), {
-                color: color || null,
+                color: handleColorSave(),
                 cover_image: coverImage || null,
             });
 
@@ -76,8 +94,9 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
             }
 
             onClose();
+            toast.success(entryToEdit ? 'Changes saved.' : 'Entry added.');
         } catch (error) {
-            console.error('Failed to add node', error);
+            toast.error('Failed to save.');
         } finally {
             setIsSaving(false);
         }
@@ -101,8 +120,8 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
                 {!entryToEdit && (
                     <div className={styles.formGroup} ref={dropdownRef}>
                         <label>Select Entry</label>
-                        <div 
-                            className={styles.selectTrigger} 
+                        <div
+                            className={styles.selectTrigger}
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         >
                             {selectedEntry ? (
@@ -122,8 +141,8 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
                                     <p className={styles.emptyState}>No more entries available.</p>
                                 ) : (
                                     availableEntries.map(e => (
-                                        <div 
-                                            key={e.id} 
+                                        <div
+                                            key={e.id}
                                             className={`${styles.entryListItem} ${selectedEntryId === e.id ? styles.entryListItemActive : ''}`}
                                             onClick={() => handleEntrySelect(e.id)}
                                         >
@@ -144,7 +163,7 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
                 )}
 
                 <div className={styles.formGroup}>
-                    <label><Palette size={16} className={styles.iconInfo} /> Custom Color Stripe</label>
+                    <label><Palette size={16} className={styles.iconInfo} /> Entry Accent Color</label>
                     <div className={styles.colorPalette}>
                         {COLORS.map(c => (
                             <button
@@ -152,10 +171,30 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
                                 type="button"
                                 className={`${styles.colorBtn} ${color === c.value ? styles.colorBtnActive : ''}`}
                                 style={{ backgroundColor: c.value }}
-                                onClick={() => setColor(c.value === color ? '' : c.value)}
+                                onClick={() => {
+                                    setColor(c.value === color ? '' : c.value);
+                                    setCustomColor('');
+                                }}
                                 title={c.label}
                             />
                         ))}
+                        
+                        <button
+                            type="button"
+                            className={`${styles.colorBtn} ${styles.customColorBtn} ${customColor ? styles.colorBtnActive : ''}`}
+                            style={{ backgroundColor: customColor || 'transparent' }}
+                            onClick={() => colorPickerRef.current?.click()}
+                            title="Custom Color"
+                        >
+                            {!customColor && <Plus size={16} />}
+                            <input
+                                ref={colorPickerRef}
+                                type="color"
+                                value={customColor || '#742121'}
+                                onChange={handleCustomColorChange}
+                                className={styles.hiddenColorInput}
+                            />
+                        </button>
                     </div>
                 </div>
 
@@ -181,8 +220,10 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
                                         const result = await uploadImage(file);
                                         if (result.url) {
                                             setCoverImage(result.url);
+                                            toast.success('Image uploaded!');
                                         } else if (result.error) {
                                             setUploadError(result.error);
+                                            toast.error(`Upload error: ${result.error}`);
                                         }
                                         setIsUploading(false);
                                     }

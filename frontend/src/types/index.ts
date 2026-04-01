@@ -1,20 +1,39 @@
 import { type ReactNode } from 'react';
+import { type Editor } from '@tiptap/react';
 
 export interface Entry {
     id: number;
+    user_id: number;
     title: string;
     date: string;
     content: string | null;
     image_url?: string;
     color?: string | null;
     cover_image?: string | null;
-    user_id: number;
     created_at: string;
     updated_at: string;
 }
 
-export type Page = 'entries' | 'timelines';
+export interface User {
+    id: number;
+    name: string;
+    email: string;
+    created_at: string;
+}
 
+export interface LoginCredentials {
+    email: string;
+    password?: string;
+}
+
+export interface RegisterCredentials {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+}
+
+export type Page = 'landing' | 'entries' | 'timelines';
 
 export interface PageSettings {
     backgroundUrl: string | null;
@@ -48,26 +67,26 @@ export interface EntryProviderProps {
     children: ReactNode;
 }
 
-export interface TimelineProviderProps {
-    children: ReactNode;
-}
-
-
 export interface Timeline {
     id: number;
     name: string;
     isDefault: boolean;
-    entryIds: number[]; // empty means all (default timeline)
+    entryIds: number[];
 }
 
 export interface TimelineContextValue {
     timelines: Timeline[];
     activeTimeline: Timeline | null;
     selectTimeline: (timeline: Timeline) => void;
-    createTimeline: (name: string) => void;
-    deleteTimeline: (id: number) => void;
-    addEntryToTimeline: (timelineId: number, entryId: number) => void;
-    removeEntryFromTimeline: (timelineId: number, entryId: number) => void;
+    createTimeline: (name: string) => Promise<void>;
+    deleteTimeline: (id: number) => Promise<void>;
+    addEntryToTimeline: (timelineId: number, entryId: number) => Promise<void>;
+    removeEntryFromTimeline: (timelineId: number, entryId: number) => Promise<void>;
+    isLoading: boolean;
+}
+
+export interface TimelineProviderProps {
+    children: ReactNode;
 }
 
 export type FontSizeOptions = {
@@ -84,8 +103,6 @@ export interface ResizableImageAttributes {
     y?: number;
     rotation?: number;
 }
-
-import { type Editor } from '@tiptap/react';
 
 export interface EditorToolbarProps {
     editor: Editor | null;

@@ -1,0 +1,196 @@
+.landingContainer {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--color-light-beige, #f8f5f2);
+    color: var(--color-dark-brown);
+    display: flex;
+    flex-direction: column;
+}
+
+.hero {
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 24px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), transparent);
+}
+
+.heroContent {
+    max-width: 800px;
+    animation: fadeIn 1s ease-out;
+}
+
+.title {
+    font-size: 8rem;
+    font-weight: 300;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    letter-spacing: -2px;
+}
+
+.sparkle {
+    color: var(--color-burgundy);
+    width: 48px;
+    height: 48px;
+}
+
+.subtitle {
+    font-size: 1.8rem;
+    font-weight: 300;
+    opacity: 0.7;
+    margin-bottom: 40px;
+}
+
+.ctaButtons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.primaryBtn {
+    padding: 16px 36px;
+    font-size: 1.6rem;
+    font-weight: 500;
+    background: var(--color-dark-brown);
+    color: var(--color-light-beige);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.primaryBtn:hover {
+    background: #3a3f44;
+    transform: translateY(-2px);
+}
+
+.secondaryBtn {
+    padding: 16px 36px;
+    font-size: 1.6rem;
+    font-weight: 500;
+    background: white;
+    color: var(--color-dark-brown);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.secondaryBtn:hover {
+    background: #fbfbfb;
+    transform: translateY(-2px);
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 24px;
+}
+
+.featureCard {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s;
+}
+
+.featureCard:hover {
+    transform: translateY(-10px);
+}
+
+.featureIcon {
+    width: 40px;
+    height: 40px;
+    color: var(--color-burgundy);
+    margin-bottom: 24px;
+}
+
+.featureCard h3 {
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+.featureCard p {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    opacity: 0.6;
+}
+
+.footer {
+    padding: 60px 24px;
+    text-align: center;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    margin-top: auto;
+}
+
+.footer p {
+    font-size: 1rem;
+    opacity: 0.4;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 1024px) {
+    .title {
+        font-size: 5rem;
+    }
+
+    .subtitle {
+        font-size: 1.5rem;
+    }
+
+    .ctaButtons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .features {
+        padding: 60px 16px;
+        gap: 24px;
+    }
+
+    .featureCard {
+        padding: 28px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 3.5rem;
+        letter-spacing: -1px;
+    }
+
+    .hero {
+        height: auto;
+        min-height: 70vh;
+        padding: 60px 16px;
+    }
+
+    .primaryBtn,
+    .secondaryBtn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+}
