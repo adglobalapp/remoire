@@ -15,10 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('avatar_url')->default('/images/no_profile.jpg');
+            $table->string('friend_code', 10)->unique();
+            $table->text('bio')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+            $table->timestamp('last_seen_at')->nullable();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

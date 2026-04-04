@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('entries', function (Blueprint $table) {
-            $table->string('color')->nullable();
-            $table->string('cover_image')->nullable();
+        Schema::create('entry_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('entry_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->timestamps();
         });
     }
 
@@ -22,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('entries', function (Blueprint $table) {
-            $table->dropColumn(['color', 'cover_image']);
-        });
+        Schema::dropIfExists('entry_user');
     }
 };

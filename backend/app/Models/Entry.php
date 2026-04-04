@@ -10,7 +10,7 @@ class Entry extends Model
     /** @use HasFactory<\Database\Factories\EntryFactory> */
     use HasFactory;
 
-    protected $fillable = ['title', 'date', 'content', 'image_url', 'user_id', 'color', 'cover_image'];
+    protected $fillable = ['title', 'date', 'content', 'image_url', 'user_id', 'color'];
 
     public function user()
     {
@@ -20,5 +20,10 @@ class Entry extends Model
     public function timelines()
     {
         return $this->belongsToMany(Timeline::class);
+    }
+
+    public function participants()
+    {
+        return $this->belongsToMany(User::class);
     }
 }

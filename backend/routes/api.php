@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EntryController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\TimelineController;
+use App\Http\Controllers\FriendController;
 
 // Auth routes
 Route::post('/auth/register', [AuthController::class, 'register']);
@@ -21,4 +22,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('timelines', TimelineController::class);
     Route::post('/timelines/{timeline}/entries/{entry}', [TimelineController::class, 'addEntry']);
     Route::delete('/timelines/{timeline}/entries/{entry}', [TimelineController::class, 'removeEntry']);
+
+    // Friend routes
+    Route::get('/friends', [FriendController::class, 'index']);
+    Route::get('/friends/requests', [FriendController::class, 'requests']);
+    Route::get('/friends/search', [FriendController::class, 'search']);
+    Route::post('/friends', [FriendController::class, 'store']);
+    Route::post('/friends/{user}/accept', [FriendController::class, 'accept']);
+    Route::delete('/friends/{user}', [FriendController::class, 'destroy']);
+    Route::post('/friends/{user}/block', [FriendController::class, 'block']);
 });

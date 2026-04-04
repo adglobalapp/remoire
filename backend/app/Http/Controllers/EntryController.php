@@ -10,7 +10,7 @@ class EntryController extends Controller
 {
     public function index()
     {
-        return auth()->user()->entries()->orderBy('created_at', 'desc')->get();
+        return auth()->user()->entries()->with('participants')->orderBy('created_at', 'desc')->get();
     }
 
     public function store(Request $request)
@@ -20,14 +20,20 @@ class EntryController extends Controller
             'date'    => 'required|date',
             'content' => 'nullable|string',
             'color'   => 'nullable|string',
-            'cover_image' => 'nullable|string',
+            'image_url' => 'nullable|string',
+            'participant_ids' => 'nullable|array',
+            'participant_ids.*' => 'exists:users,id',
         ]);
 
         $validated['user_id'] = $request->user()->id;
 
         $entry = Entry::create($validated);
 
-        return response()->json($entry, 201);
+        if ($request->has('participant_ids')) {
+            $entry->participants()->sync($request->participant_ids);
+        }
+
+        return response()->json($entry->load('participants'), 201);
     }
 
     public function show(Entry $entry)
@@ -35,7 +41,7 @@ class EntryController extends Controller
         if ($entry->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-        return $entry;
+        return $entry->load('participants');
     }
 
     public function update(Request $request, Entry $entry)
@@ -48,12 +54,18 @@ class EntryController extends Controller
             'date'    => 'sometimes|date',
             'content' => 'nullable|string',
             'color'   => 'nullable|string',
-            'cover_image' => 'nullable|string',
+            'image_url' => 'nullable|string',
+            'participant_ids' => 'nullable|array',
+            'participant_ids.*' => 'exists:users,id',
         ]);
 
         $entry->update($validated);
 
-        return response()->json($entry);
+        if ($request->has('participant_ids')) {
+            $entry->participants()->sync($request->participant_ids);
+        }
+
+        return response()->json($entry->load('participants'));
     }
 
     public function destroy(Entry $entry)

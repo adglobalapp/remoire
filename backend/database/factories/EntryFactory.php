@@ -17,11 +17,12 @@ class EntryFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => 1,
-            'title' => fake()->sentence(3),
+            'user_id' => \App\Models\User::factory(),
+            'title' => fake()->sentence(fake()->numberBetween(2, 5)),
             'date' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
-            'content' => fake()->paragraph(5),
+            'content' => fake()->paragraph(fake()->numberBetween(3, 8)),
             'image_url' => null,
+            'color' => fake()->hexColor(),
         ];
     }
 }
