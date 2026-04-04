@@ -1,0 +1,98 @@
+.profileHeader {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+}
+
+.profileAvatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.profileNameSection {
+    display: flex;
+    flex-direction: column;
+}
+
+.profileNameSection h2 {
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--color-dark-brown);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1;
+}
+
+.friendCodeBadge {
+    font-size: 1.1rem;
+    opacity: 0.4;
+    font-weight: 400;
+}
+
+.miniBio {
+    margin-top: 6px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: var(--color-dark-brown);
+    opacity: 0.6;
+}
+
+.profileInfoGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px 20px;
+}
+
+.infoItem {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.infoLabelGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-dark-brown);
+    opacity: 0.5;
+}
+
+.infoLabelGroup svg {
+    opacity: 0.8;
+}
+
+.infoContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.infoLabelGroup label {
+    font-size: 1.0rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 400;
+    margin: 0;
+}
+
+.infoContent span {
+    font-size: 1.4rem;
+    color: var(--color-dark-brown);
+    line-height: 1.1;
+}
+
+.modalFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}

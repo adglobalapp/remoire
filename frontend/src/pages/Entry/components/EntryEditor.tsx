@@ -224,6 +224,13 @@ const EntryEditor = () => {
                     }
                 }}
             >
+                {!activeEntry && (
+                    <div className={styles.emptyStateOverlay}>
+                        <div className="empty-state-placeholder">
+                            No entry selected. Please select one from the sidebar or click the + button.
+                        </div>
+                    </div>
+                )}
                 <CanvasScaleContext.Provider value={transform.scale}>
                     <div
                         className={styles.canvas}
@@ -251,7 +258,6 @@ const EntryEditor = () => {
                                 </div>
                             </div>
                         )}
-
                     </div>
                 </CanvasScaleContext.Provider>
             </div>

@@ -23,13 +23,13 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
             try {
                 const data = await api.getTimelines();
                 if (data.length > 0) {
-                    setTimelines(data);
-                    // Set active to first one or default
-                    setActiveTimeline(data.find(t => t.isDefault) || data[0]);
+                    const sorted = [...data].sort((a, b) => (a.isDefault ? 1 : b.isDefault ? -1 : 0));
+                    setTimelines(sorted);
+                    // Set active to first one (most recently added or first custom)
+                    setActiveTimeline(sorted[0]);
                 } else {
-                    // If no timelines in DB, maybe create the default one?
-                    // For now just keep the local one
                     setTimelines([DEFAULT_TIMELINE]);
+                    setActiveTimeline(DEFAULT_TIMELINE);
                 }
             } finally {
                 setIsLoading(false);
@@ -46,7 +46,10 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
         try {
             const newTimeline = await api.createTimeline(name);
             if (newTimeline) {
-                setTimelines(prev => [...prev, newTimeline]);
+                setTimelines(prev => {
+                    const next = [newTimeline, ...prev.filter(t => !t.isDefault), ...prev.filter(t => t.isDefault)];
+                    return next;
+                });
                 setActiveTimeline(newTimeline);
             }
         } catch (error) {
@@ -64,7 +67,7 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
                 setTimelines(prev => {
                     const next = prev.filter(t => t.id !== id);
                     setActiveTimeline(curr => {
-                        if (curr?.id === id) return next.find(t => t.isDefault) || next[0] || DEFAULT_TIMELINE;
+                        if (curr?.id === id) return next[0] || DEFAULT_TIMELINE;
                         return curr;
                     });
                     return next;

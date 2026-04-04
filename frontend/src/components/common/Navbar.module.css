@@ -4,11 +4,12 @@
     justify-content: space-between;
     padding: 0.2rem 2rem;
     background-color: var(--color-light-beige);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
     height: 56px;
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 10;
+    overflow: visible;
 }
 
 .logoSection {
@@ -72,36 +73,157 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    position: relative;
+    min-width: 180px;
+    justify-content: flex-end;
 }
 
-.userBadge {
+.userProfileTrigger {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 1rem;
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 20px;
-    font-size: 1.3rem;
-    color: var(--color-dark-brown);
-}
-
-.logoutBtn {
-    background: none;
-    border: none;
-    color: rgba(0, 0, 0, 0.3);
+    gap: 0.6rem;
     cursor: pointer;
-    padding: 4px;
-    transition: color 0.2s, transform 0.1s;
-    display: flex;
-    align-items: center;
+    padding: 0.55rem 0.8rem;
+    border-radius: 7px;
+    transition: color 0.15s;
 }
 
-.logoutBtn:hover {
+.userProfileTrigger:hover .userName {
     color: var(--color-burgundy);
 }
 
-.logoutBtn:active {
-    transform: scale(0.9);
+.avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-dark-beige), #d4c4b0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-family: var(--font-ui);
+    font-weight: 400;
+    color: var(--color-dark-brown);
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.userName {
+    font-size: 1.4rem;
+    font-family: var(--font-ui);
+    color: var(--color-dark-brown);
+    font-weight: 400;
+    transition: color 0.15s;
+    white-space: nowrap;
+}
+
+.profileDropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    background-color: var(--color-light-beige);
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    border-top: none;
+    min-width: 100%;
+    padding: 0.3rem 0.3rem 0.4rem;
+    z-index: 30;
+    animation: dropdownOpen 0.15s ease-out;
+    transform-origin: top center;
+}
+
+.dropdownHeader {
+    padding: 0.6rem 0.8rem 0.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    margin-bottom: 0.2rem;
+}
+
+.dropdownHeaderName {
+    font-size: 1.15rem;
+    font-family: var(--font-ui);
+    color: var(--color-dark-brown);
+    font-weight: 400;
+    opacity: 0.6;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 1.4rem;
+    font-family: var(--font-ui);
+    color: var(--color-dark-brown);
+    transition: color 0.15s;
+    user-select: none;
+    background: none;
+    white-space: nowrap;
+}
+
+.dropdownItem svg {
+    opacity: 0.5;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+}
+
+.dropdownItem:hover {
+    background: none;
+    color: var(--color-burgundy);
+}
+
+.dropdownItem:hover svg {
+    opacity: 1;
+}
+
+.dropdownSeparator {
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.06);
+    margin: 0.2rem 0.5rem;
+}
+
+.signOutItem {
+    color: var(--color-error);
+}
+
+.signOutItem svg {
+    color: var(--color-error);
+    opacity: 0.7;
+}
+
+.signOutItem:hover {
+    background: none;
+    color: var(--color-error-hover);
+}
+
+.signOutItem:hover svg {
+    opacity: 1;
+}
+
+@keyframes dropdownOpen {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .authButtons {
@@ -110,7 +232,6 @@
     gap: 1rem;
 }
 
-/* ── Hamburger (hidden on desktop) ──────────── */
 .hamburger {
     display: none;
     background: transparent;
@@ -130,7 +251,6 @@
     background-color: rgba(0, 0, 0, 0.06);
 }
 
-/* ── Mobile dropdown ────────────────────────── */
 .mobileMenu {
     display: none;
     position: absolute;
@@ -144,7 +264,7 @@
     gap: 0;
     animation: slideDown 0.2s ease-out;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    z-index: 999;
+    z-index: 90;
 }
 
 .mobileLink {
@@ -218,7 +338,6 @@
     }
 }
 
-/* ── Responsive ─────────────────────────────── */
 @media (max-width: 1024px) {
     .navbar {
         padding: 0.2rem 1rem;

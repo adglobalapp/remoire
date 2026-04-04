@@ -25,7 +25,7 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
 
     const [selectedEntryId, setSelectedEntryId] = useState<number | ''>(entryToEdit?.id || '');
     const [color, setColor] = useState<string>(entryToEdit?.color || '');
-    const [coverImage, setCoverImage] = useState<string>(entryToEdit?.cover_image || '');
+    const [imageUrl, setImageUrl] = useState<string>(entryToEdit?.image_url || '');
     const [isSaving, setIsSaving] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -67,7 +67,7 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
             const isPreset = COLORS.some(c => c.value === entryColor);
             setColor(isPreset ? entryColor : '');
             setCustomColor(isPreset ? '' : entryColor);
-            setCoverImage(entry.cover_image || '');
+            setImageUrl(entry.image_url || '');
         }
         setIsDropdownOpen(false);
     };
@@ -89,7 +89,7 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
         try {
             await updateEntryMetadata(Number(selectedEntryId), {
                 color: handleColorSave(),
-                cover_image: coverImage || null,
+                image_url: imageUrl || undefined,
             });
 
             if (!entryToEdit && activeTimeline && !activeTimeline.isDefault) {
@@ -160,7 +160,7 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
                             {isDropdownOpen && (
                                 <div className={styles.dropdownMenu}>
                                     {availableEntries.length === 0 ? (
-                                        <p className={styles.emptyState}>No more entries available.</p>
+                                        <p className="empty-state-placeholder">No more entries available.</p>
                                     ) : (
                                         availableEntries.map(e => (
                                             <div
@@ -223,10 +223,10 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
                     <div className={styles.formGroup}>
                         <label><Upload size={16} className={styles.iconInfo} /> Cover Image</label>
 
-                        {coverImage ? (
+                        {imageUrl ? (
                             <div className={styles.imagePreviewContainer}>
-                                <img src={coverImage} alt="Cover" className={styles.previewThumbnail} />
-                                <button type="button" className="btn btn-secondary" onClick={() => setCoverImage('')}>Remove</button>
+                                <img src={imageUrl} alt="Cover" className={styles.previewThumbnail} />
+                                <button type="button" className="btn btn-secondary" onClick={() => setImageUrl('')}>Remove</button>
                             </div>
                         ) : (
                             <label className={`btn btn-secondary ${styles.uploadLabel}`}>
@@ -241,7 +241,7 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
                                             setUploadError(null);
                                             const result = await uploadImage(file);
                                             if (result.url) {
-                                                setCoverImage(result.url);
+                                                setImageUrl(result.url);
                                                 toast.success('Image uploaded!');
                                             } else if (result.error) {
                                                 setUploadError(result.error);

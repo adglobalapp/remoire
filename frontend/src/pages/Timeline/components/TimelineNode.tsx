@@ -16,7 +16,7 @@ const TimelineNode = ({ entry, side }: TimelineNodeProps) => {
         excerpt = excerpt.substring(entry.title.length).trim();
     }
 
-    const imageUrl = entry.cover_image || getImageUrl(entry.content);
+    const imageUrl = entry.image_url || getImageUrl(entry.content);
     const dateStr = formatDate(entry.date || entry.created_at);
 
     return (
@@ -31,7 +31,32 @@ const TimelineNode = ({ entry, side }: TimelineNodeProps) => {
                         <div className={styles.textContent}>
                             <h3 className={styles.title}>{entry.title || 'Untitled'}</h3>
                             {excerpt && <p className={styles.excerpt}>{excerpt}</p>}
-                            <span className={styles.date}>{dateStr}</span>
+                            <div className={styles.cardFooter}>
+                                <span className={styles.date}>{dateStr}</span>
+                                {entry.participants && entry.participants.length > 0 && (
+                                    <div className={styles.participantAvatars}>
+                                        {entry.participants.slice(0, 4).map((p, i) => (
+                                            <div
+                                                key={p.id}
+                                                className={styles.participantAvatar}
+                                                style={{ zIndex: entry.participants!.length - i }}
+                                                title={p.name}
+                                            >
+                                                {p.avatar_url ? (
+                                                    <img src={p.avatar_url} alt={p.name} />
+                                                ) : (
+                                                    p.name.charAt(0)
+                                                )}
+                                            </div>
+                                        ))}
+                                        {entry.participants.length > 4 && (
+                                            <div className={`${styles.participantAvatar} ${styles.participantAvatarMore}`}>
+                                                +{entry.participants.length - 4}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                             <button
                                 className={styles.editBtn}
                                 onClick={(e) => { e.stopPropagation(); setIsEditOpen(true); }}

@@ -45,22 +45,26 @@
 }
 
 .scrollArrow {
-    background-color: rgba(252, 246, 237, 0.15);
+    background-color: rgba(252, 246, 237, 0.05);
     border: none;
-    width: 24px;
+    width: 28px;
     height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     border-radius: 4px;
-    z-index: 2;
+    z-index: 5;
     transition: background-color 0.2s;
     flex-shrink: 0;
+    margin: 0 4px;
+    padding: 0 !important;
 }
 
 .scrollArrow svg {
     stroke: var(--color-light-beige) !important;
+    stroke-width: 2.5px;
+    color: var(--color-light-beige) !important;
 }
 
 .scrollArrow:hover {

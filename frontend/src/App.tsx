@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react';
 import EntryPage from './pages/Entry/EntryPage';
 import TimelinePage from './pages/Timeline/TimelinePage';
 import LandingPage from './pages/Landing/LandingPage';
+import FriendlistPage from './pages/Friendlist/FriendlistPage';
 import LoginModal from './components/auth/LoginModal';
 import RegisterModal from './components/auth/RegisterModal';
 import { EntryProvider } from './contexts/EntryContext';
@@ -73,7 +74,13 @@ function AppContent() {
     return (
         <EntryProvider>
             <TimelineProvider>
-                {page === 'entries' ? <EntryPage /> : <TimelinePage />}
+                {page === 'entries' ? (
+                    <EntryPage />
+                ) : page === 'timelines' ? (
+                    <TimelinePage />
+                ) : (
+                    <FriendlistPage />
+                )}
             </TimelineProvider>
         </EntryProvider>
     );

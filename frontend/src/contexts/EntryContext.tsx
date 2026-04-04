@@ -119,8 +119,16 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
         setActiveEntry(prev => prev?.id === id ? updated : prev);
     }, []);
 
+    // update entry participants
+    const updateEntryParticipants = useCallback(async (id: number, participantIds: number[]) => {
+        const updated = await apiUpdateEntry(id, { participant_ids: participantIds } as any);
+        if (!updated) return;
+        setEntries(prev => prev.map(e => e.id === id ? updated : e));
+        setActiveEntry(prev => prev?.id === id ? updated : prev);
+    }, []);
+
     return (
-        <EntryContext.Provider value={{ entries, activeEntry, selectEntry, createEntry, deleteEntry, saveEntry, updateEntryTitle, updateEntryDate, updateEntryMetadata }}>
+        <EntryContext.Provider value={{ entries, activeEntry, selectEntry, createEntry, deleteEntry, saveEntry, updateEntryTitle, updateEntryDate, updateEntryMetadata, updateEntryParticipants }}>
             {children}
         </EntryContext.Provider>
     );

@@ -17,10 +17,8 @@
     left: 0;
     transform-origin: 0 0;
     will-change: transform;
-    /* Wide enough so nodes can go left/right of center */
     width: 1000px;
 }
-
 
 .timelineWrapper {
     position: relative;
@@ -35,7 +33,6 @@
     }
 }
 
-/* Vertical center line */
 .centerLine {
     position: absolute;
     left: 50%;
@@ -46,23 +43,6 @@
     background: linear-gradient(to bottom, transparent, var(--color-burgundy) 60px, var(--color-burgundy) calc(100% - 60px), transparent);
     opacity: 0.35;
     border-radius: 2px;
-}
-
-.emptyTimeline {
-    padding: 60px 20px;
-    text-align: center;
-    color: var(--color-dark-brown);
-    opacity: 0.5;
-}
-
-.emptyTimeline p {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-}
-
-.emptyHint {
-    font-size: 0.9rem;
-    font-family: var(--font-body);
 }
 
 .addButton:disabled {
@@ -89,4 +69,17 @@
 .addButton:hover:not(:disabled) {
     background-color: #1a1517;
     transform: translateY(-1px);
+}
+
+.emptyStateOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10;
 }

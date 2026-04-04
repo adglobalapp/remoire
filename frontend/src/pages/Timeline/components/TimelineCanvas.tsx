@@ -76,19 +76,24 @@ const TimelineCanvas = () => {
             onMouseDown={onMouseDown}
             onTouchStart={onTouchStart}
         >
+            {(isLoading || visibleEntries.length === 0) && (
+                <div className={styles.emptyStateOverlay}>
+                    <div className="empty-state-placeholder">
+                        {isLoading 
+                            ? 'Loading timeline...' 
+                            : (activeTimeline?.isDefault 
+                                ? 'No entries yet. Create your first one!' 
+                                : 'No entries found in this timeline.')
+                        }
+                    </div>
+                </div>
+            )}
+
             <div
                 className={styles.canvas}
                 style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})` }}
             >
-                {isLoading ? (
-                    <div className={styles.emptyTimeline}>
-                        <p>Loading timeline...</p>
-                    </div>
-                ) : visibleEntries.length === 0 ? (
-                    <div className={styles.emptyTimeline}>
-                        <p>No entries on this timeline yet.</p>
-                    </div>
-                ) : (
+                {visibleEntries.length > 0 && (
                     <div className={styles.timelineWrapper}>
                         {/* Vertical center line */}
                         <div className={styles.centerLine} />

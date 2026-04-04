@@ -9,16 +9,31 @@ export interface Entry {
     content: string | null;
     image_url?: string;
     color?: string | null;
-    cover_image?: string | null;
     created_at: string;
     updated_at: string;
+    participants?: User[];
 }
 
 export interface User {
     id: number;
     name: string;
     email: string;
+    avatar_url?: string | null;
+    friend_code: string;
+    bio?: string | null;
+    last_seen_at?: string | null;
     created_at: string;
+    friend_status?: 'none' | 'pending' | 'accepted' | 'blocked';
+    is_requester?: boolean;
+}
+
+export interface FriendRelation {
+    id: number;
+    user_id: number;
+    friend_id: number;
+    status: 'pending' | 'accepted' | 'blocked';
+    created_at: string;
+    updated_at: string;
 }
 
 export interface LoginCredentials {
@@ -33,7 +48,7 @@ export interface RegisterCredentials {
     password_confirmation: string;
 }
 
-export type Page = 'landing' | 'entries' | 'timelines';
+export type Page = 'landing' | 'entries' | 'timelines' | 'friends';
 
 export interface PageSettings {
     backgroundUrl: string | null;
@@ -61,6 +76,7 @@ export interface EntryContextValue {
     updateEntryTitle: (id: number, title: string) => void;
     updateEntryDate: (id: number, date: string) => Promise<void>;
     updateEntryMetadata: (id: number, data: Partial<Entry>) => Promise<void>;
+    updateEntryParticipants: (id: number, participantIds: number[]) => Promise<void>;
 }
 
 export interface EntryProviderProps {

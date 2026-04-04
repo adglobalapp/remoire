@@ -101,7 +101,7 @@ export const createEntry = async (title: string): Promise<Entry | null> => {
 
 export const updateEntry = async (
     id: number,
-    data: Partial<Pick<Entry, 'title' | 'date' | 'content' | 'color' | 'cover_image'>>
+    data: Partial<Pick<Entry, 'title' | 'date' | 'content' | 'color' | 'image_url'>> & { participant_ids?: number[] }
 ): Promise<Entry | null> => {
     try {
         const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
@@ -205,6 +205,92 @@ export const removeEntryFromTimeline = async (timelineId: number, entryId: numbe
     try {
         const response = await fetch(`${API_BASE_URL}/timelines/${timelineId}/entries/${entryId}`, {
             method: 'DELETE',
+            headers: getHeaders(),
+        });
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
+};
+
+// Friend-related API methods
+export const getFriends = async (): Promise<User[]> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/friends`, {
+            headers: getHeaders(),
+        });
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        return [];
+    }
+};
+
+export const getFriendRequests = async (): Promise<{ pending: User[], sent: User[] }> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/friends/requests`, {
+            headers: getHeaders(),
+        });
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        return { pending: [], sent: [] };
+    }
+};
+
+export const searchUsers = async (query: string): Promise<User[]> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/friends/search?q=${encodeURIComponent(query)}`, {
+            headers: getHeaders(),
+        });
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        return [];
+    }
+};
+
+export const sendFriendRequest = async (friendId: number): Promise<boolean> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/friends`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ friend_id: friendId }),
+        });
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
+};
+
+export const acceptFriendRequest = async (userId: number): Promise<boolean> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/friends/${userId}/accept`, {
+            method: 'POST',
+            headers: getHeaders(),
+        });
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
+};
+
+export const deleteFriendship = async (userId: number): Promise<boolean> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/friends/${userId}`, {
+            method: 'DELETE',
+            headers: getHeaders(),
+        });
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
+};
+
+export const blockUser = async (userId: number): Promise<boolean> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/friends/${userId}/block`, {
+            method: 'POST',
             headers: getHeaders(),
         });
         return response.ok;

@@ -1,0 +1,76 @@
+.resultsList {
+    max-height: 400px;
+    min-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 4px;
+}
+
+.resultItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.resultItem:hover {
+    background: rgba(84, 29, 48, 0.03);
+}
+
+.resultItem:hover .userName {
+    color: var(--color-burgundy);
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #eee;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    color: var(--color-dark-brown);
+    overflow: hidden;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.userDetails {
+    display: flex;
+    flex-direction: column;
+}
+
+.userName {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--color-dark-brown);
+    transition: color 0.2s;
+}
+
+.title {
+    font-size: 1.6rem;
+    font-weight: 400;
+    margin: 0;
+}

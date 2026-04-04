@@ -116,7 +116,7 @@ const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
                     ))}
 
                     {filteredEntries.length === 0 && (
-                        <div className="sidebar-empty-state">
+                        <div className="empty-state-placeholder">
                             No entries yet. Create one!
                         </div>
                     )}

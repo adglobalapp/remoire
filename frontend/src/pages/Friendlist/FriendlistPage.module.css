@@ -1,0 +1,124 @@
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    animation: fadeIn 0.4s ease-out;
+    width: 100%;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 0px;
+}
+
+.header h1 {
+    font-size: 2.4rem !important;
+    font-weight: 400;
+    color: var(--color-dark-brown);
+    margin: 0;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 12px;
+}
+
+.friendList {
+    background: var(--color-light-beige);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    width: 100%;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.friendRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    transition: background 0.2s;
+}
+
+.friendRow:last-child {
+    border-bottom: none;
+}
+
+.friendRow:hover {
+    background: rgba(84, 29, 48, 0.03);
+}
+
+.friendMain {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #eee;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+}
+
+.name {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--color-dark-brown);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.name:hover {
+    color: var(--color-burgundy);
+}
+
+.subText {
+    font-size: 1.3rem;
+    color: var(--color-dark-brown);
+    opacity: 0.6;
+}
+
+.sectionTitle {
+    background: var(--color-burgundy);
+    padding: 10px 24px;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    color: var(--color-light-beige);
+    font-weight: 400;
+    font-family: var(--font-ui);
+}
+
+.bgDarkBlue {
+    background: var(--color-dark-blue);
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

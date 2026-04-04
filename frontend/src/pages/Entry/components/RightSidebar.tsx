@@ -1,8 +1,12 @@
-import { useEffect, useRef } from 'react';
-import { MapPin, Calendar, Plus, Users, PanelRight, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { MapPin, Calendar, Plus, Users, PanelRight, X, Trash2 } from 'lucide-react';
 import { useEntryContext } from '../../../contexts/EntryContext';
 import { usePage } from '../../../App';
 import styles from './RightSidebar.module.css';
+import { getFriends } from '../../../services/api';
+import { type User } from '../../../types';
+import AddParticipantModal from './AddParticipantModal';
 
 interface RightSidebarProps {
     isOpen?: boolean;
@@ -10,12 +14,19 @@ interface RightSidebarProps {
 }
 
 const RightSidebar = ({ isOpen: propOpen, onToggle }: RightSidebarProps) => {
-    const { activeEntry, updateEntryDate } = useEntryContext();
+    const { activeEntry, updateEntryDate, updateEntryParticipants } = useEntryContext();
     const { page } = usePage();
     const lastPage = useRef(page);
+    const [friends, setFriends] = useState<User[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const mobileOpen = propOpen || false;
     const toggle = onToggle || (() => { });
+
+    // Load friends for participant selection
+    useEffect(() => {
+        getFriends().then(setFriends);
+    }, []);
 
     // Auto-close on page change (only on mobile/tablet)
     useEffect(() => {
@@ -36,10 +47,31 @@ const RightSidebar = ({ isOpen: propOpen, onToggle }: RightSidebarProps) => {
         }
     };
 
+    const removeParticipant = (userId: number) => {
+        if (activeEntry) {
+            const currentIds = activeEntry.participants?.map(p => p.id) || [];
+            updateEntryParticipants(activeEntry.id, currentIds.filter(id => id !== userId));
+        }
+    };
+
+    const addParticipant = (userId: number) => {
+        if (activeEntry) {
+            const currentIds = activeEntry.participants?.map(p => p.id) || [];
+            if (!currentIds.includes(userId)) {
+                updateEntryParticipants(activeEntry.id, [...currentIds, userId]);
+            }
+            setIsModalOpen(false);
+        }
+    };
+
     // Format stored date (YYYY-MM-DD) for the date input
     const dateValue = activeEntry?.date
         ? activeEntry.date.substring(0, 10)
         : '';
+
+    const availableFriends = friends.filter(f => 
+        !activeEntry?.participants?.some(p => p.id === f.id)
+    );
 
     return (
         <div className={mobileOpen ? styles.mobileVisible : styles.mobileHidden}>
@@ -61,20 +93,24 @@ const RightSidebar = ({ isOpen: propOpen, onToggle }: RightSidebarProps) => {
 
                 <div className={styles.scrollContent}>
                     <div className={styles.metaGroup}>
-                        <label className="text-small">Location</label>
-                        <div className={styles.metaValue}>
-                            <MapPin size={22} className={styles.iconColor} />
-                            <span>St. Stephen Str...</span>
+                        <div className={styles.infoLabelGroup}>
+                            <MapPin size={16} />
+                            <label>Location</label>
                         </div>
-                        <button className="btn btn-secondary btn-sm">
+                        <div className={styles.metaValue}>
+                            <span className="empty-state-placeholder">No location set</span>
+                        </div>
+                        <button className="btn btn-secondary btn-sm" style={{ width: '100%' }}>
                             <Plus size={14} /> Add Location
                         </button>
                     </div>
 
                     <div className={styles.metaGroup}>
-                        <label className="text-small">Date</label>
+                        <div className={styles.infoLabelGroup}>
+                            <Calendar size={16} />
+                            <label>Date</label>
+                        </div>
                         <div className={styles.metaValue}>
-                            <Calendar size={22} className={styles.iconColor} />
                             <input
                                 type="date"
                                 value={dateValue}
@@ -87,24 +123,60 @@ const RightSidebar = ({ isOpen: propOpen, onToggle }: RightSidebarProps) => {
                     </div>
 
                     <div className={styles.metaGroup}>
-                        <label className="text-small">Participants</label>
+                        <div className={styles.infoLabelGroup}>
+                            <Users size={16} />
+                            <label>Participants</label>
+                        </div>
+                        
                         <div className={styles.participantList}>
-                            <div className={styles.participantRow}>
-                                <span>John</span>
-                                <div className={styles.avatar}>J</div>
-                            </div>
-                            <div className={styles.participantRow}>
-                                <span>Mom</span>
-                                <div className={styles.avatar} style={{ backgroundColor: '#eab8b8' }}>M</div>
-                            </div>
+                            {activeEntry?.participants && activeEntry.participants.length > 0 ? (
+                                activeEntry.participants.map(user => (
+                                    <div key={user.id} className={styles.participantRow}>
+                                        <div className={styles.userItem}>
+                                            <div className={styles.avatar}>
+                                                {user.avatar_url ? (
+                                                    <img src={user.avatar_url} alt={user.name} />
+                                                ) : (
+                                                    user.name.charAt(0)
+                                                )}
+                                            </div>
+                                            <span className={styles.userName}>{user.name}</span>
+                                        </div>
+                                        <button 
+                                            className={styles.removeBtn}
+                                            onClick={() => removeParticipant(user.id)}
+                                            title="Remove Participant"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="empty-state-placeholder">
+                                    No participants yet
+                                </div>
+                            )}
                         </div>
 
-                        <button className="btn btn-secondary btn-sm">
-                            <Users size={14} /> Add Participant
+                        <button 
+                            className="btn btn-secondary btn-sm addParticipantBtn" 
+                            onClick={() => setIsModalOpen(true)}
+                            disabled={!activeEntry}
+                        >
+                            <Plus size={14} /> Add Participant
                         </button>
                     </div>
                 </div>
             </aside>
+
+            {isModalOpen && createPortal(
+                <AddParticipantModal 
+                    friends={availableFriends} 
+                    onClose={() => setIsModalOpen(false)} 
+                    onSelectFriend={addParticipant} 
+                />,
+                document.body
+            )}
         </div>
     );
 };

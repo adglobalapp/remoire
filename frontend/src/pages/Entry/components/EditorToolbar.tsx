@@ -18,7 +18,7 @@ const EditorToolbar = ({
     onPageSettingsChange
 }: EditorToolbarProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [currentFont, setCurrentFont] = useState("'Kaushan Script', cursive");
+    const [currentFont, setCurrentFont] = useState("'Kaushan Script'");
     const [currentSize, setCurrentSize] = useState('16px');
     const [currentColor, setCurrentColor] = useState('#493627');
     const [currentAlign, setCurrentAlign] = useState('left');
@@ -81,43 +81,77 @@ const EditorToolbar = ({
             if (isPickingColorRef.current) return;
 
             try {
-                const { view, state } = editor;
-                const { from } = state.selection;
-                const { node } = view.domAtPos(from);
-                const el = node.nodeType === 3 ? node.parentElement : (node as HTMLElement);
+                // Use Tiptap's built-in attribute detection which is more reliable than getComputedStyle
+                let attrs = editor.getAttributes('textStyle');
 
-                if (el) {
-                    const style = window.getComputedStyle(el);
-
-                    // font family
-                    let family = style.fontFamily;
-                    if (family) {
-                        family = family.split(',')[0].replace(/['"]/g, '').trim();
-                        const presets = [
-                            "'Kaushan Script', cursive",
-                            "Helvetica",
-                            "'Odor Mean Chey', cursive",
-                            "'Gurajada', serif",
-                            "'Gudea', sans-serif"
-                        ];
-                        const match = presets.find(p => p.includes(family)) || family;
-                        setCurrentFont(match);
+                // If selection has mixed fonts, getAttributes might return empty. 
+                // Fallback to the font at the start of selection for better UX.
+                if (!attrs.fontFamily && !editor.state.selection.empty) {
+                    const { from } = editor.state.selection;
+                    const node = editor.state.doc.nodeAt(from);
+                    if (node && node.marks) {
+                        const styleMark = node.marks.find(m => m.type.name === 'textStyle');
+                        if (styleMark && styleMark.attrs.fontFamily) {
+                            attrs = { ...attrs, fontFamily: styleMark.attrs.fontFamily };
+                        }
                     }
-
-                    // color
-                    const color = rgbToHex(style.color);
-                    setCurrentColor(color);
-
-                    // font size
-                    const size = style.fontSize;
-                    setCurrentSize(size);
-
-                    // alignment
-                    const align = style.textAlign || 'left';
-                    setCurrentAlign(align);
                 }
+
+                // Font Family
+                if (attrs.fontFamily) {
+                    const family = attrs.fontFamily.replace(/['"]/g, '').trim();
+                    const presets = [
+                        "Kaushan Script", "Odor Mean Chey", "Dancing Script", "Pacifico", "Caveat", "Indie Flower", "Shadows Into Light",
+                        "Playfair Display", "Merriweather", "Lora", "Cormorant Garamond", "Gurajada",
+                        "Inter", "Roboto", "Open Sans", "Montserrat", "Lato", "Poppins", "Gudea",
+                        "Bebas Neue", "Lobster", "Abril Fatface", "Righteous", "Comfortaa",
+                        "Fira Code", "JetBrains Mono", "Space Mono",
+                        "Special Elite", "Courier Prime"
+                    ];
+                    // Find the matching preset value (which might be quoted in the select values)
+                    const match = presets.find(p => family === p || family.includes(p) || p.includes(family));
+                    if (match) {
+                        // If the preset has spaces, our select values use single quotes
+                        const selectVal = match.includes(' ') ? `'${match}'` : match;
+                        setCurrentFont(selectVal);
+                    } else {
+                        setCurrentFont(family);
+                    }
+                } else {
+                    // Kaushan Script is the base font of the editor
+                    setCurrentFont("'Kaushan Script'");
+                }
+
+                // Color
+                const focusedElement = editor.view.dom.querySelector('.ProseMirror-focused');
+                if (attrs.color) {
+                    setCurrentColor(attrs.color);
+                } else if (focusedElement) {
+                    // Fallback to computed if no attribute is set (default color)
+                    const style = window.getComputedStyle(focusedElement);
+                    setCurrentColor(rgbToHex(style.color));
+                }
+
+                // Font Size
+                if (attrs.fontSize) {
+                    setCurrentSize(attrs.fontSize);
+                } else {
+                    // If no explicit font size attribute, determine size based on block type
+                    if (editor.isActive('heading', { level: 1 })) setCurrentSize('36px');
+                    else if (editor.isActive('heading', { level: 2 })) setCurrentSize('30px');
+                    else if (editor.isActive('heading', { level: 3 })) setCurrentSize('24px');
+                    else setCurrentSize('16px');
+                }
+
+                // Alignment
+                if (editor.isActive({ textAlign: 'center' })) setCurrentAlign('center');
+                else if (editor.isActive({ textAlign: 'right' })) setCurrentAlign('right');
+                else if (editor.isActive({ textAlign: 'justify' })) setCurrentAlign('justify');
+                else setCurrentAlign('left');
+
             } catch (err) {
                 // Silently handle toolbar state extraction errors
+                console.warn('Toolbar update error:', err);
             }
 
             updateRecentColors();
@@ -223,7 +257,7 @@ const EditorToolbar = ({
         <div className={styles.toolbarWrapper}>
             {showLeftArrow && (
                 <button type="button" className={styles.scrollArrow} onClick={() => scroll('left')}>
-                    <ChevronLeft color="#FCF6ED" size={16} />
+                    <ChevronLeft size={16} />
                 </button>
             )}
 
@@ -260,9 +294,9 @@ const EditorToolbar = ({
                         className={styles.dropdownSelect}
                         disabled={isDragMode}
                         value={
-                            currentSize === '36px' ? 'h1' :
-                                currentSize === '30px' ? 'h2' :
-                                    currentSize === '24px' ? 'h3' :
+                            editor.isActive('heading', { level: 1 }) ? 'h1' :
+                                editor.isActive('heading', { level: 2 }) ? 'h2' :
+                                    editor.isActive('heading', { level: 3 }) ? 'h3' :
                                         'p'
                         }
                         onChange={(e) => {
@@ -310,11 +344,35 @@ const EditorToolbar = ({
                             editor.chain().setFontFamily(val).run();
                         }}
                     >
-                        <option value="'Kaushan Script', cursive">Kaushan Script</option>
-                        <option value="Helvetica">Helvetica</option>
-                        <option value="'Odor Mean Chey', cursive">Odor Mean Chey</option>
-                        <option value="'Gurajada', serif">Gurajada</option>
-                        <option value="'Gudea', sans-serif">Gudea</option>
+                        <option value="'Kaushan Script'">Kaushan Script</option>
+                        <option value="'Odor Mean Chey'">Odor Mean Chey</option>
+                        <option value="'Dancing Script'">Dancing Script</option>
+                        <option value="Pacifico">Pacifico</option>
+                        <option value="Caveat">Caveat</option>
+                        <option value="'Indie Flower'">Indie Flower</option>
+                        <option value="'Shadows Into Light'">Shadows Into Light</option>
+                        <option value="'Playfair Display'">Playfair Display</option>
+                        <option value="Merriweather">Merriweather</option>
+                        <option value="Lora">Lora</option>
+                        <option value="'Cormorant Garamond'">Cormorant Garamond</option>
+                        <option value="Gurajada">Gurajada</option>
+                        <option value="Inter">Inter (Sans)</option>
+                        <option value="Roboto">Roboto</option>
+                        <option value="'Open Sans'">Open Sans</option>
+                        <option value="Montserrat">Montserrat</option>
+                        <option value="Lato">Lato</option>
+                        <option value="Poppins">Poppins</option>
+                        <option value="Gudea">Gudea</option>
+                        <option value="'Bebas Neue'">Bebas Neue</option>
+                        <option value="Lobster">Lobster</option>
+                        <option value="'Abril Fatface'">Abril Fatface</option>
+                        <option value="Righteous">Righteous</option>
+                        <option value="Comfortaa">Comfortaa</option>
+                        <option value="'Fira Code'">Fira Code</option>
+                        <option value="'JetBrains Mono'">JetBrains Mono</option>
+                        <option value="'Space Mono'">Space Mono</option>
+                        <option value="'Special Elite'">Special Elite</option>
+                        <option value="'Courier Prime'">Courier Prime</option>
                     </select>
 
                     <select
@@ -693,7 +751,7 @@ const EditorToolbar = ({
 
             {showRightArrow && (
                 <button type="button" className={styles.scrollArrow} onClick={() => scroll('right')}>
-                    <ChevronRight color="#FCF6ED" size={16} />
+                    <ChevronRight size={16} />
                 </button>
             )}
         </div>

@@ -100,7 +100,7 @@ const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
 
                 <div className="sidebar-list">
                     {isLoading ? (
-                        <div className="sidebar-empty-state">Loading timelines...</div>
+                        <div className="empty-state-placeholder">Loading timelines...</div>
                     ) : (
                         <>
                             {filtered.map((timeline) => (
@@ -127,7 +127,7 @@ const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
                             ))}
 
                             {filtered.length === 0 && (
-                                <div className="sidebar-empty-state">No timelines found.</div>
+                                <div className="empty-state-placeholder">No timelines found.</div>
                             )}
                         </>
                     )}
