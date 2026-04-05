@@ -38,3 +38,26 @@ export interface Options {
     zoomSpeed?: number;
     initialTransform?: Transform;
 }
+
+export interface TypographyProps {
+    editor: Editor;
+    isDragMode: boolean;
+}
+
+export interface FormattingProps {
+    editor: Editor;
+    isDragMode: boolean;
+}
+
+export interface ColorPaletteProps {
+    editor: Editor;
+    isDragMode: boolean;
+    onColorPickerToggle?: (isPicking: boolean) => void;
+}
+
+export interface PageSettingsProps {
+    isDragMode: boolean;
+    pageSettings?: PageSettings;
+    onPageSettingsChange?: (settings: PageSettings) => void;
+}
+

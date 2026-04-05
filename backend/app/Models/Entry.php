@@ -17,7 +17,6 @@ class Entry extends Model
         parent::boot();
 
         static::saving(function ($entry) {
-            // Always try to extract title from content to ensure they are in sync
             if ($entry->content) {
                 $extracted = static::extractTitle($entry->content);
                 $entry->title = $extracted ?: 'Untitled';
@@ -27,14 +26,17 @@ class Entry extends Model
 
     public static function extractTitle($content)
     {
-        if (!$content || !is_string($content)) return null;
+        if (!$content || !is_string($content))
+            return null;
         $data = json_decode($content, true);
-        if (!$data || !isset($data['contentJSON'])) return null;
+        if (!$data || !isset($data['contentJSON']))
+            return null;
 
         $json = $data['contentJSON'];
         $title = static::findFirstText($json);
-        
-        if (!$title) return null;
+
+        if (!$title)
+            return null;
         return mb_strlen($title) > 50 ? mb_substr($title, 0, 50) . '...' : $title;
     }
 
@@ -47,7 +49,8 @@ class Entry extends Model
         if (isset($node['content']) && is_array($node['content'])) {
             foreach ($node['content'] as $child) {
                 $found = static::findFirstText($child);
-                if ($found) return $found;
+                if ($found)
+                    return $found;
             }
         }
         return null;

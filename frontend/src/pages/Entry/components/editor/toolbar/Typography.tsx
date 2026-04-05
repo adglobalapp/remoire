@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react';
 import classNames from 'classnames';
-import { type Editor } from '@tiptap/react';
+import { type TypographyProps } from '../../../../../types';
 import styles from './Typography.module.css';
-
-interface TypographyProps {
-    editor: Editor;
-    isDragMode: boolean;
-}
 
 const FONTS = [
     { value: "'Kaushan Script'", label: "Kaushan Script" },

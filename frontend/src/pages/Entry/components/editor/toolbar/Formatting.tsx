@@ -1,15 +1,10 @@
 import classNames from 'classnames';
-import { type Editor } from '@tiptap/react';
+import { type FormattingProps } from '../../../../../types';
 import {
     Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight,
     AlignJustify, Undo, Redo, List, ListOrdered
 } from 'lucide-react';
 import styles from './Formatting.module.css';
-
-interface FormattingProps {
-    editor: Editor;
-    isDragMode: boolean;
-}
 
 export const History = ({ editor, isDragMode }: FormattingProps) => (
     <div className={styles.toolbarGroup}>

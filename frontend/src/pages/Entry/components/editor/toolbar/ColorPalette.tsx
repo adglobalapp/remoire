@@ -2,14 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Palette } from 'lucide-react';
 import classNames from 'classnames';
-import { type Editor } from '@tiptap/react';
+import { type ColorPaletteProps } from '../../../../../types';
 import styles from './ColorPalette.module.css';
-
-interface ColorPaletteProps {
-    editor: Editor;
-    isDragMode: boolean;
-    onColorPickerToggle?: (isPicking: boolean) => void;
-}
 
 const PRESET_COLORS = [
     '#493627', '#E4E0E1', '#D6C0B3', '#AB886D',
@@ -33,7 +27,7 @@ const ColorPalette = ({ editor, isDragMode, onColorPickerToggle }: ColorPaletteP
     const [currentColor, setCurrentColor] = useState('#493627');
     const [recentColors, setRecentColors] = useState<string[]>([]);
     const [showPalette, setShowPalette] = useState(false);
-    
+
     const isPickingColorRef = useRef(false);
     const paletteRef = useRef<HTMLDivElement>(null);
     const originalColorRef = useRef<string | null>(null);
@@ -64,7 +58,7 @@ const ColorPalette = ({ editor, isDragMode, onColorPickerToggle }: ColorPaletteP
 
             try {
                 let attrs = editor.getAttributes('textStyle');
-                
+
                 // Color fallback detection
                 const focusedElement = editor.view.dom.querySelector('.ProseMirror-focused');
                 if (attrs.color) {

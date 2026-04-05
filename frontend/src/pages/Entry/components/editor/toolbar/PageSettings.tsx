@@ -2,14 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Settings } from 'lucide-react';
 import classNames from 'classnames';
-import { type PageSettings as PageSettingsType } from '../../../../../types';
+import { type PageSettingsProps } from '../../../../../types';
 import styles from './PageSettings.module.css';
-
-interface PageSettingsProps {
-    isDragMode: boolean;
-    pageSettings?: PageSettingsType;
-    onPageSettingsChange?: (settings: PageSettingsType) => void;
-}
 
 const PageSettings = ({ isDragMode, pageSettings, onPageSettingsChange }: PageSettingsProps) => {
     const [showSettings, setShowSettings] = useState(false);
