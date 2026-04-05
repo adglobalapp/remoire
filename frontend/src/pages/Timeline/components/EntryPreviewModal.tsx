@@ -2,7 +2,7 @@ import { usePage } from '../../../App';
 import { useEntryContext } from '../../../contexts/EntryContext';
 import { createPortal } from 'react-dom';
 import styles from './EntryPreviewModal.module.css';
-import editorStyles from '../../Entry/components/EntryEditor.module.css';
+import editorStyles from '../../Entry/components/editor/Canvas.module.css';
 import type { PageSettings, EntryPreviewModalProps } from '../../../types';
 
 import { X, Edit3 } from 'lucide-react';
@@ -10,11 +10,11 @@ import { X, Edit3 } from 'lucide-react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
-import { ResizableImage } from '../../Entry/components/extensions/ResizableImage';
+import { ResizableImage } from '../../Entry/components/editor/extensions/ResizableImage';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { Color } from '@tiptap/extension-color';
-import { FontSize } from '../../Entry/components/extensions/FontSize';
+import { FontSize } from '../../Entry/components/editor/extensions/FontSize';
 import { DEFAULT_PAGE_SETTINGS } from '../../../types';
 
 const EntryPreviewModal = ({ entry, onClose }: EntryPreviewModalProps) => {

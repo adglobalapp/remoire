@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useEditor, EditorContent, type Editor } from '@tiptap/react';
+import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -7,17 +7,17 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { Color } from '@tiptap/extension-color';
 import classNames from 'classnames';
-import EditorToolbar from './EditorToolbar';
+import Toolbar from './Toolbar';
 import { ResizableImage } from './extensions/ResizableImage';
 import { FontSize } from './extensions/FontSize';
-import { useEntryContext } from '../../../contexts/EntryContext';
-import { CanvasScaleContext } from '../../../contexts/CanvasScaleContext';
-import { useCanvasNavigation } from '../../../hooks/useCanvasNavigation';
-import { type PageSettings, DEFAULT_PAGE_SETTINGS } from '../../../types';
-import styles from './EntryEditor.module.css';
+import { useEntryContext } from '../../../../contexts/EntryContext';
+import { CanvasScaleContext } from '../../../../contexts/CanvasScaleContext';
+import { useCanvasNavigation } from '../../../../hooks/useCanvasNavigation';
+import { type PageSettings, DEFAULT_PAGE_SETTINGS } from '../../../../types';
+import styles from './Canvas.module.css';
 
-const EntryEditor = () => {
-    const { activeEntry, saveEntry, updateEntryTitle } = useEntryContext();
+const Canvas = () => {
+    const { activeEntry, saveEntry } = useEntryContext();
 
     const {
         transform,
@@ -30,12 +30,14 @@ const EntryEditor = () => {
 
     const [isDragMode, setIsDragMode] = useState(false);
     const [isColorPicking, setIsColorPicking] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const mouseDownTargetRef = useRef<EventTarget | null>(null);
     const [pageSettings, setPageSettings] = useState<PageSettings>(DEFAULT_PAGE_SETTINGS);
     const pageSettingsRef = useRef<PageSettings>(DEFAULT_PAGE_SETTINGS);
 
     const initialEntryId = useRef<number | null>(activeEntry?.id ?? null).current;
     const loadedEntryIdRef = useRef<number | null>(null);
+    const lastContentRef = useRef<string | null>(null);
 
     const parseStoredContent = (raw: string | null | undefined) => {
         if (!raw) return null;
@@ -48,7 +50,7 @@ const EntryEditor = () => {
     };
 
     const getInitialContent = () => {
-        if (!activeEntry) return '<h1 style="text-align: center">Untitled</h1><p>Dear Diary...</p>';
+        if (!activeEntry) return '<h1>Untitled</h1><p>Dear Diary...</p>';
         const stored = parseStoredContent(activeEntry.content);
         if (stored && typeof stored === 'object' && stored.contentJSON) {
             return stored.contentJSON;
@@ -56,24 +58,7 @@ const EntryEditor = () => {
 
         if (typeof stored === 'string' && stored) return stored;
 
-        return '<h1 style="text-align: center">Untitled</h1><p>Dear Diary...</p>';
-    };
-
-    // Automatic title
-    const extractTitle = (editor: Editor) => {
-        const { doc } = editor.state;
-        let title = '';
-
-        // look for the first node that has text
-        doc.descendants((node) => {
-            if (title) return false;
-            if (node.isTextblock && node.textContent.trim()) {
-                title = node.textContent.trim();
-                return false;
-            }
-        });
-
-        return (title.length > 50 ? title.substring(0, 50) + '...' : title) || 'Untitled';
+        return '<h1>Untitled</h1><p>Dear Diary...</p>';
     };
 
     // Config editor
@@ -104,28 +89,48 @@ const EntryEditor = () => {
         },
     });
 
+    const extractTitleFromJSON = (json: any): string => {
+        if (!json || !json.content) return 'Untitled';
+        
+        const findFirstText = (node: any): string | null => {
+            if (node.text) return node.text.trim();
+            if (node.content && Array.isArray(node.content)) {
+                for (const child of node.content) {
+                    const found = findFirstText(child);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+
+        return findFirstText(json) || 'Untitled';
+    };
+
     // Save entry
+    const { updateEntryTitle } = useEntryContext();
     useEffect(() => {
         if (!editor || initialEntryId === null) return;
         const handleUpdate = ({ transaction }: { transaction: any }) => {
             if (transaction.getMeta('isColorPreview')) return;
 
-            const titleText = extractTitle(editor);
-            updateEntryTitle(initialEntryId, titleText);
-
             const contentJSON = editor.getJSON();
+            const currentTitle = extractTitleFromJSON(contentJSON);
+            
+            // Real-time sync with sidebar
+            if (currentTitle !== activeEntry?.title) {
+                updateEntryTitle(initialEntryId, currentTitle);
+            }
+
             const serialized = JSON.stringify({ contentJSON, pageSettings: pageSettingsRef.current });
-            saveEntry(initialEntryId, titleText, serialized);
+            saveEntry(initialEntryId, currentTitle, serialized);
         };
         editor.on('update', handleUpdate);
         return () => { editor.off('update', handleUpdate); };
-    }, [editor, saveEntry, updateEntryTitle, initialEntryId]);
+    }, [editor, saveEntry, initialEntryId, activeEntry?.title, updateEntryTitle]);
 
     // Load entry
     useEffect(() => {
-        if (!activeEntry || initialEntryId === null) return;
-        if (loadedEntryIdRef.current === activeEntry.id) return;
-        loadedEntryIdRef.current = activeEntry.id;
+        if (!editor || !activeEntry || (loadedEntryIdRef.current === activeEntry.id && lastContentRef.current === activeEntry.content)) return;
 
         const stored = parseStoredContent(activeEntry.content);
         const contentJSON = (stored && typeof stored === 'object' && stored.contentJSON)
@@ -137,15 +142,32 @@ const EntryEditor = () => {
             settings = { ...DEFAULT_PAGE_SETTINGS, ...stored.pageSettings };
         }
 
-        // Delay content loading to avoid React life-cycle warnings (flushSync)
-        setTimeout(() => {
-            if (!editor) return;
+        // Case 1: Entry ID changed - Full reload
+        if (loadedEntryIdRef.current !== activeEntry.id) {
+            loadedEntryIdRef.current = activeEntry.id;
+            lastContentRef.current = activeEntry.content;
+
+            setIsLoading(true);
             setPageSettings(settings);
             pageSettingsRef.current = settings;
-            editor.commands.setContent(contentJSON, { emitUpdate: false });
-            editor.commands.blur();
-        }, 0);
-    }, [activeEntry, editor, initialEntryId]);
+
+            // Delayed to avoid lifecycle issues
+            setTimeout(() => {
+                if (editor) {
+                    editor.commands.setContent(contentJSON, { emitUpdate: false });
+                    setIsLoading(false);
+                }
+            }, 10);
+        }
+        // Case 2: Same entry, but content/settings updated (e.g. from server/sync)
+        else {
+            lastContentRef.current = activeEntry.content;
+            if (JSON.stringify(settings) !== JSON.stringify(pageSettingsRef.current)) {
+                setPageSettings(settings);
+                pageSettingsRef.current = settings;
+            }
+        }
+    }, [editor, activeEntry]);
 
     // Drag mode
     useEffect(() => {
@@ -194,10 +216,10 @@ const EntryEditor = () => {
         setPageSettings(newSettings);
         pageSettingsRef.current = newSettings;
         if (initialEntryId !== null && editor) {
-            const titleText = extractTitle(editor);
-            const contentJSON = editor.getJSON() || null;
+            const contentJSON = editor.getJSON();
+            const currentTitle = extractTitleFromJSON(contentJSON);
             const serialized = JSON.stringify({ contentJSON, pageSettings: newSettings });
-            saveEntry(initialEntryId, titleText, serialized);
+            saveEntry(initialEntryId, currentTitle, serialized);
         }
     };
 
@@ -231,6 +253,11 @@ const EntryEditor = () => {
                         </div>
                     </div>
                 )}
+                {isLoading && (
+                    <div className={styles.emptyStateOverlay}>
+                        <div className="spinner" />
+                    </div>
+                )}
                 <CanvasScaleContext.Provider value={transform.scale}>
                     <div
                         className={styles.canvas}
@@ -262,7 +289,7 @@ const EntryEditor = () => {
                 </CanvasScaleContext.Provider>
             </div>
 
-            <EditorToolbar
+            <Toolbar
                 editor={editor}
                 isDragMode={isDragMode}
                 onToggleDragMode={() => setIsDragMode(!isDragMode)}
@@ -274,4 +301,4 @@ const EntryEditor = () => {
     );
 };
 
-export default EntryEditor;
+export default Canvas;

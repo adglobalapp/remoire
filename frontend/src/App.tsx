@@ -1,7 +1,7 @@
 import { useState, createContext, useContext, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
-import EntryPage from './pages/Entry/EntryPage';
+import EntryPage from './pages/Entry';
 import TimelinePage from './pages/Timeline/TimelinePage';
 import LandingPage from './pages/Landing/LandingPage';
 import FriendlistPage from './pages/Friendlist/FriendlistPage';

@@ -23,9 +23,14 @@ export const useAutoSave = (
         const [id, data] = entry;
         pendingSavesRef.current.delete(id);
 
+        // Optimistic update
+        setEntries(prev => prev.map(e => e.id === id ? { ...e, ...data } : e));
+        setActiveEntry(prev => prev?.id === id ? { ...prev, ...data } : prev);
+
         try {
             const updated = await apiUpdateEntry(id, data);
             if (updated) {
+                // Sync with server if needed (server might have extra fields like updated_at)
                 setEntries(prev => prev.map(e => e.id === id ? updated : e));
                 setActiveEntry(prev => prev?.id === id ? updated : prev);
             }

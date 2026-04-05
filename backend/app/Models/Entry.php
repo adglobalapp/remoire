@@ -12,6 +12,47 @@ class Entry extends Model
 
     protected $fillable = ['title', 'date', 'content', 'image_url', 'user_id', 'color'];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($entry) {
+            // Always try to extract title from content to ensure they are in sync
+            if ($entry->content) {
+                $extracted = static::extractTitle($entry->content);
+                $entry->title = $extracted ?: 'Untitled';
+            }
+        });
+    }
+
+    public static function extractTitle($content)
+    {
+        if (!$content || !is_string($content)) return null;
+        $data = json_decode($content, true);
+        if (!$data || !isset($data['contentJSON'])) return null;
+
+        $json = $data['contentJSON'];
+        $title = static::findFirstText($json);
+        
+        if (!$title) return null;
+        return mb_strlen($title) > 50 ? mb_substr($title, 0, 50) . '...' : $title;
+    }
+
+    private static function findFirstText($node)
+    {
+        if (isset($node['text'])) {
+            $text = trim($node['text']);
+            return $text ?: null;
+        }
+        if (isset($node['content']) && is_array($node['content'])) {
+            foreach ($node['content'] as $child) {
+                $found = static::findFirstText($child);
+                if ($found) return $found;
+            }
+        }
+        return null;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

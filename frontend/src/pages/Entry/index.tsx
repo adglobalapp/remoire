@@ -1,7 +1,7 @@
 import Navbar from '../../components/common/Navbar';
-import LeftSidebar from './components/LeftSidebar';
-import RightSidebar from './components/RightSidebar';
-import EntryEditor from './components/EntryEditor';
+import LeftSidebar from './components/sidebar/LeftSidebar';
+import RightSidebar from './components/sidebar/RightSidebar';
+import Canvas from './components/editor/Canvas';
 import { useEntryContext } from '../../contexts/EntryContext';
 import { useResponsiveSidebar } from '../../hooks/useResponsiveSidebar';
 
@@ -27,7 +27,7 @@ const EntryPage = () => {
                 </div>
 
                 <section className="content-area-full">
-                    <EntryEditor key={activeEntry?.id ?? 'none'} />
+                    <Canvas key={activeEntry?.id ?? 'none'} />
                 </section>
 
                 <div className="sidebar-right">

@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, UserPlus } from 'lucide-react';
 import styles from './AddParticipantModal.module.css';
-import { type AddParticipantModalProps } from '../../../types';
+import { type AddParticipantModalProps } from '../../../../types';
 
 const AddParticipantModal: React.FC<AddParticipantModalProps> = ({ onClose, onSelectFriend, friends }) => {
     return (

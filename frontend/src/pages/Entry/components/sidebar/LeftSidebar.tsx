@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Trash2, Plus, Search, PanelLeft, X } from 'lucide-react';
-import DeleteConfirmationModal from '../../../components/common/DeleteConfirmationModal';
-import { useEntryContext } from '../../../contexts/EntryContext';
-import { formatDateTime } from '../../../utils/dateUtils';
-import { usePage } from '../../../App';
+import DeleteConfirmationModal from '../../../../components/common/DeleteConfirmationModal';
+import { useEntryContext } from '../../../../contexts/EntryContext';
+import { formatDateTime } from '../../../../utils/dateUtils';
+import { usePage } from '../../../../App';
 import styles from './LeftSidebar.module.css';
-import { type LeftSidebarProps } from '../../../types';
+import { type LeftSidebarProps } from '../../../../types';
 
 const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
     const { entries, activeEntry, selectEntry, createEntry, deleteEntry } = useEntryContext();
@@ -40,7 +40,7 @@ const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
     }, [page, activeEntry?.id]);
 
     const filteredEntries = entries.filter(entry => {
-        const matchesSearch = entry.title.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesSearch = (entry.title || '').toLowerCase().includes(searchQuery.toLowerCase());
         if (activeFilter === 'all') return matchesSearch;
 
         const entryDate = new Date(entry.created_at);

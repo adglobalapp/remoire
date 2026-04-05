@@ -1,0 +1,132 @@
+.paletteContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.actionButton {
+    background: transparent;
+    border: none;
+    color: var(--color-white);
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    opacity: 0.7;
+}
+
+.actionButton:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    opacity: 1;
+}
+
+.isActive {
+    background-color: rgba(255, 255, 255, 0.2);
+    opacity: 1;
+}
+
+.palettePopup {
+    background-color: var(--color-dark-blue);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 1rem;
+    min-width: 200px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.paletteSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.paletteLabel {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-weight: 500;
+    margin-bottom: 0.1rem;
+}
+
+.colorGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.4rem;
+}
+
+.colorSquare {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.colorSquare:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-white);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+.paletteDivider {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0.25rem 0;
+}
+
+.customColorSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.colorInputWrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 0.4rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.colorHex {
+    color: var(--color-white);
+    font-size: 0.8rem;
+    font-family: monospace;
+    font-weight: 500;
+    opacity: 0.8;
+}
+
+.colorPicker {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.colorPicker::-webkit-color-swatch {
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.colorPicker::-moz-color-swatch {
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}

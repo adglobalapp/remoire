@@ -4,7 +4,7 @@ import { useRef, useEffect, useCallback } from 'react';
 import { Trash2 } from 'lucide-react';
 import Moveable from 'react-moveable';
 import classNames from 'classnames';
-import { useCanvasScale } from '../../../../contexts/CanvasScaleContext';
+import { useCanvasScale } from '../../../../../contexts/CanvasScaleContext';
 import styles from './ResizableImage.module.css';
 
 const ImageNodeView = (props: any) => {

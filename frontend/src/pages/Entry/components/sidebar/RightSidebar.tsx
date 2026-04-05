@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { MapPin, Calendar, Plus, Users, PanelRight, X, Trash2 } from 'lucide-react';
-import { useEntryContext } from '../../../contexts/EntryContext';
-import { usePage } from '../../../App';
+import { useEntryContext } from '../../../../contexts/EntryContext';
+import { usePage } from '../../../../App';
 import styles from './RightSidebar.module.css';
-import { getFriends } from '../../../api';
-import { type User, type LeftSidebarProps as RightSidebarProps } from '../../../types';
-import AddParticipantModal from './AddParticipantModal';
+import { getFriends } from '../../../../api';
+import { type User, type LeftSidebarProps as RightSidebarProps } from '../../../../types';
+import AddParticipantModal from '../modal/AddParticipantModal';
 
 const RightSidebar = ({ isOpen: propOpen, onToggle }: RightSidebarProps) => {
     const { activeEntry, updateEntryDate, updateEntryParticipants } = useEntryContext();

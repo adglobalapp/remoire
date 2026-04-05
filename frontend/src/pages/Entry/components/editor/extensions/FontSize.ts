@@ -1,5 +1,5 @@
 import { Extension } from '@tiptap/core';
-import { type FontSizeOptions } from '../../../../types';
+import { type FontSizeOptions } from '../../../../../types';
 
 declare module '@tiptap/core' {
     interface Commands<ReturnType> {

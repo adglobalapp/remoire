@@ -16,7 +16,7 @@ class EntryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'   => 'required|string|max:255',
+            'title'   => 'nullable|string|max:255',
             'date'    => 'required|date',
             'content' => 'nullable|string',
             'color'   => 'nullable|string',
@@ -50,7 +50,7 @@ class EntryController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
         $validated = $request->validate([
-            'title'   => 'sometimes|string|max:255',
+            'title'   => 'nullable|string|max:255',
             'date'    => 'sometimes|date',
             'content' => 'nullable|string',
             'color'   => 'nullable|string',
@@ -77,4 +77,5 @@ class EntryController extends Controller
 
         return response()->json(['message' => 'Deleted']);
     }
+
 }
