@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { UserPlus, Loader2 } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
+import Loader from '../../components/common/Loader';
 import Navbar from '../../components/common/Navbar';
 import styles from './index.module.css';
 import { type User as UserType } from '../../types';
 import { getFriends, getFriendRequests, acceptFriendRequest, deleteFriendship, blockUser } from '../../api';
-import Row from './components/list/Row';
+import List from './components/list/List';
 import AddFriend from './components/modal/AddFriend';
 import UserProfile from './components/modal/UserProfile';
 import Confirmation from '../../components/common/modal/Confirmation';
@@ -18,7 +19,6 @@ const FriendlistPage = () => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
 
-    // Confirmation Modal state
     const [confirmAction, setConfirmAction] = useState<{
         type: 'delete' | 'block';
         userId: number;
@@ -90,7 +90,7 @@ const FriendlistPage = () => {
     return (
         <div className="page-container">
             <Navbar />
-            <main style={{ flex: 1, overflowY: 'auto' }}>
+            <main className={styles.mainContent}>
                 <div className={styles.container}>
                     <header className={styles.header}>
                         <h1>Friends</h1>
@@ -102,58 +102,39 @@ const FriendlistPage = () => {
                     </header>
 
                     {isLoading ? (
-                        <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0' }}>
-                            <Loader2 className="loading-icon" size={48} />
-                        </div>
+                        <Loader className={styles.loaderContainer} />
                     ) : (
                         <>
-                            {pendingRequests.length > 0 && (
-                                <div className={styles.friendList} style={{ marginBottom: '30px' }}>
-                                    <div className={`${styles.sectionTitle} ${styles.bgDarkBlue}`}>Pending Requests</div>
-                                    {pendingRequests.map(user => (
-                                        <Row
-                                            key={user.id}
-                                            user={user}
-                                            type="pending"
-                                            onAccept={handleAccept}
-                                            onDelete={() => setConfirmAction({ type: 'delete', userId: user.id, userName: user.name })}
-                                            onViewProfile={setSelectedUser}
-                                        />
-                                    ))}
-                                </div>
-                            )}
+                            <List
+                                title="Pending Requests"
+                                users={pendingRequests}
+                                type="pending"
+                                delay={0}
+                                onAccept={handleAccept}
+                                onDelete={(user) => setConfirmAction({ type: 'delete', userId: user.id, userName: user.name })}
+                                onViewProfile={setSelectedUser}
+                                titleClassName={styles.bgDarkBlue}
+                            />
 
-                            {sentRequests.length > 0 && (
-                                <div className={styles.friendList} style={{ marginBottom: '30px' }}>
-                                    <div className={`${styles.sectionTitle} ${styles.bgDarkBlue}`}>Sent Requests</div>
-                                    {sentRequests.map(user => (
-                                        <Row
-                                            key={user.id}
-                                            user={user}
-                                            type="sent"
-                                            onDelete={() => setConfirmAction({ type: 'delete', userId: user.id, userName: user.name })}
-                                            onViewProfile={setSelectedUser}
-                                        />
-                                    ))}
-                                </div>
-                            )}
+                            <List
+                                title="Sent Requests"
+                                users={sentRequests}
+                                type="sent"
+                                delay={1}
+                                onDelete={(user) => setConfirmAction({ type: 'delete', userId: user.id, userName: user.name })}
+                                onViewProfile={setSelectedUser}
+                                titleClassName={styles.bgDarkBlue}
+                            />
 
-                            <div className={styles.friendList}>
-                                <div className={styles.sectionTitle}>My Friends ({friends.length})</div>
-                                {friends.length > 0 ? (
-                                    friends.map(user => (
-                                        <Row
-                                            key={user.id}
-                                            user={user}
-                                            type="friend"
-                                            onDelete={() => setConfirmAction({ type: 'delete', userId: user.id, userName: user.name })}
-                                            onViewProfile={setSelectedUser}
-                                        />
-                                    ))
-                                ) : (
-                                    <div className="empty-state-placeholder">You haven't added any friends yet.</div>
-                                )}
-                            </div>
+                            <List
+                                title="My Friends"
+                                users={friends}
+                                type="friend"
+                                delay={2}
+                                onDelete={(user) => setConfirmAction({ type: 'delete', userId: user.id, userName: user.name })}
+                                onViewProfile={setSelectedUser}
+                                showEmptyState
+                            />
                         </>
                     )}
 
@@ -175,6 +156,7 @@ const FriendlistPage = () => {
                     {confirmAction && (
                         <Confirmation
                             title={confirmAction.type === 'delete' ? 'Remove Connection?' : 'Block User?'}
+                            variant="danger"
                             message={
                                 confirmAction.type === 'delete'
                                     ? <span>Are you sure you want to remove <strong>{confirmAction.userName}</strong> from your friends?</span>

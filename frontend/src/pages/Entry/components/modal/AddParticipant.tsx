@@ -6,7 +6,7 @@ const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectFriend
     return (
         <div className="global-modal-overlay" onClick={onClose}>
             <div className="global-modal-content" onClick={(e) => e.stopPropagation()}>
-                <div style={{ paddingBottom: '10px' }}>
+                <div className={styles.modalHeader}>
                     <h3 className={styles.title}>Add Participant</h3>
                     <button className="global-modal-close-btn" onClick={onClose}>
                         <X size={20} />

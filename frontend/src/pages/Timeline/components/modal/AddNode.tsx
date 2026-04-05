@@ -5,19 +5,11 @@ import toast from 'react-hot-toast';
 import { uploadImage } from '../../../../api';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
-import DeleteConfirmation from '../../../../components/common/modal/DeleteConfirmation';
+import Confirmation from '../../../../components/common/modal/Confirmation';
 import { type AddNodeProps } from '../../../../types';
+import { PRESET_COLORS } from '../../../../utils/constants';
 import styles from './AddNode.module.css';
 
-const COLORS = [
-    { value: '#f8a5c2', label: 'Soft Coral' },
-    { value: '#f9e2af', label: 'Sunny Yellow' },
-    { value: '#a6e3a1', label: 'Minty Green' },
-    { value: '#89dceb', label: 'Sky Blue' },
-    { value: '#cba6f7', label: 'Soft Lavender' },
-    { value: '#fab387', label: 'Peach' },
-    { value: '#f5e0dc', label: 'Warm Sand' },
-];
 
 const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
     const { entries, updateEntryMetadata } = useEntryContext();
@@ -33,7 +25,7 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [customColor, setCustomColor] = useState<string>(
-        COLORS.some(c => c.value === (entryToEdit?.color || '')) ? '' : (entryToEdit?.color || '')
+        PRESET_COLORS.includes(entryToEdit?.color || '') ? '' : (entryToEdit?.color || '')
     );
     const dropdownRef = useRef<HTMLDivElement>(null);
     const colorPickerRef = useRef<HTMLInputElement>(null);
@@ -64,7 +56,7 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
         const entry = entries.find(ent => ent.id === id);
         if (entry) {
             const entryColor = entry.color || '';
-            const isPreset = COLORS.some(c => c.value === entryColor);
+            const isPreset = PRESET_COLORS.includes(entryColor);
             setColor(isPreset ? entryColor : '');
             setCustomColor(isPreset ? '' : entryColor);
             setImageUrl(entry.image_url || '');
@@ -187,17 +179,16 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                     <div className={styles.formGroup}>
                         <label><Palette size={16} className={styles.iconInfo} /> Entry Accent Color</label>
                         <div className={styles.colorPalette}>
-                            {COLORS.map(c => (
+                            {PRESET_COLORS.map(c => (
                                 <button
-                                    key={c.value}
+                                    key={c}
                                     type="button"
-                                    className={`${styles.colorBtn} ${color === c.value ? styles.colorBtnActive : ''}`}
-                                    style={{ backgroundColor: c.value }}
+                                    className={`${styles.colorBtn} ${color === c ? styles.colorBtnActive : ''}`}
+                                    style={{ backgroundColor: c }}
                                     onClick={() => {
-                                        setColor(c.value === color ? '' : c.value);
+                                        setColor(c === color ? '' : c);
                                         setCustomColor('');
                                     }}
-                                    title={c.label}
                                 />
                             ))}
 
@@ -288,17 +279,20 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                 </div>
             </div>
 
-            <DeleteConfirmation
-                isOpen={isConfirmOpen}
-                onClose={() => setIsConfirmOpen(false)}
-                onConfirm={handleConfirmDelete}
-                title="Remove from Timeline"
-                message={
-                    <span>
-                        Are you sure you want to remove <strong>{entryToEdit?.title || 'this entry'}</strong> from the timeline? It will only be removed from this timeline and will not be permanently deleted.
-                    </span>
-                }
-            />
+            {isConfirmOpen && (
+                <Confirmation
+                    title="Remove from Timeline"
+                    variant="danger"
+                    message={
+                        <span>
+                            Are you sure you want to remove <strong>{entryToEdit?.title || 'this entry'}</strong> from the timeline? It will only be removed from this timeline and will not be permanently deleted.
+                        </span>
+                    }
+                    confirmText="Remove"
+                    onConfirm={handleConfirmDelete}
+                    onCancel={() => setIsConfirmOpen(false)}
+                />
+            )}
         </>,
         document.body
     );

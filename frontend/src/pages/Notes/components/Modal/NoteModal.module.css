@@ -1,0 +1,276 @@
+.modalContent {
+    max-width: 650px !important;
+    width: 95% !important;
+    height: auto !important;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem !important;
+    gap: 1.25rem !important;
+    border-radius: 20px !important;
+    overflow: hidden;
+    background-color: var(--note-bg, var(--color-light-beige)) !important;
+    --placeholder-color: rgba(0, 0, 0, 0.4);
+}
+
+.modalHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0.5rem 0;
+}
+
+.headerActions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.titleInput {
+    flex: 1;
+    font-family: var(--font-ui), serif;
+    font-size: 2rem;
+    border: none;
+    outline: none;
+    color: var(--color-dark-brown);
+    background: transparent;
+    padding: 0;
+    height: 2.2rem;
+    line-height: normal;
+    /* Better for Gurajada metrics */
+}
+
+.titleInput::placeholder {
+    color: var(--placeholder-color);
+    opacity: 0.6;
+}
+
+.headerBtn {
+    background: rgba(0, 0, 0, 0.06);
+    border: none;
+    cursor: pointer;
+    color: var(--color-dark-brown);
+    opacity: 0.5;
+    width: 38px;
+    /* Fixed size */
+    height: 38px;
+    padding: 0 !important;
+    /* Override global btn padding */
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.headerBtn:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.headerBtn.pinnedActive {
+    opacity: 1;
+    color: var(--color-dark-blue);
+    background-color: rgba(38, 36, 49, 0.1);
+}
+
+.closeBtnOverride {
+    position: static !important;
+    opacity: 1 !important;
+    padding: 8px !important;
+}
+
+.modalBody {
+    padding: 0 0.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    min-height: 300px;
+    /* Slightly taller default */
+}
+
+.editorContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    height: 100%;
+}
+
+.toolbar {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 12px;
+    margin-bottom: 0.8rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.toolbarBtn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: var(--color-dark-brown);
+    opacity: 0.75;
+    padding: 0 !important;
+}
+
+.toolbarBtn:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+    opacity: 1;
+}
+
+.toolbarBtn.active {
+    background-color: var(--color-dark-blue);
+    color: var(--color-white);
+    opacity: 1;
+}
+
+.toolbarDivider {
+    width: 1px;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.1);
+    margin: 0 0.2rem;
+}
+
+:global(.ProseMirror) {
+    min-height: 250px;
+    padding: 0.5rem 0;
+    outline: none;
+    font-family: var(--font-body), sans-serif;
+    font-size: 1.15rem;
+    line-height: 1.6;
+}
+
+:global(.ProseMirror p) {
+    margin-bottom: 0.6rem;
+}
+
+:global(.ProseMirror ul[data-type="taskList"]) {
+    list-style: none;
+    padding: 0;
+}
+
+:global(.ProseMirror ul[data-type="taskList"] li) {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 0.4rem;
+}
+
+:global(.ProseMirror ul[data-type="taskList"] input[type="checkbox"]) {
+    appearance: none;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.4);
+    /* Translucency fix */
+    position: relative;
+    transition: all 0.2s;
+    margin-top: 2px;
+}
+
+:global(.ProseMirror ul[data-type="taskList"] input[type="checkbox"]:checked) {
+    background-color: var(--color-dark-blue);
+    border-color: var(--color-dark-blue);
+}
+
+:global(.ProseMirror ul[data-type="taskList"] input[type="checkbox"]:checked::after) {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.modalFooter {
+    padding: 1rem 0.5rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px dashed rgba(0, 0, 0, 0.05);
+    /* Subtle structure */
+}
+
+.footerActions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.colorPalette {
+    display: flex;
+    gap: 10px;
+}
+
+.colorCircle {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    transition: transform 0.2s, border-color 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.colorCircle:hover {
+    transform: scale(1.15);
+}
+
+.colorCircle.selected {
+    border-color: var(--color-dark-blue);
+    transform: scale(1.15);
+}
+
+@media (max-width: 480px) {
+    .modalContent {
+        padding: 1rem !important;
+        gap: 0.75rem !important;
+    }
+
+    .modalBody {
+        min-height: 160px;
+    }
+
+    .titleInput {
+        font-size: 1.5rem;
+    }
+
+    .toolbar {
+        gap: 0.25rem;
+        padding: 0.4rem;
+    }
+
+    .toolbarBtn {
+        width: 30px;
+        height: 30px;
+    }
+
+    .modalFooter {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.75rem 0.5rem 0;
+    }
+
+    .colorPalette {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .footerActions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}

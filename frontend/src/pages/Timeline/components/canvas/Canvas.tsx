@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react';
 import AddNode from '../modal/AddNode';
 import Node from './Node';
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
+import Loader from '../../../../components/common/Loader';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { useCanvasNavigation } from '../../../../hooks/useCanvasNavigation';
 import { compareDates } from '../../../../utils/dateUtils';
@@ -76,15 +77,13 @@ const Canvas = () => {
             onMouseDown={onMouseDown}
             onTouchStart={onTouchStart}
         >
-            {(isLoading || visibleEntries.length === 0) && (
+            {isLoading && <Loader contextual />}
+            {!isLoading && visibleEntries.length === 0 && (
                 <div className={styles.emptyStateOverlay}>
                     <div className="empty-state-placeholder">
-                        {isLoading 
-                            ? 'Loading timeline...' 
-                            : (activeTimeline?.isDefault 
-                                ? 'No entries yet. Create your first one!' 
-                                : 'No entries found in this timeline.')
-                        }
+                        {activeTimeline?.isDefault 
+                            ? 'No entries yet. Create your first one!' 
+                            : 'No entries found in this timeline.'}
                     </div>
                 </div>
             )}
@@ -103,9 +102,10 @@ const Canvas = () => {
                             const side: 'left' | 'right' = index % 2 === 0 ? 'left' : 'right';
                             return (
                                 <Node
-                                    key={entry.id}
+                                    key={`${activeTimeline?.id || 'default'}-${entry.id}`}
                                     entry={entry}
                                     side={side}
+                                    index={index}
                                 />
                             );
                         })}

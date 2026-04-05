@@ -1,97 +1,126 @@
-import { useState, createContext, useContext, useEffect } from 'react';
+import { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { Loader2 } from 'lucide-react';
+import Loader from './components/common/Loader';
+import Navbar from './components/common/Navbar';
 import EntryPage from './pages/Entry';
 import TimelinePage from './pages/Timeline';
 import LandingPage from './pages/Landing';
 import FriendlistPage from './pages/Friendlist';
+import NotesPage from './pages/Notes';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import { EntryProvider } from './contexts/EntryContext';
 import { TimelineProvider } from './contexts/TimelineContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { type Page } from './types';
 
-export const PageContext = createContext<{
-    page: Page;
-    setPage: (p: Page) => void;
-}>({ page: 'entries', setPage: () => { } });
-
-export const usePage = () => useContext(PageContext);
-
-function AppContent() {
-    const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
-    const { page, setPage } = usePage();
-    const [showLogin, setShowLogin] = useState(false);
-    const [showRegister, setShowRegister] = useState(false);
-
-    // Redirect to landing if not authenticated
-    useEffect(() => {
-        if (!isAuthLoading && !isAuthenticated) {
-            setPage('landing');
-        } else if (!isAuthLoading && isAuthenticated && page === 'landing') {
-            setPage('entries');
-        }
-    }, [isAuthenticated, isAuthLoading, page, setPage]);
-
-    if (isAuthLoading) {
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+    const { isAuthenticated, isLoading } = useAuth();
+    
+    if (isLoading) {
         return (
-            <div className="loading-screen">
-                <Loader2 className="loading-icon" size={48} />
+            <div className="page-container">
+                <Navbar />
+                <main className="main-layout">
+                    <Loader />
+                </main>
             </div>
         );
     }
-
-    if (!isAuthenticated || page === 'landing') {
-        return (
-            <>
-                <LandingPage
-                    onLogin={() => setShowLogin(true)}
-                    onRegister={() => setShowRegister(true)}
-                />
-                {showLogin && (
-                    <Login
-                        onClose={() => setShowLogin(false)}
-                        onSwitchToRegister={() => {
-                            setShowLogin(false);
-                            setShowRegister(true);
-                        }}
-                    />
-                )}
-                {showRegister && (
-                    <Register
-                        onClose={() => setShowRegister(false)}
-                        onSwitchToLogin={() => {
-                            setShowRegister(false);
-                            setShowLogin(true);
-                        }}
-                    />
-                )}
-            </>
-        );
+    
+    if (!isAuthenticated) {
+        return <Navigate to="/" replace />;
     }
+    
+    return <>{children}</>;
+}
+
+function LandingRoute({ children }: { children: React.ReactNode }) {
+    const { isAuthenticated, isLoading } = useAuth();
+    
+    if (isLoading) {
+        return <Loader />;
+    }
+    
+    if (isAuthenticated) {
+        return <Navigate to="/entries" replace />;
+    }
+    
+    return <>{children}</>;
+}
+
+function AppContent() {
+    const [showLogin, setShowLogin] = useState(false);
+    const [showRegister, setShowRegister] = useState(false);
 
     return (
         <EntryProvider>
             <TimelineProvider>
-                {page === 'entries' ? (
-                    <EntryPage />
-                ) : page === 'timelines' ? (
-                    <TimelinePage />
-                ) : (
-                    <FriendlistPage />
-                )}
+                <Routes>
+                    <Route path="/" element={
+                        <LandingRoute>
+                            <>
+                                <LandingPage
+                                    onLogin={() => setShowLogin(true)}
+                                    onRegister={() => setShowRegister(true)}
+                                />
+                                {showLogin && (
+                                    <Login
+                                        onClose={() => setShowLogin(false)}
+                                        onSwitchToRegister={() => {
+                                            setShowLogin(false);
+                                            setShowRegister(true);
+                                        }}
+                                    />
+                                )}
+                                {showRegister && (
+                                    <Register
+                                        onClose={() => setShowRegister(false)}
+                                        onSwitchToLogin={() => {
+                                            setShowRegister(false);
+                                            setShowLogin(true);
+                                        }}
+                                    />
+                                )}
+                            </>
+                        </LandingRoute>
+                    } />
+                    
+                    <Route path="/entries" element={
+                        <ProtectedRoute>
+                            <EntryPage />
+                        </ProtectedRoute>
+                    } />
+                    
+                    <Route path="/timelines" element={
+                        <ProtectedRoute>
+                            <TimelinePage />
+                        </ProtectedRoute>
+                    } />
+                    
+                    <Route path="/friends" element={
+                        <ProtectedRoute>
+                            <FriendlistPage />
+                        </ProtectedRoute>
+                    } />
+                    
+                    <Route path="/notes" element={
+                        <ProtectedRoute>
+                            <NotesPage />
+                        </ProtectedRoute>
+                    } />
+
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
             </TimelineProvider>
         </EntryProvider>
     );
 }
 
 function App() {
-    const [page, setPage] = useState<Page>('entries');
-
     return (
         <AuthProvider>
-            <PageContext.Provider value={{ page, setPage }}>
+            <BrowserRouter>
                 <Toaster
                     position="bottom-right"
                     containerStyle={{ zIndex: 10000000 }}
@@ -115,7 +144,7 @@ function App() {
                     }}
                 />
                 <AppContent />
-            </PageContext.Provider>
+            </BrowserRouter>
         </AuthProvider>
     );
 }

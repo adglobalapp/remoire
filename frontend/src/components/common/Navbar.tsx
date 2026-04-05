@@ -1,54 +1,49 @@
 import { useState } from 'react';
 import { BookMarked, Users, Map, StickyNote, NotebookText, TrendingUp, LogOut, User, Menu, X } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import styles from './Navbar.module.css';
-import { usePage } from '../../App';
 import { useAuth } from '../../contexts/AuthContext';
 
 const Navbar = () => {
-    const { page, setPage } = usePage();
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
 
-    const handleNav = (p: Parameters<typeof setPage>[0]) => {
-        setPage(p);
-        setMenuOpen(false);
-    };
-
     return (
         <nav className={styles.navbar}>
-            <div className={styles.logoSection} onClick={() => handleNav('entries')} style={{ cursor: 'pointer' }}>
-                <BookMarked size={25} />
-                <span className="font-logo">Remoire</span>
+            <div className={styles.logoSection} onClick={() => navigate('/entries')} style={{ cursor: 'pointer' }}>
+                <BookMarked size={22} />
+                <span className={`font-logo ${styles.logoText}`}>Remoire</span>
             </div>
 
             {/* Desktop menu */}
             <div className={styles.menuItems}>
-                <a
-                    href="#"
-                    className={`${styles.link} ${page === 'entries' ? styles.active : ''}`}
-                    onClick={(e) => { e.preventDefault(); handleNav('entries'); }}
+                <NavLink
+                    to="/entries"
+                    className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
                 >
                     <NotebookText size={20} /> Entries
-                </a>
+                </NavLink>
 
-                <a
-                    href="#"
-                    className={`${styles.link} ${page === 'timelines' ? styles.active : ''}`}
-                    onClick={(e) => { e.preventDefault(); handleNav('timelines'); }}
+                <NavLink
+                    to="/timelines"
+                    className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
                 >
                     <TrendingUp size={20} /> Timelines
-                </a>
-                <a
-                    href="#"
-                    className={`${styles.link} ${page === 'friends' ? styles.active : ''}`}
-                    onClick={(e) => { e.preventDefault(); handleNav('friends'); }}
+                </NavLink>
+                <NavLink
+                    to="/friends"
+                    className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
                 >
                     <Users size={20} /> Friendlist
-                </a>
-                <a href="#" className={styles.link}>
+                </NavLink>
+                <NavLink
+                    to="/notes"
+                    className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
+                >
                     <StickyNote size={20} /> Notes
-                </a>
+                </NavLink>
                 <a href="#" className={styles.link}>
                     <Map size={20} /> Map
                 </a>
@@ -57,8 +52,8 @@ const Navbar = () => {
             <div className={styles.authSection}>
                 {user && (
                     <div className={styles.userInfo}>
-                        <div 
-                            className={styles.userProfileTrigger} 
+                        <div
+                            className={styles.userProfileTrigger}
                             onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                         >
                             <div className={styles.avatar}>
@@ -81,8 +76,8 @@ const Navbar = () => {
                                     <span>My Profile</span>
                                 </div>
                                 <div className={styles.dropdownSeparator} />
-                                <div 
-                                    className={`${styles.dropdownItem} ${styles.signOutItem}`} 
+                                <div
+                                    className={`${styles.dropdownItem} ${styles.signOutItem}`}
                                     onClick={() => { logout(); setProfileMenuOpen(false); }}
                                 >
                                     <LogOut size={15} />
@@ -106,24 +101,22 @@ const Navbar = () => {
             {/* Mobile dropdown – absolute overlay so it doesn't shift content */}
             {menuOpen && (
                 <div className={styles.mobileMenu}>
-                    <a href="#" className={`${styles.mobileLink} ${page === 'entries' ? styles.active : ''}`}
-                        onClick={(e) => { e.preventDefault(); handleNav('entries'); }}>
+                    <NavLink to="/entries" className={({ isActive }) => `${styles.mobileLink} ${isActive ? styles.active : ''}`} onClick={() => setMenuOpen(false)}>
                         <NotebookText size={18} /> Entries
-                    </a>
-                    <a href="#" className={`${styles.mobileLink} ${page === 'timelines' ? styles.active : ''}`}
-                        onClick={(e) => { e.preventDefault(); handleNav('timelines'); }}>
+                    </NavLink>
+
+                    <NavLink to="/timelines" className={({ isActive }) => `${styles.mobileLink} ${isActive ? styles.active : ''}`} onClick={() => setMenuOpen(false)}>
                         <TrendingUp size={18} /> Timelines
-                    </a>
-                    <a
-                        href="#"
-                        className={`${styles.mobileLink} ${page === 'friends' ? styles.active : ''}`}
-                        onClick={(e) => { e.preventDefault(); handleNav('friends'); }}
-                    >
+                    </NavLink>
+
+                    <NavLink to="/friends" className={({ isActive }) => `${styles.mobileLink} ${isActive ? styles.active : ''}`} onClick={() => setMenuOpen(false)}>
                         <Users size={18} /> Friendlist
-                    </a>
-                    <a href="#" className={styles.mobileLink}>
+                    </NavLink>
+
+                    <NavLink to="/notes" className={({ isActive }) => `${styles.mobileLink} ${isActive ? styles.active : ''}`} onClick={() => setMenuOpen(false)}>
                         <StickyNote size={18} /> Notes
-                    </a>
+                    </NavLink>
+
                     <a href="#" className={styles.mobileLink}>
                         <Map size={18} /> Map
                     </a>

@@ -72,7 +72,7 @@ const PageSettings = ({ isDragMode, pageSettings, onPageSettingsChange }: PageSe
                                     e.target.value = '';
                                 }
                             }}
-                            style={{ display: 'none' }}
+                            className={styles.hiddenInput}
                         />
                     </div>
 

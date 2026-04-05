@@ -18,11 +18,16 @@
     gap: 0.4rem;
     color: var(--color-dark-brown);
     text-decoration: none;
+    cursor: pointer;
 }
 
 .logoSection svg {
     color: var(--color-burgundy);
     margin-bottom: 2px;
+}
+
+.logoText {
+    font-size: 1.45rem;
 }
 
 .menuItems {

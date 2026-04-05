@@ -3,14 +3,8 @@ import { createPortal } from 'react-dom';
 import { Palette } from 'lucide-react';
 import classNames from 'classnames';
 import { type ColorPaletteProps } from '../../../../../types';
+import { PRESET_COLORS } from '../../../../../utils/constants';
 import styles from './ColorPalette.module.css';
-
-const PRESET_COLORS = [
-    '#493627', '#E4E0E1', '#D6C0B3', '#AB886D',
-    '#2C3E50', '#E74C3C', '#27AE60', '#F1C40F',
-    '#8E44AD', '#3498DB', '#16A085', '#D35400',
-    '#FFC0CB', '#B0C4DE', '#98FB98', '#FFFACD'
-];
 
 const rgbToHex = (color: string) => {
     if (!color || typeof color !== 'string') return '#493627';

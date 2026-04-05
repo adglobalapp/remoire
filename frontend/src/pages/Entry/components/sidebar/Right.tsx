@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { MapPin, Calendar, Plus, Users, PanelRight, X, Trash2 } from 'lucide-react';
 import { useEntryContext } from '../../../../contexts/EntryContext';
-import { usePage } from '../../../../App';
+import { useLocation } from 'react-router-dom';
 import styles from './Right.module.css';
 import { getFriends } from '../../../../api';
 import { type User, type LeftProps } from '../../../../types';
@@ -10,8 +10,8 @@ import AddParticipant from '../modal/AddParticipant';
 
 const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const { activeEntry, updateEntryDate, updateEntryParticipants } = useEntryContext();
-    const { page } = usePage();
-    const lastPage = useRef(page);
+    const { pathname } = useLocation();
+    const lastPage = useRef(pathname);
     const [friends, setFriends] = useState<User[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -28,13 +28,13 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         const isLargeScreen = window.innerWidth > 1400;
         if (isLargeScreen) return;
 
-        if (page !== lastPage.current) {
+        if (pathname !== lastPage.current) {
             if (onToggle && propOpen) {
                 onToggle();
             }
         }
-        lastPage.current = page;
-    }, [page, onToggle, propOpen]);
+        lastPage.current = pathname;
+    }, [pathname, onToggle, propOpen]);
 
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (activeEntry) {
@@ -78,7 +78,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                 {<PanelRight size={20} />}
             </button>
 
-            <aside className={`sidebar-container sidebar-burgundy ${styles.sidebarContainer}`}>
+            <aside className="sidebar-container sidebar-burgundy">
                 <div className="sidebar-header">
                     <h3>Entry Details</h3>
                     <button className="sidebar-close-btn" onClick={toggle} aria-label="Close sidebar">
@@ -95,7 +95,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                         <div className={styles.metaValue}>
                             <span className="empty-state-placeholder">No location set</span>
                         </div>
-                        <button className="btn btn-secondary btn-sm" style={{ width: '100%' }}>
+                        <button className={`btn btn-secondary btn-sm ${styles.fullWidth}`}>
                             <Plus size={14} /> Add Location
                         </button>
                     </div>

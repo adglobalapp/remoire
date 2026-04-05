@@ -1,0 +1,155 @@
+.noteCard {
+    background-color: var(--note-bg, var(--color-white));
+    border-radius: 16px;
+    padding: 1.75rem;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.2s, box-shadow 0.25s;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow: hidden;
+    min-height: 250px;
+    aspect-ratio: 1 / 1;
+    clip-path: polygon(0% 0%, calc(100% - 32px) 0%, 100% 32px, 100% 100%, 0% 100%);
+    animation: noteCardFadeUp 0.45s cubic-bezier(0.25, 1, 0.5, 1) both;
+    animation-delay: calc(var(--delay, 0) * 60ms);
+}
+
+@keyframes noteCardFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(24px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.noteCard:hover {
+    transform: translateY(-4px);
+}
+
+.donkeyEar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-bottom-left-radius: 16px;
+    z-index: 2;
+    pointer-events: none;
+    clip-path: polygon(0% 0%, 0% 100%, 100% 100%);
+}
+
+.title {
+    font-family: var(--font-ui), serif;
+    font-size: 1.8rem;
+    font-weight: 500;
+    margin: 0;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+    color: var(--color-dark-brown);
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.preview {
+    font-family: var(--font-body), sans-serif;
+    font-size: 1.05rem;
+    color: rgba(0, 0, 0, 0.7);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.todoPreview {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    flex: 1;
+}
+
+.todoItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    opacity: 0.85;
+}
+
+.todoItem.completed {
+    text-decoration: line-through;
+    opacity: 0.45;
+}
+
+.checkbox {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid rgba(0, 0, 0, 0.18);
+    border-radius: 4px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    background-color: rgba(255, 255, 255, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.checked {
+    background-color: var(--color-dark-blue);
+    border-color: var(--color-dark-blue);
+}
+
+.checked::after {
+    content: '✓';
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.pinIcon {
+    position: absolute;
+    bottom: 0.9rem;
+    right: 0.9rem;
+    opacity: 0.5;
+    color: var(--color-dark-brown);
+    z-index: 3;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.4));
+}
+
+.todoText {
+    flex: 1;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 600px) {
+    .noteCard {
+        aspect-ratio: unset;
+        min-height: unset;
+        padding: 1.25rem;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+
+    .preview {
+        -webkit-line-clamp: 4;
+        line-clamp: 4;
+        font-size: 0.95rem;
+    }
+}

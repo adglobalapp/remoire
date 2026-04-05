@@ -158,6 +158,11 @@
     cursor: not-allowed;
 }
 
+.submitBtn :global(.loading-icon) {
+    color: var(--color-light-beige) !important;
+    opacity: 1 !important;
+}
+
 .modalFooter {
     text-align: center;
     border-top: 1px solid rgba(0, 0, 0, 0.05);

@@ -9,6 +9,7 @@ export interface LeftProps {
 export interface NodeProps {
     entry: Entry;
     side: 'left' | 'right';
+    index?: number;
 }
 
 export interface AddNodeProps {
@@ -21,19 +22,12 @@ export interface EntryPreviewProps {
     onClose: () => void;
 }
 
-export interface DeleteConfirmationProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onConfirm: () => void;
-    title: string;
-    message: ReactNode;
-}
-
 export interface ConfirmationProps {
-    title: string;
+    title: string | ReactNode;
     message: string | ReactNode;
     confirmText?: string;
     cancelText?: string;
+    variant?: 'default' | 'danger';
     onConfirm: () => void;
     onCancel: () => void;
 }
@@ -60,6 +54,7 @@ export interface RowProps {
     onAccept?: (id: number) => void;
     onDelete: (id: number) => void;
     onViewProfile: (user: User) => void;
+    index?: number;
 }
 
 export interface AddFriendProps {

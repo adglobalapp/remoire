@@ -3,7 +3,7 @@ export interface LandingPageProps {
     onRegister: () => void;
 }
 
-export type Page = 'landing' | 'entries' | 'timelines' | 'friends';
+export type Page = 'landing' | 'entries' | 'timelines' | 'friends' | 'notes';
 
 export interface PageSettings {
     backgroundUrl: string | null;

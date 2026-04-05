@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Search, UserPlus, Check, Clock } from 'lucide-react';
+import classNames from 'classnames';
 import styles from './AddFriend.module.css';
 import { type User as UserType } from '../../../../types';
 import { searchUsers, sendFriendRequest } from '../../../../api';
@@ -52,7 +53,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
     return (
         <div className="global-modal-overlay" onClick={onClose}>
             <div className="global-modal-content" onClick={(e) => e.stopPropagation()}>
-                <div style={{ paddingBottom: '10px' }}>
+                <div className={styles.modalHeader}>
                     <h3 className={styles.title}>Find Friends</h3>
                     <button className="global-modal-close-btn" onClick={onClose}>
                         <X size={20} />
@@ -94,7 +95,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
                                     {user.friend_status === 'accepted' ? (
                                         <span className={styles.statusBadge}><Check size={14} /> Friends</span>
                                     ) : user.friend_status === 'pending' ? (
-                                        <span className={styles.statusBadge} style={{ opacity: 0.6 }}><Clock size={14} /> Pending</span>
+                                        <span className={classNames(styles.statusBadge, styles.statusBadgePending)}><Clock size={14} /> Pending</span>
                                     ) : (
                                         <button
                                             className="btn btn-dark btn-sm"

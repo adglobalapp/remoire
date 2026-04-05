@@ -7,7 +7,7 @@ import AddNode from '../modal/AddNode';
 import { formatDate } from '../../../../utils/dateUtils';
 import { getExcerpt, getImageUrl } from '../../../../utils/contentUtils';
 
-const Node = ({ entry, side }: NodeProps) => {
+const Node = ({ entry, side, index = 0 }: NodeProps) => {
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -20,7 +20,10 @@ const Node = ({ entry, side }: NodeProps) => {
     const dateStr = formatDate(entry.date || entry.created_at);
 
     return (
-        <div className={`${styles.nodeWrapper} ${side === 'right' ? styles.right : styles.left}`}>
+        <div 
+            className={`${styles.nodeWrapper} ${side === 'right' ? styles.right : styles.left}`}
+            style={{ animationDelay: `${0.3 + index * 0.15}s` }}
+        >
             <div className={styles.cardContainer}>
                 <div
                     className={styles.card}

@@ -75,18 +75,26 @@
 
 .previewBody {
     padding: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: auto;
     flex: 1;
     display: flex;
     flex-direction: column;
     background: var(--color-dark-beige);
+    position: relative;
+}
+
+.previewCanvas {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    transform-origin: top center;
+    width: 100%;
 }
 
 .previewPaper {
     background-color: transparent;
-    width: 100%;
-    aspect-ratio: 1 / 1.4142;
+    width: 210mm;
+    min-height: 297mm;
     flex-shrink: 0;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
     background-image: url('./../../../../assets/images/paper.png');

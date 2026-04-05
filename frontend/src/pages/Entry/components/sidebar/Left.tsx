@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Trash2, Plus, Search, PanelLeft, X } from 'lucide-react';
-import DeleteConfirmation from '../../../../components/common/modal/DeleteConfirmation';
+import Confirmation from '../../../../components/common/modal/Confirmation';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { formatDateTime } from '../../../../utils/dateUtils';
-import { usePage } from '../../../../App';
+import { useLocation } from 'react-router-dom';
 import styles from './Left.module.css';
 import { type LeftProps } from '../../../../types';
 
@@ -12,8 +12,8 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const [activeFilter, setActiveFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [itemToDelete, setItemToDelete] = useState<number | null>(null);
-    const { page } = usePage();
-    const lastPage = useRef(page);
+    const { pathname } = useLocation();
+    const lastPage = useRef(pathname);
     const lastId = useRef(activeEntry?.id);
 
     const mobileOpen = propOpen || false;
@@ -24,7 +24,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         const isLargeScreen = window.innerWidth > 1400;
         if (isLargeScreen) return;
 
-        const pageChanged = page !== lastPage.current;
+        const pageChanged = pathname !== lastPage.current;
         const entryChanged = activeEntry?.id !== lastId.current;
 
         if (pageChanged || entryChanged) {
@@ -32,12 +32,12 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                 onToggle();
             }
         }
-    }, [page, activeEntry?.id, onToggle, propOpen]);
+    }, [pathname, activeEntry?.id, onToggle, propOpen]);
 
     useEffect(() => {
-        lastPage.current = page;
+        lastPage.current = pathname;
         lastId.current = activeEntry?.id;
-    }, [page, activeEntry?.id]);
+    }, [pathname, activeEntry?.id]);
 
     const filteredEntries = entries.filter(entry => {
         const matchesSearch = (entry.title || '').toLowerCase().includes(searchQuery.toLowerCase());
@@ -146,17 +146,20 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                     </div>
                 </div>
 
-                <DeleteConfirmation
-                    isOpen={itemToDelete !== null}
-                    onClose={() => setItemToDelete(null)}
-                    onConfirm={confirmDelete}
-                    title="Delete Entry"
-                    message={
-                        <span>
-                            Are you sure you want to delete <strong>{entries.find(e => e.id === itemToDelete)?.title || 'Untitled'}</strong>? This action cannot be undone.
-                        </span>
-                    }
-                />
+                {itemToDelete !== null && (
+                    <Confirmation
+                        title="Delete Entry"
+                        variant="danger"
+                        message={
+                            <span>
+                                Are you sure you want to delete <strong>{entries.find(e => e.id === itemToDelete)?.title || 'Untitled'}</strong>? This action cannot be undone.
+                            </span>
+                        }
+                        confirmText="Delete"
+                        onConfirm={confirmDelete}
+                        onCancel={() => setItemToDelete(null)}
+                    />
+                )}
             </aside>
         </div>
     );

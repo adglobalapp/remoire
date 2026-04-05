@@ -1,6 +1,7 @@
-import { usePage } from '../../../../App';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
+import { useState, useRef, useLayoutEffect } from 'react';
 import styles from './EntryPreview.module.css';
 import editorStyles from '../../../Entry/components/editor/Canvas.module.css';
 import type { PageSettings, EntryPreviewProps } from '../../../../types';
@@ -19,11 +20,11 @@ import { DEFAULT_PAGE_SETTINGS } from '../../../../types';
 
 const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
     const { selectEntry } = useEntryContext();
-    const { setPage } = usePage();
+    const navigate = useNavigate();
 
     const handleEdit = () => {
         selectEntry(entry);
-        setPage('entries');
+        navigate('/entries');
         onClose();
     };
 
@@ -65,6 +66,25 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
         immediatelyRender: false,
     });
 
+    const [scale, setScale] = useState(1);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useLayoutEffect(() => {
+        if (!containerRef.current) return;
+
+        const updateScale = () => {
+            if (!containerRef.current) return;
+            const containerWidth = containerRef.current.offsetWidth;
+            // Reference width 210mm is approx 794px. We'll use 800 similar to the editor.
+            const newScale = Math.min(1, containerWidth / 800);
+            setScale(newScale);
+        };
+
+        updateScale();
+        window.addEventListener('resize', updateScale);
+        return () => window.removeEventListener('resize', updateScale);
+    }, []);
+
     return createPortal(
         <div
             className={styles.modalOverlay}
@@ -80,17 +100,26 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
                     </button>
                 </div>
 
-                <div className={styles.previewBody}>
+                <div className={styles.previewBody} ref={containerRef}>
                     <div
-                        className={styles.previewPaper}
+                        className={styles.previewCanvas}
                         style={{
-                            backgroundImage: pageSettings.backgroundUrl ? `url(${pageSettings.backgroundUrl})` : undefined,
-                            backgroundSize: pageSettings.backgroundUrl ? 'cover' : undefined,
-                            padding: `${pageSettings.paddingTop}px ${pageSettings.paddingRight}px ${pageSettings.paddingBottom}px ${pageSettings.paddingLeft}px`
+                            transform: `scale(${scale})`,
+                            height: `${297 * scale}mm`, // Approximate A4 aspect height to prevent overflow issues
+                            minHeight: '100%'
                         }}
                     >
-                        <div className={editorStyles.editorContent}>
-                            <EditorContent editor={editor} />
+                        <div
+                            className={styles.previewPaper}
+                            style={{
+                                backgroundImage: pageSettings.backgroundUrl ? `url(${pageSettings.backgroundUrl})` : undefined,
+                                backgroundSize: pageSettings.backgroundUrl ? 'cover' : undefined,
+                                padding: `${pageSettings.paddingTop}px ${pageSettings.paddingRight}px ${pageSettings.paddingBottom}px ${pageSettings.paddingLeft}px`
+                            }}
+                        >
+                            <div className={editorStyles.editorContent}>
+                                <EditorContent editor={editor} />
+                            </div>
                         </div>
                     </div>
                 </div>

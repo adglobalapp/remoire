@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Trash2, Plus, Search, PanelLeft, X } from 'lucide-react';
 import toast from 'react-hot-toast';
-import DeleteConfirmation from '../../../../components/common/modal/DeleteConfirmation';
+import Confirmation from '../../../../components/common/modal/Confirmation';
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
-import { usePage } from '../../../../App';
+import { useLocation } from 'react-router-dom';
 import styles from './Left.module.css';
 import { type LeftProps } from '../../../../types';
 
@@ -13,8 +13,8 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const [isCreating, setIsCreating] = useState(false);
     const [newName, setNewName] = useState('');
     const [itemToDelete, setItemToDelete] = useState<number | null>(null);
-    const { page } = usePage();
-    const lastPage = useRef(page);
+    const { pathname } = useLocation();
+    const lastPage = useRef(pathname);
     const lastId = useRef(activeTimeline?.id);
 
     const mobileOpen = propOpen || false;
@@ -25,7 +25,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         const isLargeScreen = window.innerWidth > 1400;
         if (isLargeScreen) return;
 
-        const pageChanged = page !== lastPage.current;
+        const pageChanged = pathname !== lastPage.current;
         const timelineChanged = activeTimeline?.id !== lastId.current;
 
         if (pageChanged || timelineChanged) {
@@ -33,12 +33,12 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                 onToggle();
             }
         }
-    }, [page, activeTimeline?.id, onToggle, propOpen]);
+    }, [pathname, activeTimeline?.id, onToggle, propOpen]);
 
     useEffect(() => {
-        lastPage.current = page;
+        lastPage.current = pathname;
         lastId.current = activeTimeline?.id;
-    }, [page, activeTimeline?.id]);
+    }, [pathname, activeTimeline?.id]);
 
     const filtered = timelines.filter(t =>
         t.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -165,17 +165,20 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                     </div>
                 </div>
 
-                <DeleteConfirmation
-                    isOpen={itemToDelete !== null}
-                    onClose={() => setItemToDelete(null)}
-                    onConfirm={confirmDelete}
-                    title="Delete Timeline"
-                    message={
-                        <span>
-                            Are you sure you want to delete <strong>{timelines.find(t => t.id === itemToDelete)?.name}</strong>? This action cannot be undone.
-                        </span>
-                    }
-                />
+                {itemToDelete !== null && (
+                    <Confirmation
+                        title="Delete Timeline"
+                        variant="danger"
+                        message={
+                            <span>
+                                Are you sure you want to delete <strong>{timelines.find(t => t.id === itemToDelete)?.name}</strong>? This action cannot be undone.
+                            </span>
+                        }
+                        confirmText="Delete"
+                        onConfirm={confirmDelete}
+                        onCancel={() => setItemToDelete(null)}
+                    />
+                )}
             </aside>
         </div>
     );

@@ -135,7 +135,7 @@ const Toolbar = ({
                         accept="image/*"
                         ref={fileInputRef}
                         onChange={handleImageUpload}
-                        style={{ display: 'none' }}
+                        className={styles.hiddenInput}
                     />
                 </div>
 

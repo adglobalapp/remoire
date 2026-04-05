@@ -10,6 +10,7 @@ import classNames from 'classnames';
 import Toolbar from './Toolbar';
 import { ResizableImage } from './extensions/ResizableImage';
 import { FontSize } from './extensions/FontSize';
+import Loader from '../../../../components/common/Loader';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { CanvasScaleContext } from '../../../../contexts/CanvasScaleContext';
 import { useCanvasNavigation } from '../../../../hooks/useCanvasNavigation';
@@ -253,11 +254,7 @@ const Canvas = () => {
                         </div>
                     </div>
                 )}
-                {isLoading && (
-                    <div className={styles.emptyStateOverlay}>
-                        <div className="spinner" />
-                    </div>
-                )}
+                {isLoading && <Loader contextual />}
                 <CanvasScaleContext.Provider value={transform.scale}>
                     <div
                         className={styles.canvas}

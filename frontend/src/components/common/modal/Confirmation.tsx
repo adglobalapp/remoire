@@ -1,5 +1,5 @@
-import React from 'react';
-import { Check, X } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import styles from './Confirmation.module.css';
 import { type ConfirmationProps } from '../../../types';
 
@@ -9,13 +9,18 @@ const Confirmation: React.FC<ConfirmationProps> = ({
     confirmText = 'Confirm',
     cancelText = 'Cancel',
     onConfirm,
-    onCancel
+    onCancel,
+    variant = 'default'
 }) => {
-    return (
-        <div className={styles.modalOverlay} onClick={onCancel}>
+    const isDanger = variant === 'danger';
+    const confirmBtnClass = isDanger ? 'btn-danger' : 'btn-primary';
+
+    return createPortal(
+        <div className="global-modal-overlay" onClick={onCancel}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
                     <div className={styles.headerTitleContainer}>
+                        {isDanger && <AlertTriangle className={styles.alertIcon} size={24} />}
                         <h3>{title}</h3>
                     </div>
                     <button className="global-modal-close-btn" onClick={onCancel}>
@@ -24,19 +29,22 @@ const Confirmation: React.FC<ConfirmationProps> = ({
                 </div>
 
                 <div className={styles.modalBody}>
-                    <p className={styles.modalMessage}>{message}</p>
+                    <p className={styles.modalMessage}>
+                        {message}
+                    </p>
                 </div>
 
                 <div className={styles.modalFooter}>
-                    <button className="btn btn-light" onClick={onCancel}>
-                        <X size={18} /> {cancelText}
+                    <button className="btn btn-secondary" onClick={onCancel}>
+                        {cancelText}
                     </button>
-                    <button className="btn btn-dark" onClick={onConfirm}>
-                        <Check size={18} /> {confirmText}
+                    <button className={`btn ${confirmBtnClass}`} onClick={onConfirm}>
+                        {confirmText}
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

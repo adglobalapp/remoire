@@ -33,6 +33,20 @@
     overflow: hidden;
     border: 1px solid rgba(0, 0, 0, 0.05);
     width: 100%;
+    animation: friendListFadeUp 0.45s cubic-bezier(0.25, 1, 0.5, 1) both;
+    animation-delay: calc(var(--delay, 0) * 100ms);
+}
+
+@keyframes friendListFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes fadeIn {
@@ -40,6 +54,7 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -121,4 +136,131 @@
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.mainContent {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.loaderContainer {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
+}
+
+.listMargin {
+    margin-bottom: 30px;
+}
+
+.badgeButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0px 14px;
+    border-radius: 50px;
+    font-size: 1.2rem !important;
+    font-weight: 400;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    background: transparent;
+    white-space: nowrap;
+    height: 30px;
+    line-height: 1;
+    cursor: pointer;
+    font-family: var(--font-ui);
+}
+
+.badgeButtonSuccess {
+    color: var(--color-success);
+    border-color: rgba(var(--color-success-rgb), 0.3);
+    background-color: rgba(var(--color-success-rgb), 0.05);
+}
+
+.badgeButtonSuccess:hover {
+    background-color: rgba(var(--color-success-rgb), 0.12);
+    border-color: var(--color-success);
+}
+
+.badgeButtonDanger {
+    color: var(--color-error);
+    border-color: rgba(var(--color-error-rgb), 0.3);
+    background-color: rgba(var(--color-error-rgb), 0.05);
+}
+
+.badgeButtonDanger:hover {
+    background-color: rgba(var(--color-error-rgb), 0.12);
+    border-color: var(--color-error);
+}
+
+.iconButton {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.statusWrapper {
+    display: flex;
+    align-items: center;
+}
+
+.statusIcon {
+    margin-right: 4px;
+}
+
+.pendingStatus {
+    opacity: 0.6;
+}
+
+@media (max-width: 600px) {
+    .container {
+        margin: 20px auto;
+        padding: 0 12px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        font-size: 2rem !important;
+    }
+
+    .friendRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 16px;
+    }
+
+    .friendMain {
+        width: 100%;
+        gap: 12px;
+    }
+
+    .actions {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding-left: 60px;
+    }
+
+    .name {
+        font-size: 1.3rem;
+    }
+
+    .subText {
+        font-size: 1.1rem;
+    }
+
+    .sectionTitle {
+        padding: 8px 16px;
+        font-size: 1.2rem;
+    }
 }
