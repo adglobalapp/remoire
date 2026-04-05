@@ -40,19 +40,19 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.mobileToggle {
-    display: none;
-}
-
 .mobileHidden,
 .mobileVisible {
     height: 100%;
 }
 
 .mobileToggle {
+    display: flex;
     left: 0;
     border-radius: 0 8px 8px 0;
     background-color: var(--color-dark-blue);
+    opacity: 1;
+    pointer-events: auto;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mobileHidden :global(.sidebar-container) {
@@ -68,7 +68,13 @@
 }
 
 .mobileVisible .mobileToggle {
-    transform: translateX(260px);
+    transform: translateX(272px);
     opacity: 0;
     pointer-events: none;
+}
+
+@media (min-width: 1401px) {
+    .mobileToggle {
+        display: none;
+    }
 }

@@ -2,12 +2,12 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Upload, Palette, ChevronDown, Plus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { uploadImage } from '../../../api';
-import { useEntryContext } from '../../../contexts/EntryContext';
-import { useTimelineContext } from '../../../contexts/TimelineContext';
-import DeleteConfirmationModal from '../../../components/common/DeleteConfirmationModal';
-import { type AddTimelineNodeModalProps } from '../../../types';
-import styles from './AddTimelineNodeModal.module.css';
+import { uploadImage } from '../../../../api';
+import { useEntryContext } from '../../../../contexts/EntryContext';
+import { useTimelineContext } from '../../../../contexts/TimelineContext';
+import DeleteConfirmation from '../../../../components/common/modal/DeleteConfirmation';
+import { type AddNodeProps } from '../../../../types';
+import styles from './AddNode.module.css';
 
 const COLORS = [
     { value: '#f8a5c2', label: 'Soft Coral' },
@@ -19,7 +19,7 @@ const COLORS = [
     { value: '#f5e0dc', label: 'Warm Sand' },
 ];
 
-const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProps) => {
+const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
     const { entries, updateEntryMetadata } = useEntryContext();
     const { activeTimeline, addEntryToTimeline, removeEntryFromTimeline } = useTimelineContext();
 
@@ -288,7 +288,7 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
                 </div>
             </div>
 
-            <DeleteConfirmationModal
+            <DeleteConfirmation
                 isOpen={isConfirmOpen}
                 onClose={() => setIsConfirmOpen(false)}
                 onConfirm={handleConfirmDelete}
@@ -304,4 +304,4 @@ const AddTimelineNodeModal = ({ onClose, entryToEdit }: AddTimelineNodeModalProp
     );
 };
 
-export default AddTimelineNodeModal;
+export default AddNode;

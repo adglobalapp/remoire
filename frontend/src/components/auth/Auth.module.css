@@ -9,7 +9,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 100;
+    z-index: 10000;
     animation: fadeIn 0.2s ease-out;
 }
 
@@ -25,16 +25,12 @@
     gap: 24px;
     border: 1px solid rgba(0, 0, 0, 0.05);
     animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes slideUp {
@@ -42,7 +38,6 @@
         opacity: 0;
         transform: translateY(20px) scale(0.95);
     }
-
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -51,8 +46,8 @@
 
 .modalHeader {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .modalHeader h2 {
@@ -65,7 +60,16 @@
     gap: 12px;
 }
 
+.subtitle {
+    font-size: 1rem;
+    color: rgba(0, 0, 0, 0.5);
+    margin: 0;
+}
+
 .closeBtn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
     background: none;
     border: none;
     color: rgba(0, 0, 0, 0.3);
@@ -108,11 +112,6 @@
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.formGroup input::placeholder {
-    font-size: 0.9rem;
-    opacity: 0.5;
-}
-
 .formGroup input:focus {
     outline: none;
     border-color: var(--color-burgundy);
@@ -123,16 +122,9 @@
     color: var(--color-error);
     font-size: 1.2rem;
     margin-top: 1px;
-    margin-left: 2px;
-    line-height: 1;
-}
-
-.inputError {
-    border-color: var(--color-error) !important;
-}
-
-.inputError:focus {
-    box-shadow: 0 0 0 4px rgba(var(--color-error-rgb), 0.1) !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .submitBtn {
@@ -147,6 +139,10 @@
     cursor: pointer;
     transition: background 0.2s, transform 0.1s;
     margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .submitBtn:hover {
@@ -168,25 +164,23 @@
     padding-top: 20px;
 }
 
-.modalFooter p {
+.footerText {
     font-size: 0.95rem;
     color: rgba(0, 0, 0, 0.5);
     margin: 0;
 }
 
-.modalFooter button {
+.switchBtn {
     background: none;
     border: none;
     color: var(--color-burgundy);
     font-weight: 400;
     cursor: pointer;
     padding: 0 4px;
-    text-decoration: none;
     font-size: 1.4rem;
     transition: color 0.2s;
 }
 
-.modalFooter button:hover {
+.switchBtn:hover {
     color: var(--color-burgundy-hover);
-    text-decoration: none;
 }

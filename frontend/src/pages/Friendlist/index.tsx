@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { UserPlus, Loader2 } from 'lucide-react';
 import Navbar from '../../components/common/Navbar';
-import styles from './FriendlistPage.module.css';
+import styles from './index.module.css';
 import { type User as UserType } from '../../types';
 import { getFriends, getFriendRequests, acceptFriendRequest, deleteFriendship, blockUser } from '../../api';
-import FriendRow from './components/FriendRow';
-import AddFriendModal from './components/AddFriendModal';
-import UserProfileModal from './components/UserProfileModal';
-import ConfirmationModal from '../../components/common/ConfirmationModal';
+import Row from './components/list/Row';
+import AddFriend from './components/modal/AddFriend';
+import UserProfile from './components/modal/UserProfile';
+import Confirmation from '../../components/common/modal/Confirmation';
 import toast from 'react-hot-toast';
 
 const FriendlistPage = () => {
@@ -111,7 +111,7 @@ const FriendlistPage = () => {
                                 <div className={styles.friendList} style={{ marginBottom: '30px' }}>
                                     <div className={`${styles.sectionTitle} ${styles.bgDarkBlue}`}>Pending Requests</div>
                                     {pendingRequests.map(user => (
-                                        <FriendRow
+                                        <Row
                                             key={user.id}
                                             user={user}
                                             type="pending"
@@ -127,7 +127,7 @@ const FriendlistPage = () => {
                                 <div className={styles.friendList} style={{ marginBottom: '30px' }}>
                                     <div className={`${styles.sectionTitle} ${styles.bgDarkBlue}`}>Sent Requests</div>
                                     {sentRequests.map(user => (
-                                        <FriendRow
+                                        <Row
                                             key={user.id}
                                             user={user}
                                             type="sent"
@@ -142,7 +142,7 @@ const FriendlistPage = () => {
                                 <div className={styles.sectionTitle}>My Friends ({friends.length})</div>
                                 {friends.length > 0 ? (
                                     friends.map(user => (
-                                        <FriendRow
+                                        <Row
                                             key={user.id}
                                             user={user}
                                             type="friend"
@@ -158,14 +158,14 @@ const FriendlistPage = () => {
                     )}
 
                     {showAddModal && (
-                        <AddFriendModal
+                        <AddFriend
                             onClose={() => setShowAddModal(false)}
                             onRefresh={fetchData}
                         />
                     )}
 
                     {selectedUser && (
-                        <UserProfileModal
+                        <UserProfile
                             user={selectedUser}
                             onClose={() => setSelectedUser(null)}
                             onBlock={(id) => setConfirmAction({ type: 'block', userId: id, userName: selectedUser.name })}
@@ -173,7 +173,7 @@ const FriendlistPage = () => {
                     )}
 
                     {confirmAction && (
-                        <ConfirmationModal
+                        <Confirmation
                             title={confirmAction.type === 'delete' ? 'Remove Connection?' : 'Block User?'}
                             message={
                                 confirmAction.type === 'delete'

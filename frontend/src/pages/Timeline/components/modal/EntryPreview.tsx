@@ -1,23 +1,23 @@
-import { usePage } from '../../../App';
-import { useEntryContext } from '../../../contexts/EntryContext';
+import { usePage } from '../../../../App';
+import { useEntryContext } from '../../../../contexts/EntryContext';
 import { createPortal } from 'react-dom';
-import styles from './EntryPreviewModal.module.css';
-import editorStyles from '../../Entry/components/editor/Canvas.module.css';
-import type { PageSettings, EntryPreviewModalProps } from '../../../types';
+import styles from './EntryPreview.module.css';
+import editorStyles from '../../../Entry/components/editor/Canvas.module.css';
+import type { PageSettings, EntryPreviewProps } from '../../../../types';
 
 import { X, Edit3 } from 'lucide-react';
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
-import { ResizableImage } from '../../Entry/components/editor/extensions/ResizableImage';
+import { ResizableImage } from '../../../Entry/components/editor/extensions/ResizableImage';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { Color } from '@tiptap/extension-color';
-import { FontSize } from '../../Entry/components/editor/extensions/FontSize';
-import { DEFAULT_PAGE_SETTINGS } from '../../../types';
+import { FontSize } from '../../../Entry/components/editor/extensions/FontSize';
+import { DEFAULT_PAGE_SETTINGS } from '../../../../types';
 
-const EntryPreviewModal = ({ entry, onClose }: EntryPreviewModalProps) => {
+const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
     const { selectEntry } = useEntryContext();
     const { setPage } = usePage();
 
@@ -34,10 +34,16 @@ const EntryPreviewModal = ({ entry, onClose }: EntryPreviewModalProps) => {
         try {
             const parsed = typeof entry.content === 'string' ? JSON.parse(entry.content) : entry.content;
             if (parsed && typeof parsed === 'object') {
-                contentJSON = parsed.contentJSON || parsed;
-                if (parsed.pageSettings) {
-                    pageSettings = { ...DEFAULT_PAGE_SETTINGS, ...parsed.pageSettings };
+                if (parsed.contentJSON) {
+                    contentJSON = parsed.contentJSON;
+                    if (parsed.pageSettings) {
+                        pageSettings = { ...DEFAULT_PAGE_SETTINGS, ...parsed.pageSettings };
+                    }
+                } else {
+                    contentJSON = parsed;
                 }
+            } else {
+                contentJSON = entry.content;
             }
         } catch {
             contentJSON = entry.content;
@@ -63,7 +69,6 @@ const EntryPreviewModal = ({ entry, onClose }: EntryPreviewModalProps) => {
         <div
             className={styles.modalOverlay}
             onClick={onClose}
-
             onWheel={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
         >
@@ -109,4 +114,4 @@ const EntryPreviewModal = ({ entry, onClose }: EntryPreviewModalProps) => {
     );
 };
 
-export default EntryPreviewModal;
+export default EntryPreview;

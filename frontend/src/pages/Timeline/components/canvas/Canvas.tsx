@@ -1,15 +1,15 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Plus } from 'lucide-react';
-import AddTimelineNodeModal from './AddTimelineNodeModal';
-import TimelineNode from './TimelineNode';
-import { useTimelineContext } from '../../../contexts/TimelineContext';
-import { useEntryContext } from '../../../contexts/EntryContext';
-import { useCanvasNavigation } from '../../../hooks/useCanvasNavigation';
-import { compareDates } from '../../../utils/dateUtils';
-import { type Entry } from '../../../types';
-import styles from './TimelineCanvas.module.css';
+import AddNode from '../modal/AddNode';
+import Node from './Node';
+import { useTimelineContext } from '../../../../contexts/TimelineContext';
+import { useEntryContext } from '../../../../contexts/EntryContext';
+import { useCanvasNavigation } from '../../../../hooks/useCanvasNavigation';
+import { compareDates } from '../../../../utils/dateUtils';
+import { type Entry } from '../../../../types';
+import styles from './Canvas.module.css';
 
-const TimelineCanvas = () => {
+const Canvas = () => {
     const { activeTimeline, isLoading } = useTimelineContext();
     const { entries } = useEntryContext();
 
@@ -102,7 +102,7 @@ const TimelineCanvas = () => {
                         {visibleEntries.map((entry, index) => {
                             const side: 'left' | 'right' = index % 2 === 0 ? 'left' : 'right';
                             return (
-                                <TimelineNode
+                                <Node
                                     key={entry.id}
                                     entry={entry}
                                     side={side}
@@ -126,10 +126,10 @@ const TimelineCanvas = () => {
             )}
 
             {isAddModalOpen && (
-                <AddTimelineNodeModal onClose={() => setIsAddModalOpen(false)} />
+                <AddNode onClose={() => setIsAddModalOpen(false)} />
             )}
         </div>
     );
 };
 
-export default TimelineCanvas;
+export default Canvas;

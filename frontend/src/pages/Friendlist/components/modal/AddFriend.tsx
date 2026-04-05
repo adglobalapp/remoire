@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Search, UserPlus, Check, Clock } from 'lucide-react';
-import styles from './AddFriendModal.module.css';
-import { type User as UserType } from '../../../types';
-import { searchUsers, sendFriendRequest } from '../../../api';
+import styles from './AddFriend.module.css';
+import { type User as UserType } from '../../../../types';
+import { searchUsers, sendFriendRequest } from '../../../../api';
 import toast from 'react-hot-toast';
-import { type AddFriendModalProps } from '../../../types';
+import { type AddFriendProps } from '../../../../types';
 
-const AddFriendModal: React.FC<AddFriendModalProps> = ({ onClose, onRefresh }) => {
+const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<UserType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -119,4 +119,4 @@ const AddFriendModal: React.FC<AddFriendModalProps> = ({ onClose, onRefresh }) =
     );
 };
 
-export default AddFriendModal;
+export default AddFriend;

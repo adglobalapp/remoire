@@ -1,27 +1,27 @@
 import { type ReactNode } from 'react';
 import { type Entry, type User } from './models';
 
-export interface LeftSidebarProps {
+export interface LeftProps {
     isOpen?: boolean;
     onToggle?: () => void;
 }
 
-export interface TimelineNodeProps {
+export interface NodeProps {
     entry: Entry;
     side: 'left' | 'right';
 }
 
-export interface AddTimelineNodeModalProps {
+export interface AddNodeProps {
     onClose: () => void;
     entryToEdit?: Entry;
 }
 
-export interface EntryPreviewModalProps {
+export interface EntryPreviewProps {
     entry: Entry;
     onClose: () => void;
 }
 
-export interface DeleteConfirmationModalProps {
+export interface DeleteConfirmationProps {
     isOpen: boolean;
     onClose: () => void;
     onConfirm: () => void;
@@ -29,7 +29,7 @@ export interface DeleteConfirmationModalProps {
     message: ReactNode;
 }
 
-export interface ConfirmationModalProps {
+export interface ConfirmationProps {
     title: string;
     message: string | ReactNode;
     confirmText?: string;
@@ -38,23 +38,23 @@ export interface ConfirmationModalProps {
     onCancel: () => void;
 }
 
-export interface RegisterModalProps {
+export interface RegisterProps {
     onClose: () => void;
     onSwitchToLogin: () => void;
 }
 
-export interface LoginModalProps {
+export interface LoginProps {
     onClose: () => void;
     onSwitchToRegister: () => void;
 }
 
-export interface UserProfileModalProps {
+export interface UserProfileProps {
     user: User;
     onClose: () => void;
     onBlock: (id: number) => void;
 }
 
-export interface FriendRowProps {
+export interface RowProps {
     user: User;
     type: 'friend' | 'pending' | 'sent';
     onAccept?: (id: number) => void;
@@ -62,12 +62,12 @@ export interface FriendRowProps {
     onViewProfile: (user: User) => void;
 }
 
-export interface AddFriendModalProps {
+export interface AddFriendProps {
     onClose: () => void;
     onRefresh: () => void;
 }
 
-export interface AddParticipantModalProps {
+export interface AddParticipantProps {
     onClose: () => void;
     onSelectFriend: (userId: number) => void;
     friends: User[];

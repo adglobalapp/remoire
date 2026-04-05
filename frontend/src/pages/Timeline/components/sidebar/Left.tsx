@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Trash2, Plus, Search, PanelLeft, X } from 'lucide-react';
 import toast from 'react-hot-toast';
-import DeleteConfirmationModal from '../../../components/common/DeleteConfirmationModal';
-import { useTimelineContext } from '../../../contexts/TimelineContext';
-import { usePage } from '../../../App';
-import styles from './LeftSidebar.module.css';
-import { type LeftSidebarProps } from '../../../types';
+import DeleteConfirmation from '../../../../components/common/modal/DeleteConfirmation';
+import { useTimelineContext } from '../../../../contexts/TimelineContext';
+import { usePage } from '../../../../App';
+import styles from './Left.module.css';
+import { type LeftProps } from '../../../../types';
 
-const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
+const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const { timelines, activeTimeline, selectTimeline, createTimeline, deleteTimeline, isLoading } = useTimelineContext();
     const [searchQuery, setSearchQuery] = useState('');
     const [isCreating, setIsCreating] = useState(false);
@@ -165,7 +165,7 @@ const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
                     </div>
                 </div>
 
-                <DeleteConfirmationModal
+                <DeleteConfirmation
                     isOpen={itemToDelete !== null}
                     onClose={() => setItemToDelete(null)}
                     onConfirm={confirmDelete}
@@ -181,4 +181,4 @@ const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
     );
 };
 
-export default LeftSidebar;
+export default Left;

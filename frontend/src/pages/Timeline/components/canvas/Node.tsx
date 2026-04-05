@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { type TimelineNodeProps } from '../../../types';
-import styles from './TimelineNode.module.css';
+import { type NodeProps } from '../../../../types';
+import styles from './Node.module.css';
 import { Settings } from 'lucide-react';
-import EntryPreviewModal from './EntryPreviewModal';
-import AddTimelineNodeModal from './AddTimelineNodeModal';
-import { formatDate } from '../../../utils/dateUtils';
-import { getExcerpt, getImageUrl } from '../../../utils/contentUtils';
+import EntryPreview from '../modal/EntryPreview';
+import AddNode from '../modal/AddNode';
+import { formatDate } from '../../../../utils/dateUtils';
+import { getExcerpt, getImageUrl } from '../../../../utils/contentUtils';
 
-const TimelineNode = ({ entry, side }: TimelineNodeProps) => {
+const Node = ({ entry, side }: NodeProps) => {
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -77,14 +77,14 @@ const TimelineNode = ({ entry, side }: TimelineNodeProps) => {
             <div className={styles.dot} />
 
             {isPreviewOpen && (
-                <EntryPreviewModal entry={entry} onClose={() => setIsPreviewOpen(false)} />
+                <EntryPreview entry={entry} onClose={() => setIsPreviewOpen(false)} />
             )}
 
             {isEditOpen && (
-                <AddTimelineNodeModal entryToEdit={entry} onClose={() => setIsEditOpen(false)} />
+                <AddNode entryToEdit={entry} onClose={() => setIsEditOpen(false)} />
             )}
         </div>
     );
 };
 
-export default TimelineNode;
+export default Node;

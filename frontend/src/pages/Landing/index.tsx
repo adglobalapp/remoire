@@ -1,6 +1,6 @@
 import React from 'react';
 import { Book, History, Shield, Sparkles } from 'lucide-react';
-import styles from './LandingPage.module.css';
+import styles from './index.module.css';
 import { type LandingPageProps } from '../../types';
 
 const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onRegister }) => {

@@ -1,15 +1,16 @@
+import React from 'react';
 import { createPortal } from 'react-dom';
 import { AlertTriangle, X } from 'lucide-react';
-import styles from './DeleteConfirmationModal.module.css';
-import type { DeleteConfirmationModalProps } from '../../types';
+import styles from './DeleteConfirmation.module.css';
+import { type DeleteConfirmationProps } from '../../../types';
 
-const DeleteConfirmationModal = ({
+const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
     isOpen,
     onClose,
     onConfirm,
     title,
-    message
-}: DeleteConfirmationModalProps) => {
+    message,
+}) => {
     if (!isOpen) return null;
 
     return createPortal(
@@ -22,7 +23,7 @@ const DeleteConfirmationModal = ({
                         </div>
                         <h3>{title}</h3>
                     </div>
-                    <button className="modal-close-btn" onClick={onClose}>
+                    <button className="global-modal-close-btn" onClick={onClose}>
                         <X size={20} />
                     </button>
                 </div>
@@ -35,7 +36,7 @@ const DeleteConfirmationModal = ({
                     <button className="btn btn-secondary" onClick={onClose}>
                         Cancel
                     </button>
-                    <button className={`btn ${styles.deleteBtn}`} onClick={onConfirm}>
+                    <button className={`btn btn-danger ${styles.confirmBtn}`} onClick={onConfirm}>
                         Delete
                     </button>
                 </div>
@@ -45,4 +46,4 @@ const DeleteConfirmationModal = ({
     );
 };
 
-export default DeleteConfirmationModal;
+export default DeleteConfirmation;

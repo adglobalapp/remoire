@@ -2,11 +2,11 @@ import { useState, createContext, useContext, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 import EntryPage from './pages/Entry';
-import TimelinePage from './pages/Timeline/TimelinePage';
-import LandingPage from './pages/Landing/LandingPage';
-import FriendlistPage from './pages/Friendlist/FriendlistPage';
-import LoginModal from './components/auth/LoginModal';
-import RegisterModal from './components/auth/RegisterModal';
+import TimelinePage from './pages/Timeline';
+import LandingPage from './pages/Landing';
+import FriendlistPage from './pages/Friendlist';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
 import { EntryProvider } from './contexts/EntryContext';
 import { TimelineProvider } from './contexts/TimelineContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -50,7 +50,7 @@ function AppContent() {
                     onRegister={() => setShowRegister(true)}
                 />
                 {showLogin && (
-                    <LoginModal
+                    <Login
                         onClose={() => setShowLogin(false)}
                         onSwitchToRegister={() => {
                             setShowLogin(false);
@@ -59,7 +59,7 @@ function AppContent() {
                     />
                 )}
                 {showRegister && (
-                    <RegisterModal
+                    <Register
                         onClose={() => setShowRegister(false)}
                         onSwitchToLogin={() => {
                             setShowRegister(false);

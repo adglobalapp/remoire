@@ -89,8 +89,8 @@
     aspect-ratio: 1 / 1.4142;
     flex-shrink: 0;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15));
-    background-image: url('../../../assets/images/paper.png');
-    background-size: 100% 100%;
+    background-image: url('./../../../../assets/images/paper.png');
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     display: flex;

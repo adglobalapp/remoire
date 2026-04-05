@@ -1,6 +1,6 @@
 import Navbar from '../../components/common/Navbar';
-import LeftSidebar from './components/sidebar/LeftSidebar';
-import RightSidebar from './components/sidebar/RightSidebar';
+import LeftSidebar from './components/sidebar/Left';
+import RightSidebar from './components/sidebar/Right';
 import Canvas from './components/editor/Canvas';
 import { useEntryContext } from '../../contexts/EntryContext';
 import { useResponsiveSidebar } from '../../hooks/useResponsiveSidebar';

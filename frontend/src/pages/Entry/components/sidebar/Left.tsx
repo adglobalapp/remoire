@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Trash2, Plus, Search, PanelLeft, X } from 'lucide-react';
-import DeleteConfirmationModal from '../../../../components/common/DeleteConfirmationModal';
+import DeleteConfirmation from '../../../../components/common/modal/DeleteConfirmation';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { formatDateTime } from '../../../../utils/dateUtils';
 import { usePage } from '../../../../App';
-import styles from './LeftSidebar.module.css';
-import { type LeftSidebarProps } from '../../../../types';
+import styles from './Left.module.css';
+import { type LeftProps } from '../../../../types';
 
-const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
+const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const { entries, activeEntry, selectEntry, createEntry, deleteEntry } = useEntryContext();
     const [activeFilter, setActiveFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -146,7 +146,7 @@ const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
                     </div>
                 </div>
 
-                <DeleteConfirmationModal
+                <DeleteConfirmation
                     isOpen={itemToDelete !== null}
                     onClose={() => setItemToDelete(null)}
                     onConfirm={confirmDelete}
@@ -163,4 +163,4 @@ const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
 };
 
 
-export default LeftSidebar;
+export default Left;

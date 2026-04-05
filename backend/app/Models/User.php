@@ -132,4 +132,9 @@ class User extends Authenticatable
 
         return asset(ltrim($value, '/'));
     }
+
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
 }

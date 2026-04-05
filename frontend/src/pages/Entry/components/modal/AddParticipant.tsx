@@ -1,9 +1,8 @@
-import React from 'react';
 import { X, UserPlus } from 'lucide-react';
-import styles from './AddParticipantModal.module.css';
-import { type AddParticipantModalProps } from '../../../../types';
+import styles from './AddParticipant.module.css';
+import { type AddParticipantProps } from '../../../../types';
 
-const AddParticipantModal: React.FC<AddParticipantModalProps> = ({ onClose, onSelectFriend, friends }) => {
+const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectFriend, friends }) => {
     return (
         <div className="global-modal-overlay" onClick={onClose}>
             <div className="global-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -56,4 +55,4 @@ const AddParticipantModal: React.FC<AddParticipantModalProps> = ({ onClose, onSe
     );
 };
 
-export default AddParticipantModal;
+export default AddParticipant;

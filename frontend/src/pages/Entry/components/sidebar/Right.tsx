@@ -3,12 +3,12 @@ import { createPortal } from 'react-dom';
 import { MapPin, Calendar, Plus, Users, PanelRight, X, Trash2 } from 'lucide-react';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { usePage } from '../../../../App';
-import styles from './RightSidebar.module.css';
+import styles from './Right.module.css';
 import { getFriends } from '../../../../api';
-import { type User, type LeftSidebarProps as RightSidebarProps } from '../../../../types';
-import AddParticipantModal from '../modal/AddParticipantModal';
+import { type User, type LeftProps } from '../../../../types';
+import AddParticipant from '../modal/AddParticipant';
 
-const RightSidebar = ({ isOpen: propOpen, onToggle }: RightSidebarProps) => {
+const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const { activeEntry, updateEntryDate, updateEntryParticipants } = useEntryContext();
     const { page } = usePage();
     const lastPage = useRef(page);
@@ -165,7 +165,7 @@ const RightSidebar = ({ isOpen: propOpen, onToggle }: RightSidebarProps) => {
             </aside>
 
             {isModalOpen && createPortal(
-                <AddParticipantModal 
+                <AddParticipant 
                     friends={availableFriends} 
                     onClose={() => setIsModalOpen(false)} 
                     onSelectFriend={addParticipant} 
@@ -176,4 +176,4 @@ const RightSidebar = ({ isOpen: propOpen, onToggle }: RightSidebarProps) => {
     );
 };
 
-export default RightSidebar;
+export default Right;

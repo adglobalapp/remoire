@@ -1,6 +1,6 @@
 import Navbar from '../../components/common/Navbar';
-import LeftSidebar from './components/LeftSidebar';
-import TimelineCanvas from './components/TimelineCanvas';
+import Sidebar from './components/sidebar/Left';
+import Canvas from './components/canvas/Canvas';
 import { useResponsiveSidebar } from '../../hooks/useResponsiveSidebar';
 
 const TimelinePage = () => {
@@ -12,14 +12,14 @@ const TimelinePage = () => {
 
             <main className="main-layout">
                 <div className="sidebar-left">
-                    <LeftSidebar
+                    <Sidebar
                         isOpen={isLeftOpen}
                         onToggle={toggleLeft}
                     />
                 </div>
 
                 <section className="content-area-full">
-                    <TimelineCanvas />
+                    <Canvas />
                 </section>
             </main>
         </div>

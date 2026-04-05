@@ -1,10 +1,10 @@
 import React from 'react';
 import { Trash2, Check, Clock } from 'lucide-react';
-import styles from '../FriendlistPage.module.css';
-import { formatDate } from '../../../utils/dateUtils';
-import { type FriendRowProps } from '../../../types';
+import styles from '../../index.module.css';
+import { formatDate } from '../../../../utils/dateUtils';
+import { type RowProps } from '../../../../types';
 
-const FriendRow: React.FC<FriendRowProps> = ({ user, type, onAccept, onDelete, onViewProfile }) => {
+const Row: React.FC<RowProps> = ({ user, type, onAccept, onDelete, onViewProfile }) => {
     const lastSeenText = user.last_seen_at
         ? `Last seen: ${formatDate(user.last_seen_at)}`
         : `Joined: ${formatDate(user.created_at)}`;
@@ -76,4 +76,4 @@ const FriendRow: React.FC<FriendRowProps> = ({ user, type, onAccept, onDelete, o
     );
 };
 
-export default FriendRow;
+export default Row;

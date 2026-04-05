@@ -1,9 +1,10 @@
+import React from 'react';
 import { X, Calendar, Mail, User as UserIcon, Clock, UserX } from 'lucide-react';
-import styles from './UserProfileModal.module.css';
-import { formatDate, formatRelativeDate } from '../../../utils/dateUtils';
-import { type UserProfileModalProps } from '../../../types';
+import styles from './UserProfile.module.css';
+import { formatDate, formatRelativeDate } from '../../../../utils/dateUtils';
+import { type UserProfileProps } from '../../../../types';
 
-const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, onClose, onBlock }) => {
+const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onBlock }) => {
     return (
         <div className="global-modal-overlay" onClick={onClose}>
             <div className="global-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -89,4 +90,4 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, onClose, onBl
     );
 };
 
-export default UserProfileModal;
+export default UserProfile;
