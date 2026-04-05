@@ -4,14 +4,9 @@ import { MapPin, Calendar, Plus, Users, PanelRight, X, Trash2 } from 'lucide-rea
 import { useEntryContext } from '../../../contexts/EntryContext';
 import { usePage } from '../../../App';
 import styles from './RightSidebar.module.css';
-import { getFriends } from '../../../services/api';
-import { type User } from '../../../types';
+import { getFriends } from '../../../api';
+import { type User, type LeftSidebarProps as RightSidebarProps } from '../../../types';
 import AddParticipantModal from './AddParticipantModal';
-
-interface RightSidebarProps {
-    isOpen?: boolean;
-    onToggle?: () => void;
-}
 
 const RightSidebar = ({ isOpen: propOpen, onToggle }: RightSidebarProps) => {
     const { activeEntry, updateEntryDate, updateEntryParticipants } = useEntryContext();

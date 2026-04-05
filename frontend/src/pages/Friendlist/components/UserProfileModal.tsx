@@ -1,14 +1,7 @@
 import { X, Calendar, Mail, User as UserIcon, Clock, UserX } from 'lucide-react';
 import styles from './UserProfileModal.module.css';
-import { type User as UserType } from '../../../types';
 import { formatDate, formatRelativeDate } from '../../../utils/dateUtils';
-
-
-interface UserProfileModalProps {
-    user: UserType;
-    onClose: () => void;
-    onBlock: (id: number) => void;
-}
+import { type UserProfileModalProps } from '../../../types';
 
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, onClose, onBlock }) => {
     return (
@@ -19,19 +12,19 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, onClose, onBl
                 </button>
 
                 <div className={styles.profileHeader}>
-                    <img 
-                        src={user.avatar_url || ''} 
-                        alt={user.name} 
-                        className={styles.profileAvatar} 
+                    <img
+                        src={user.avatar_url || ''}
+                        alt={user.name}
+                        className={styles.profileAvatar}
                     />
                     <div className={styles.profileNameSection}>
                         <div className={styles.nameHeader}>
                             <h2>
-                                {user.name} 
+                                {user.name}
                                 <span className={styles.friendCodeBadge}>{user.friend_code}</span>
                             </h2>
                         </div>
-                        
+
                         {user.bio && (
                             <div className={styles.miniBio}>
                                 {user.bio}
@@ -80,7 +73,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ user, onClose, onBl
                         </div>
                     </div>
                 </div>
-                
+
                 <div className={styles.modalFooter}>
                     <button className="btn btn-danger" onClick={() => onBlock(user.id)}>
                         <UserX size={18} /> Block User

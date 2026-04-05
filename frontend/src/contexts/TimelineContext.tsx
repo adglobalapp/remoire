@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import * as api from '../services/api';
+import * as api from '../api/timelines';
 import { type Timeline, type TimelineContextValue, type TimelineProviderProps } from '../types';
 
 const DEFAULT_TIMELINE: Timeline = {

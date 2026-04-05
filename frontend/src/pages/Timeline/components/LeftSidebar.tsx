@@ -5,12 +5,7 @@ import DeleteConfirmationModal from '../../../components/common/DeleteConfirmati
 import { useTimelineContext } from '../../../contexts/TimelineContext';
 import { usePage } from '../../../App';
 import styles from './LeftSidebar.module.css';
-
-
-interface LeftSidebarProps {
-    isOpen?: boolean;
-    onToggle?: () => void;
-}
+import { type LeftSidebarProps } from '../../../types';
 
 const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
     const { timelines, activeTimeline, selectTimeline, createTimeline, deleteTimeline, isLoading } = useTimelineContext();

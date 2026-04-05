@@ -3,11 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, UserPlus } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './AuthModal.module.css';
-
-interface RegisterModalProps {
-    onClose: () => void;
-    onSwitchToLogin: () => void;
-}
+import { type RegisterModalProps } from '../../types';
 
 const RegisterModal: React.FC<RegisterModalProps> = ({ onClose, onSwitchToLogin }) => {
     const { register } = useAuth();

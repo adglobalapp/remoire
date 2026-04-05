@@ -1,16 +1,8 @@
 import React from 'react';
 import { Trash2, Check, Clock } from 'lucide-react';
 import styles from '../FriendlistPage.module.css';
-import { type User as UserType } from '../../../types';
 import { formatDate } from '../../../utils/dateUtils';
-
-interface FriendRowProps {
-    user: UserType;
-    type: 'friend' | 'pending' | 'sent';
-    onAccept?: (id: number) => void;
-    onDelete: (id: number) => void;
-    onViewProfile: (user: UserType) => void;
-}
+import { type FriendRowProps } from '../../../types';
 
 const FriendRow: React.FC<FriendRowProps> = ({ user, type, onAccept, onDelete, onViewProfile }) => {
     const lastSeenText = user.last_seen_at

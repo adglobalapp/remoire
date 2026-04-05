@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Upload, Palette, ChevronDown, Plus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { uploadImage } from '../../../services/api';
+import { uploadImage } from '../../../api';
 import { useEntryContext } from '../../../contexts/EntryContext';
 import { useTimelineContext } from '../../../contexts/TimelineContext';
 import DeleteConfirmationModal from '../../../components/common/DeleteConfirmationModal';

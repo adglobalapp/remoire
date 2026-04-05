@@ -3,7 +3,7 @@ import { UserPlus, Loader2 } from 'lucide-react';
 import Navbar from '../../components/common/Navbar';
 import styles from './FriendlistPage.module.css';
 import { type User as UserType } from '../../types';
-import { getFriends, getFriendRequests, acceptFriendRequest, deleteFriendship, blockUser } from '../../services/api';
+import { getFriends, getFriendRequests, acceptFriendRequest, deleteFriendship, blockUser } from '../../api';
 import FriendRow from './components/FriendRow';
 import AddFriendModal from './components/AddFriendModal';
 import UserProfileModal from './components/UserProfileModal';

@@ -1,17 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import * as api from '../services/api';
-import { type User, type LoginCredentials, type RegisterCredentials } from '../types';
-
-interface AuthContextType {
-    user: User | null;
-    token: string | null;
-    isLoading: boolean;
-    login: (credentials: LoginCredentials) => Promise<any>;
-    register: (credentials: RegisterCredentials) => Promise<any>;
-    logout: () => void;
-    isAuthenticated: boolean;
-}
+import * as api from '../api/auth';
+import { type User, type LoginCredentials, type RegisterCredentials, type AuthContextType } from '../types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

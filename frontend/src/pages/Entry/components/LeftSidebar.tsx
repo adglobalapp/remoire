@@ -5,12 +5,7 @@ import { useEntryContext } from '../../../contexts/EntryContext';
 import { formatDateTime } from '../../../utils/dateUtils';
 import { usePage } from '../../../App';
 import styles from './LeftSidebar.module.css';
-
-
-interface LeftSidebarProps {
-    isOpen?: boolean;
-    onToggle?: () => void;
-}
+import { type LeftSidebarProps } from '../../../types';
 
 const LeftSidebar = ({ isOpen: propOpen, onToggle }: LeftSidebarProps) => {
     const { entries, activeEntry, selectEntry, createEntry, deleteEntry } = useEntryContext();

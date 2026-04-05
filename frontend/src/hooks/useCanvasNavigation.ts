@@ -1,16 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 
-interface Transform {
-    x: number;
-    y: number;
-    scale: number;
-}
-
-interface Options {
-    minScale?: number;
-    maxScale?: number;
-    initialTransform?: Transform;
-}
+import { type Transform, type Options } from '../types';
 
 export const useCanvasNavigation = (options: Options = {}) => {
     const {

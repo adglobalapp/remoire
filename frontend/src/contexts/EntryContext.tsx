@@ -1,13 +1,15 @@
-import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { getEntries, createEntry as apiCreateEntry, updateEntry as apiUpdateEntry, deleteEntry as apiDeleteEntry } from '../services/api';
+import { getEntries, createEntry as apiCreateEntry, updateEntry as apiUpdateEntry, deleteEntry as apiDeleteEntry } from '../api/entries';
 import { type Entry, type EntryContextValue, type EntryProviderProps } from '../types';
+import { useAutoSave } from '../hooks/useAutoSave';
 
 export const EntryContext = createContext<EntryContextValue | null>(null);
 
 export const EntryProvider = ({ children }: EntryProviderProps) => {
     const [entries, setEntries] = useState<Entry[]>([]);
     const [activeEntry, setActiveEntry] = useState<Entry | null>(null);
+    const { saveEntry } = useAutoSave(setEntries, setActiveEntry);
 
     // Initialization
     useEffect(() => {
@@ -59,43 +61,6 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
         });
         toast.success('Entry deleted.');
     }, []);
-
-    // Auto-save logic
-    const savingRef = useRef(false);
-    const pendingSavesRef = useRef<Map<number, { title: string, content: string }>>(new Map());
-
-    const processQueue = useCallback(async () => { // save queue to prevent server overload
-        if (savingRef.current || pendingSavesRef.current.size === 0) return;
-
-        savingRef.current = true;
-        const entry = pendingSavesRef.current.entries().next().value;
-        if (!entry) {
-            savingRef.current = false;
-            return;
-        }
-
-        const [id, data] = entry;
-        pendingSavesRef.current.delete(id);
-
-        try {
-            const updated = await apiUpdateEntry(id, data);
-            if (updated) {
-                setEntries(prev => prev.map(e => e.id === id ? updated : e));
-                setActiveEntry(prev => prev?.id === id ? updated : prev);
-            }
-        } catch (error) {
-            toast.error('Failed to save changes.', { id: 'save-error' });
-        } finally {
-            savingRef.current = false;
-            processQueue();
-        }
-    }, []);
-
-    // save entry in database
-    const saveEntry = useCallback((id: number, title: string, content: string) => {
-        pendingSavesRef.current.set(id, { title, content });
-        processQueue();
-    }, [processQueue]);
 
     // update entry title on screen (live)
     const updateEntryTitle = useCallback((id: number, title: string) => {

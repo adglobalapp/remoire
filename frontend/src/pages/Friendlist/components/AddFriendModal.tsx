@@ -2,13 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { X, Search, UserPlus, Check, Clock } from 'lucide-react';
 import styles from './AddFriendModal.module.css';
 import { type User as UserType } from '../../../types';
-import { searchUsers, sendFriendRequest } from '../../../services/api';
+import { searchUsers, sendFriendRequest } from '../../../api';
 import toast from 'react-hot-toast';
-
-interface AddFriendModalProps {
-    onClose: () => void;
-    onRefresh: () => void;
-}
+import { type AddFriendModalProps } from '../../../types';
 
 const AddFriendModal: React.FC<AddFriendModalProps> = ({ onClose, onRefresh }) => {
     const [query, setQuery] = useState('');

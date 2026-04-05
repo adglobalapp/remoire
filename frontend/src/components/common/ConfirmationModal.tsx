@@ -1,15 +1,7 @@
 import { createPortal } from 'react-dom';
 import { AlertCircle, X } from 'lucide-react';
 import styles from './ConfirmationModal.module.css';
-
-interface ConfirmationModalProps {
-    title: string;
-    message: string | React.ReactNode;
-    confirmText?: string;
-    cancelText?: string;
-    onConfirm: () => void;
-    onCancel: () => void;
-}
+import { type ConfirmationModalProps } from '../../types';
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     title,
