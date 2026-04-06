@@ -98,7 +98,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
                                         <span className={classNames(styles.statusBadge, styles.statusBadgePending)}><Clock size={14} /> Pending</span>
                                     ) : (
                                         <button
-                                            className="btn btn-dark btn-sm"
+                                            className="btn btn-primary btn-sm"
                                             onClick={() => handleSendRequest(user.id)}
                                         >
                                             <UserPlus size={18} /> Add

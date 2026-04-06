@@ -35,6 +35,10 @@
     color: var(--color-burgundy);
 }
 
+.infoLabelGroup svg {
+    color: var(--color-burgundy); /* Explicitly ensure icons are burgundy, not black */
+}
+
 .infoLabelGroup label {
     color: var(--color-dark-brown);
     font-size: 1rem;
@@ -72,8 +76,9 @@
 }
 
 .dateInput::-webkit-calendar-picker-indicator {
-    opacity: 0.4;
+    filter: invert(0.8); /* Make the indicator light/visible, not black */
     cursor: pointer;
+    opacity: 0.6;
 }
 
 .dateInput:disabled {

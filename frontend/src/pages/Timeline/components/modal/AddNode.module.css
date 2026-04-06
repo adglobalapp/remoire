@@ -290,13 +290,16 @@
 }
 
 .saveBtn {
-    background-color: var(--color-dark-brown);
-    color: var(--color-light-beige);
+    background-color: transparent !important;
+    color: var(--color-burgundy) !important;
+    border: 1px solid var(--color-burgundy) !important;
+    box-shadow: none !important;
 }
 
 .saveBtn:hover:not(:disabled) {
+    background-color: rgba(224, 64, 160, 0.08) !important;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: none !important;
 }
 
 .saveBtn:disabled {
@@ -323,20 +326,21 @@
 }
 
 .deleteBtn {
-    background-color: var(--color-error);
-    color: white;
-    border: 2px solid transparent;
+    background-color: transparent;
+    color: var(--color-error) !important;
+    border: 1px solid var(--color-error);
     margin-right: auto;
     font-size: 1.4rem !important;
     padding: 0.2rem 1.1rem !important;
     line-height: 1 !important;
     font-family: var(--font-ui), serif !important;
+    box-shadow: none;
 }
 
 .deleteBtn:hover:not(:disabled) {
-    background-color: var(--color-error-hover);
+    background-color: rgba(239, 68, 68, 0.08);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(187, 53, 53, 0.2);
+    box-shadow: none; /* No shadow as requested */
 }
 
 .deleteBtn:active:not(:disabled) {

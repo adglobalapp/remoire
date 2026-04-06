@@ -85,7 +85,7 @@ const NotesPage = () => {
                     <header className={styles.header}>
                         <h1>Notes</h1>
                         <div className={styles.actionButtons}>
-                            <button className="btn btn-dark" onClick={() => setShowAddModal(true)}>
+                            <button className={`btn ${styles.addNoteBtn}`} onClick={() => setShowAddModal(true)}>
                                 <Plus size={20} /> Add Note
                             </button>
                         </div>

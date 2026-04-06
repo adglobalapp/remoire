@@ -16,6 +16,22 @@ class Entry extends Model
     {
         parent::boot();
 
+        static::creating(function ($entry) {
+            if (!$entry->color) {
+                // Light neon palette matching the frontend constants
+                $neonColors = [
+                    '#D1F7FF', // Light Neon Cyan
+                    '#EAD1FF', // Light Neon Lavender
+                    '#D1FFD6', // Light Neon Mint
+                    '#FFF1D1', // Light Neon Peach/Yellow
+                    '#FFD1E1', // Light Neon Pink
+                    '#D1E1FF', // Light Neon Blue
+                    '#F7FFD1'  // Light Neon Lime
+                ];
+                $entry->color = $neonColors[array_rand($neonColors)];
+            }
+        });
+
         static::saving(function ($entry) {
             if ($entry->content) {
                 $extracted = static::extractTitle($entry->content);

@@ -4,6 +4,8 @@
     overflow: hidden;
     position: relative;
     background-color: var(--color-dark-beige);
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
     cursor: default;
     user-select: text;
     -webkit-user-select: text;

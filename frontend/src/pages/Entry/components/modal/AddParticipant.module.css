@@ -1,11 +1,12 @@
 .resultsList {
     max-height: 400px;
-    min-height: 200px;
+    min-height: 250px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 8px;
     padding-right: 4px;
+    margin-top: 1rem;
 }
 
 .resultItem {
@@ -13,15 +14,16 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 16px;
-    background: white;
-    border-radius: 8px;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
     transition: all 0.2s;
     cursor: pointer;
 }
 
 .resultItem:hover {
-    background: rgba(84, 29, 48, 0.03);
+    border-color: rgba(224, 64, 160, 0.2);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .resultItem:hover .userName {
@@ -39,22 +41,13 @@
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    background: #eee;
-    border: 2px solid white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
-    font-family: var(--font-body);
-    color: var(--color-dark-brown);
-    overflow: hidden;
-}
-
-.avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-burgundy);
+    font-weight: 600;
 }
 
 .userDetails {
@@ -63,7 +56,7 @@
 }
 
 .userName {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 400;
     color: var(--color-dark-brown);
     transition: color 0.2s;
@@ -73,9 +66,9 @@
     font-size: 1.6rem;
     font-weight: 400;
     margin: 0;
+    color: var(--color-dark-brown);
 }
 
 .modalHeader {
     padding-bottom: 10px;
 }
-

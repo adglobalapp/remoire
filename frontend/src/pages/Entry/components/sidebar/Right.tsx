@@ -95,7 +95,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                         <div className={styles.metaValue}>
                             <span className="empty-state-placeholder">No location set</span>
                         </div>
-                        <button className={`btn btn-secondary btn-sm ${styles.fullWidth}`}>
+                        <button className={`btn btn-dark btn-sm ${styles.fullWidth}`}>
                             <Plus size={14} /> Add Location
                         </button>
                     </div>
@@ -154,7 +154,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                         </div>
 
                         <button 
-                            className="btn btn-secondary btn-sm addParticipantBtn" 
+                            className="btn btn-dark btn-sm addParticipantBtn" 
                             onClick={() => setIsModalOpen(true)}
                             disabled={!activeEntry}
                         >

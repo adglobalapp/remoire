@@ -1,9 +1,9 @@
 export const PRESET_COLORS = [
-    '#f8a5c2', // Soft Coral
-    '#f9e2af', // Sunny Yellow
-    '#a6e3a1', // Minty Green
-    '#89dceb', // Sky Blue
-    '#cba6f7', // Soft Lavender
-    '#fab387', // Peach
-    '#f5e0dc'  // Warm Sand
+    '#D1F7FF', // Light Neon Cyan
+    '#EAD1FF', // Light Neon Lavender
+    '#D1FFD6', // Light Neon Mint
+    '#FFF1D1', // Light Neon Peach/Yellow
+    '#FFD1E1', // Light Neon Pink
+    '#D1E1FF', // Light Neon Blue
+    '#F7FFD1'  // Light Neon Lime
 ];

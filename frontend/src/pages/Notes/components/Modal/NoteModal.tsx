@@ -10,7 +10,7 @@ import styles from './NoteModal.module.css';
 
 const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }) => {
     const [title, setTitle] = useState(note?.title || '');
-    const [color, setColor] = useState(note?.color || '#fdf9f3');
+    const [color, setColor] = useState(note?.color || PRESET_COLORS[0]);
     const [isPinned, setIsPinned] = useState(note?.is_pinned || false);
 
     const [, setSelectionCount] = useState(0);

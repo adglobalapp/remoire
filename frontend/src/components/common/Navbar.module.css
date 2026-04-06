@@ -1,10 +1,12 @@
+/* ===================== NAVBAR — Neon Dark Theme ===================== */
 .navbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0.2rem 2rem;
-    background-color: var(--color-light-beige);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+    background-color: rgba(26, 23, 38, 0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     height: 56px;
     position: sticky;
     top: 0;
@@ -24,10 +26,15 @@
 .logoSection svg {
     color: var(--color-burgundy);
     margin-bottom: 2px;
+    filter: drop-shadow(0 0 6px rgba(255, 58, 110, 0.5));
 }
 
 .logoText {
     font-size: 1.45rem;
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .menuItems {
@@ -41,31 +48,38 @@
     align-items: center;
     gap: 0.6rem;
     text-decoration: none;
-    color: var(--color-dark-brown);
+    color: var(--color-light-brown);
     font-size: 1.5rem;
     transition: color 0.2s;
 }
 
 .link svg {
-    color: var(--color-burgundy);
-    transition: transform 0.2s;
+    color: var(--color-light-brown);
+    transition: color 0.2s, transform 0.2s, filter 0.2s;
+    opacity: 0.6;
 }
 
 .link:hover {
-    color: var(--color-burgundy);
+    color: var(--color-dark-brown);
 }
 
 .link:hover svg {
     transform: scale(1.1);
+    opacity: 1;
+    color: var(--color-burgundy);
+    filter: drop-shadow(0 0 4px rgba(255, 58, 110, 0.4));
 }
 
 .active {
-    color: var(--color-burgundy);
+    color: var(--color-dark-brown);
     font-weight: 500;
 }
 
 .active svg {
     transform: scale(1.05);
+    opacity: 1;
+    color: var(--color-burgundy);
+    filter: drop-shadow(0 0 4px rgba(255, 58, 110, 0.4));
 }
 
 .authSection {
@@ -89,29 +103,33 @@
     gap: 0.6rem;
     cursor: pointer;
     padding: 0.55rem 0.8rem;
-    border-radius: 7px;
-    transition: color 0.15s;
+    border-radius: 8px;
+    transition: background 0.15s;
+}
+
+.userProfileTrigger:hover {
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .userProfileTrigger:hover .userName {
-    color: var(--color-burgundy);
+    color: var(--color-dark-brown);
 }
 
 .avatar {
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-dark-beige), #d4c4b0);
+    background: var(--gradient-accent);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.7rem;
     font-family: var(--font-ui);
     font-weight: 400;
-    color: var(--color-dark-brown);
+    color: white;
     overflow: hidden;
-    border: 2px solid rgba(255, 255, 255, 0.9);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(255, 58, 110, 0.3);
+    box-shadow: 0 0 8px rgba(255, 58, 110, 0.3);
     flex-shrink: 0;
 }
 
@@ -124,7 +142,7 @@
 .userName {
     font-size: 1.4rem;
     font-family: var(--font-ui);
-    color: var(--color-dark-brown);
+    color: var(--color-light-brown);
     font-weight: 400;
     transition: color 0.15s;
     white-space: nowrap;
@@ -132,14 +150,14 @@
 
 .profileDropdown {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 4px);
     right: 0;
     left: 0;
-    background-color: var(--color-light-beige);
-    border-radius: 0 0 10px 10px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.07);
-    border-top: none;
+    background: rgba(31, 28, 46, 0.82); /* Glass surface */
+    backdrop-filter: blur(20px) saturate(130%); /* Deep glass blur */
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08); /* Specular highlight edge */
+    border: 1px solid rgba(255, 255, 255, 0.07);
     min-width: 100%;
     padding: 0.3rem 0.3rem 0.4rem;
     z-index: 30;
@@ -149,19 +167,19 @@
 
 .dropdownHeader {
     padding: 0.6rem 0.8rem 0.5rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     margin-bottom: 0.2rem;
 }
 
 .dropdownHeaderName {
     font-size: 1.15rem;
     font-family: var(--font-ui);
-    color: var(--color-dark-brown);
+    color: var(--color-light-brown);
     font-weight: 400;
     opacity: 0.6;
     display: block;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
 }
 
 .dropdownItem {
@@ -173,22 +191,22 @@
     cursor: pointer;
     font-size: 1.4rem;
     font-family: var(--font-ui);
-    color: var(--color-dark-brown);
-    transition: color 0.15s;
+    color: var(--color-light-brown);
+    transition: color 0.15s, background 0.15s;
     user-select: none;
     background: none;
     white-space: nowrap;
 }
 
 .dropdownItem svg {
-    opacity: 0.5;
+    opacity: 0.4;
     flex-shrink: 0;
     transition: opacity 0.15s;
 }
 
 .dropdownItem:hover {
-    background: none;
-    color: var(--color-burgundy);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-dark-brown);
 }
 
 .dropdownItem:hover svg {
@@ -197,7 +215,7 @@
 
 .dropdownSeparator {
     height: 1px;
-    background-color: rgba(0, 0, 0, 0.06);
+    background-color: rgba(255, 255, 255, 0.06);
     margin: 0.2rem 0.5rem;
 }
 
@@ -211,7 +229,7 @@
 }
 
 .signOutItem:hover {
-    background: none;
+    background: rgba(255, 77, 106, 0.08);
     color: var(--color-error-hover);
 }
 
@@ -220,15 +238,8 @@
 }
 
 @keyframes dropdownOpen {
-    from {
-        opacity: 0;
-        transform: translateY(-4px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .authButtons {
@@ -242,8 +253,8 @@
     background: transparent;
     border: none;
     cursor: pointer;
-    color: var(--color-dark-brown);
-    opacity: 0.4;
+    color: var(--color-light-brown);
+    opacity: 0.6;
     padding: 6px;
     border-radius: 50%;
     transition: all 0.2s;
@@ -253,7 +264,7 @@
 
 .hamburger:hover {
     opacity: 1;
-    background-color: rgba(0, 0, 0, 0.06);
+    background-color: rgba(255, 255, 255, 0.06);
 }
 
 .mobileMenu {
@@ -263,12 +274,13 @@
     left: 0;
     right: 0;
     padding: 0.5rem 0;
-    background-color: var(--color-light-beige);
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(26, 23, 38, 0.85); /* Glass surface */
+    backdrop-filter: blur(24px) saturate(140%); /* iOS-style deep blur */
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
     flex-direction: column;
     gap: 0;
     animation: slideDown 0.2s ease-out;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
     z-index: 90;
 }
 
@@ -279,15 +291,16 @@
     gap: 0.8rem;
     padding: 0.85rem 2rem;
     text-decoration: none;
-    color: var(--color-dark-brown);
+    color: var(--color-light-brown);
     font-size: 1.4rem;
     transition: background 0.2s, color 0.2s;
-    border-bottom: none;
     width: 100%;
     background: none;
-    border-right: none;
     cursor: pointer;
     border-radius: 0;
+    border: none;
+    border-right: none;
+    border-bottom: none;
 }
 
 .mobileLink svg {
@@ -295,12 +308,12 @@
 }
 
 .mobileLink:hover {
-    color: var(--color-burgundy);
+    color: var(--color-dark-brown);
+    background: rgba(255, 255, 255, 0.04);
 }
 
 .mobileLink.active {
-    color: var(--color-burgundy);
-    font-weight: 500;
+    color: var(--color-dark-brown);
 }
 
 .mobileUserBadge {
@@ -310,8 +323,8 @@
     gap: 0.8rem;
     padding: 1rem 2rem 0.6rem;
     margin-top: 0.5rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    color: var(--color-dark-brown);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--color-light-brown);
     font-size: 1.4rem;
     opacity: 0.7;
     width: 100%;
@@ -328,19 +341,12 @@
 }
 
 .logoutIconRed {
-    color: var(--color-error, #c0392b) !important;
+    color: var(--color-error) !important;
 }
 
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 1024px) {
@@ -350,24 +356,9 @@
         min-height: 56px;
         position: relative;
     }
-
-    .menuItems {
-        display: none;
-    }
-
-    .hamburger {
-        display: flex;
-    }
-
-    .mobileMenu {
-        display: flex;
-    }
-
-    .userBadge {
-        display: none;
-    }
-
-    .logoutBtn {
-        display: none;
-    }
+    .menuItems { display: none; }
+    .hamburger { display: flex; }
+    .mobileMenu { display: flex; }
+    .userBadge { display: none; }
+    .logoutBtn { display: none; }
 }

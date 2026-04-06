@@ -22,7 +22,10 @@ const Node = ({ entry, side, index = 0 }: NodeProps) => {
     return (
         <div 
             className={`${styles.nodeWrapper} ${side === 'right' ? styles.right : styles.left}`}
-            style={{ animationDelay: `${0.3 + index * 0.15}s` }}
+            style={{ 
+                animationDelay: `${0.3 + index * 0.15}s`,
+                '--entry-accent': entry.color || 'var(--color-burgundy)'
+            } as React.CSSProperties}
         >
             <div className={styles.cardContainer}>
                 <div

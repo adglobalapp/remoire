@@ -37,10 +37,10 @@ const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectFriend
                                 </div>
 
                                 <button
-                                    className="btn btn-dark btn-sm"
+                                    className="btn btn-primary btn-sm"
                                     onClick={(e) => { e.stopPropagation(); onSelectFriend(friend.id); }}
                                 >
-                                    <UserPlus size={16} /> Add
+                                    <UserPlus size={18} /> Add
                                 </button>
                             </div>
                         ))

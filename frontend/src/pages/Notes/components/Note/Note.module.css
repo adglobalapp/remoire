@@ -1,11 +1,11 @@
 .noteCard {
-    background-color: var(--note-bg, var(--color-white));
+    background-color: var(--note-bg, var(--color-light-beige));
     border-radius: 16px;
     padding: 1.75rem;
     position: relative;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05); /* Subtle border for light context */
     cursor: pointer;
-    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.2s, box-shadow 0.25s;
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.25s;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -15,6 +15,7 @@
     clip-path: polygon(0% 0%, calc(100% - 32px) 0%, 100% 32px, 100% 100%, 0% 100%);
     animation: noteCardFadeUp 0.45s cubic-bezier(0.25, 1, 0.5, 1) both;
     animation-delay: calc(var(--delay, 0) * 60ms);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes noteCardFadeUp {
@@ -30,6 +31,7 @@
 
 .noteCard:hover {
     transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
 }
 
 .donkeyEar {
@@ -38,7 +40,7 @@
     right: 0;
     width: 32px;
     height: 32px;
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.08); /* Darker corner for the flip */
     border-bottom-left-radius: 16px;
     z-index: 2;
     pointer-events: none;
@@ -47,12 +49,12 @@
 
 .title {
     font-family: var(--font-ui), serif;
-    font-size: 1.8rem;
+    font-size: 1.6rem; /* Reduced from 1.8rem */
     font-weight: 500;
     margin: 0;
     padding-bottom: 0.65rem;
-    border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
-    color: var(--color-dark-brown);
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+    color: #1A1726; /* Dark text for colored background */
     line-height: 1.1;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -62,7 +64,7 @@
 .preview {
     font-family: var(--font-body), sans-serif;
     font-size: 1.05rem;
-    color: rgba(0, 0, 0, 0.7);
+    color: rgba(26, 23, 38, 0.85); /* Dark text for colored background */
     line-height: 1.6;
     display: -webkit-box;
     -webkit-line-clamp: 6;
@@ -86,7 +88,7 @@
     align-items: center;
     gap: 0.75rem;
     font-size: 1rem;
-    opacity: 0.85;
+    color: #1A1726; /* Dark text */
 }
 
 .todoItem.completed {
@@ -95,13 +97,13 @@
 }
 
 .checkbox {
-    width: 16px;
-    height: 16px;
-    border: 1.5px solid rgba(0, 0, 0, 0.18);
+    width: 14px;
+    height: 14px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 4px;
     flex-shrink: 0;
     transition: all 0.2s;
-    background-color: rgba(255, 255, 255, 0.45);
+    background-color: rgba(255, 255, 255, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -109,8 +111,8 @@
 }
 
 .checked {
-    background-color: var(--color-dark-blue);
-    border-color: var(--color-dark-blue);
+    background: #1A1726; /* Dark checkmar */
+    border-color: transparent;
 }
 
 .checked::after {
@@ -124,11 +126,10 @@
     position: absolute;
     bottom: 0.9rem;
     right: 0.9rem;
-    opacity: 0.5;
-    color: var(--color-dark-brown);
+    color: #1A1726; /* Dark icon */
+    opacity: 0.35;
     z-index: 3;
     pointer-events: none;
-    filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.4));
 }
 
 .todoText {

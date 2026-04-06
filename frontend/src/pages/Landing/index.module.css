@@ -1,10 +1,11 @@
 .landingContainer {
     width: 100%;
     min-height: 100vh;
-    background: var(--color-light-beige, #f8f5f2);
+    background: var(--color-dark-beige);
     color: var(--color-dark-brown);
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
 }
 
 .hero {
@@ -14,12 +15,22 @@
     justify-content: center;
     text-align: center;
     padding: 0 24px;
-    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), transparent);
+    position: relative;
+    background: radial-gradient(ellipse at 50% -10%, rgba(255, 58, 110, 0.18) 0%, rgba(168, 85, 247, 0.10) 40%, transparent 70%);
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
 }
 
 .heroContent {
     max-width: 800px;
     animation: fadeIn 1s ease-out;
+    position: relative;
 }
 
 .title {
@@ -31,19 +42,26 @@
     justify-content: center;
     gap: 16px;
     letter-spacing: -2px;
+    background: linear-gradient(135deg, #F0EAF8 0%, #C8B8E8 50%, #FF3A6E 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .sparkle {
     color: var(--color-burgundy);
     width: 48px;
     height: 48px;
+    filter: drop-shadow(0 0 12px rgba(255, 58, 110, 0.6));
+    -webkit-text-fill-color: initial;
 }
 
 .subtitle {
     font-size: 1.8rem;
     font-weight: 300;
-    opacity: 0.7;
+    color: var(--color-light-brown);
     margin-bottom: 40px;
+    opacity: 0.85;
 }
 
 .ctaButtons {
@@ -56,40 +74,42 @@
     padding: 16px 36px;
     font-size: 1.6rem;
     font-weight: 500;
-    background: var(--color-dark-brown);
-    color: var(--color-light-beige);
+    background: var(--gradient-accent);
+    color: white;
     border: none;
     border-radius: 50px;
     cursor: pointer;
-    transition: transform 0.2s, background 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 8px 30px rgba(255, 58, 110, 0.35), 0 0 60px rgba(255, 58, 110, 0.15);
 }
 
 .primaryBtn:hover {
-    background: #3a3f44;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 40px rgba(255, 58, 110, 0.5), 0 0 80px rgba(255, 58, 110, 0.2);
 }
 
 .secondaryBtn {
     padding: 16px 36px;
     font-size: 1.6rem;
     font-weight: 500;
-    background: white;
+    background: rgba(255, 255, 255, 0.04);
     color: var(--color-dark-brown);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 50px;
     cursor: pointer;
-    transition: transform 0.2s, background 0.2s;
+    transition: transform 0.2s, background 0.2s, border-color 0.2s;
 }
 
 .secondaryBtn:hover {
-    background: #fbfbfb;
-    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 58, 110, 0.3);
+    transform: translateY(-3px);
 }
 
 .features {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 40px;
+    gap: 32px;
     max-width: 1200px;
     margin: 0 auto;
     padding: 100px 24px;
@@ -98,99 +118,69 @@
 .featureCard {
     text-align: center;
     padding: 40px;
-    background: white;
+    background: rgba(255, 255, 255, 0.025);
     border-radius: 24px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    backdrop-filter: blur(8px);
 }
 
 .featureCard:hover {
     transform: translateY(-10px);
+    border-color: rgba(255, 58, 110, 0.25);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(255, 58, 110, 0.08);
 }
 
 .featureIcon {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     color: var(--color-burgundy);
     margin-bottom: 24px;
+    filter: drop-shadow(0 0 8px rgba(255, 58, 110, 0.5));
 }
 
 .featureCard h3 {
     font-size: 1.8rem;
     font-weight: 500;
     margin-bottom: 16px;
+    color: var(--color-dark-brown);
 }
 
 .featureCard p {
     font-size: 1.25rem;
     line-height: 1.6;
-    opacity: 0.6;
+    color: var(--color-light-brown);
 }
 
 .footer {
     padding: 60px 24px;
     text-align: center;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
     margin-top: auto;
 }
 
 .footer p {
     font-size: 1rem;
+    color: var(--color-light-brown);
     opacity: 0.4;
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 1024px) {
-    .title {
-        font-size: 5rem;
-    }
-
-    .subtitle {
-        font-size: 1.5rem;
-    }
-
-    .ctaButtons {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .features {
-        padding: 60px 16px;
-        gap: 24px;
-    }
-
-    .featureCard {
-        padding: 28px 20px;
-    }
+    .title { font-size: 5rem; }
+    .subtitle { font-size: 1.5rem; }
+    .ctaButtons { flex-direction: column; align-items: center; }
+    .features { padding: 60px 16px; gap: 20px; }
+    .featureCard { padding: 28px 20px; }
 }
 
 @media (max-width: 480px) {
-    .title {
-        font-size: 3.5rem;
-        letter-spacing: -1px;
-    }
-
-    .hero {
-        height: auto;
-        min-height: 70vh;
-        padding: 60px 16px;
-    }
-
-    .primaryBtn,
-    .secondaryBtn {
-        width: 100%;
-        text-align: center;
-        justify-content: center;
-    }
+    .title { font-size: 3.5rem; letter-spacing: -1px; }
+    .hero { height: auto; min-height: 70vh; padding: 60px 16px; }
+    .primaryBtn, .secondaryBtn { width: 100%; text-align: center; justify-content: center; }
 }

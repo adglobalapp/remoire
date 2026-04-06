@@ -5,6 +5,9 @@
     position: relative;
     cursor: grab;
     user-select: none;
+    background-color: var(--color-dark-beige);
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
 }
 
 .canvasContainer.dragging {
@@ -38,13 +41,22 @@
     left: 50%;
     top: 0;
     bottom: 0;
-    width: 3px;
-    background: linear-gradient(to bottom, transparent, var(--color-burgundy) 60px, var(--color-burgundy) calc(100% - 60px), transparent);
-    opacity: 0.35;
+    width: 2px;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        var(--color-burgundy) 60px,
+        #A855F7 50%,
+        var(--color-burgundy) calc(100% - 60px),
+        transparent
+    );
+    opacity: 0.4;
     border-radius: 2px;
     transform-origin: top center;
     transform: translateX(-50%) scaleY(0);
     animation: growLine 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    filter: blur(0.5px);
+    box-shadow: 0 0 12px rgba(255, 58, 110, 0.4);
 }
 
 @keyframes growLine {
@@ -53,8 +65,8 @@
 }
 
 .addButton:disabled {
-    background-color: var(--color-light-brown);
-    opacity: 0.5;
+    background-color: rgba(255, 255, 255, 0.1);
+    opacity: 0.3;
     cursor: not-allowed;
     box-shadow: none;
 }
@@ -64,18 +76,25 @@
     top: 24px;
     right: 24px;
     z-index: 100;
-    background-color: var(--color-dark-brown);
-    color: var(--color-light-beige);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: var(--gradient-accent);
+    color: white;
+    box-shadow: 0 4px 12px rgba(224, 64, 160, 0.18);
     display: flex;
     align-items: center;
     gap: 8px;
     transition: all 0.2s ease;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 1.4rem;
+    font-family: var(--font-ui);
+    cursor: pointer;
 }
 
 .addButton:hover:not(:disabled) {
-    background-color: #1a1517;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(124, 58, 237, 0.15); /* Reduced hover glow intensity */
+    opacity: 0.9;
 }
 
 .emptyStateOverlay {

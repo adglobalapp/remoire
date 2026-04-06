@@ -95,7 +95,7 @@ const FriendlistPage = () => {
                     <header className={styles.header}>
                         <h1>Friends</h1>
                         <div className={styles.actionButtons}>
-                            <button className="btn btn-dark" onClick={() => setShowAddModal(true)}>
+                            <button className={`btn ${styles.addFriendBtn}`} onClick={() => setShowAddModal(true)}>
                                 <UserPlus size={20} /> Add Friend
                             </button>
                         </div>

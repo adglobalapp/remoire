@@ -38,7 +38,7 @@ const Note: React.FC<NoteProps> = ({ note, onClick, index = 0 }) => {
             className={styles.noteCard} 
             onClick={onClick}
             style={{ 
-                '--note-bg': note.color || '#fff',
+                '--note-bg': note.color || '#D1F7FF',
                 '--delay': index,
             } as React.CSSProperties}
         >

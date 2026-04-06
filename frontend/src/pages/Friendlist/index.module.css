@@ -17,7 +17,10 @@
 .header h1 {
     font-size: 2.4rem !important;
     font-weight: 400;
-    color: var(--color-dark-brown);
+    background: var(--gradient-accent-alt);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin: 0;
 }
 
@@ -29,9 +32,9 @@
 .friendList {
     background: var(--color-light-beige);
     border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-card);
     overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     width: 100%;
     animation: friendListFadeUp 0.45s cubic-bezier(0.25, 1, 0.5, 1) both;
     animation-delay: calc(var(--delay, 0) * 100ms);
@@ -66,7 +69,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 24px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     transition: background 0.2s;
 }
 
@@ -75,7 +78,7 @@
 }
 
 .friendRow:hover {
-    background: rgba(84, 29, 48, 0.03);
+    background: rgba(192, 68, 90, 0.05);
 }
 
 .friendMain {
@@ -90,9 +93,9 @@
     height: 48px;
     border-radius: 50%;
     object-fit: cover;
-    background: #eee;
-    border: 2px solid white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background: #2A2640;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .info {
@@ -119,17 +122,18 @@
 }
 
 .sectionTitle {
-    background: var(--color-burgundy);
+    background: var(--gradient-header);
     padding: 10px 24px;
     font-size: 1.4rem;
     text-transform: uppercase;
-    color: var(--color-light-beige);
+    color: white;
     font-weight: 400;
     font-family: var(--font-ui);
+    letter-spacing: 0.06em;
 }
 
 .bgDarkBlue {
-    background: var(--color-dark-blue);
+    background: var(--gradient-accent);
 }
 
 .actions {
@@ -146,11 +150,30 @@
 .loaderContainer {
     display: flex;
     justify-content: center;
+    align-items: center;
     padding: 60px 0;
+    min-height: 200px;
 }
 
 .listMargin {
     margin-bottom: 30px;
+}
+
+.addFriendBtn {
+    background: var(--gradient-accent) !important;
+    border: none !important; /* Removed transparent border for cleaner edge */
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(224, 64, 160, 0.18) !important;
+    transition: box-shadow 0.2s, transform 0.2s !important;
+    border-radius: 8px !important;
+    padding: 10px 20px !important; /* Exact match with Add Entry */
+    font-size: 1.4rem !important;
+}
+
+.addFriendBtn:hover {
+    opacity: 0.9 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 15px rgba(124, 58, 237, 0.15) !important; /* Reduced hover glow intensity */
 }
 
 .badgeButton {
