@@ -1,13 +1,11 @@
 @import './styles/variables.css';
 
-/* reset */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* base */
 html,
 body {
   height: 100%;
@@ -24,7 +22,6 @@ body {
   font-size: 1.2rem;
 }
 
-/* scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -43,7 +40,6 @@ body {
   background-color: rgba(0, 0, 0, 0.2);
 }
 
-/* typography */
 p,
 textarea,
 input,
@@ -64,7 +60,6 @@ input,
   font-size: 1.15em;
 }
 
-/* buttons */
 .btn,
 button {
   font-family: var(--font-ui), serif !important;
@@ -155,12 +150,10 @@ button {
   padding: 0.3rem 0.6rem;
 }
 
-/* utility */
 .w-full {
   width: 100%;
 }
 
-/* modals */
 .global-modal-overlay {
   position: fixed;
   top: 0;
@@ -214,6 +207,7 @@ button {
     opacity: 0;
     transform: translateY(40px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -264,7 +258,6 @@ button {
   }
 }
 
-/* layout */
 .page-container {
   height: 100vh;
   display: flex;
@@ -278,7 +271,6 @@ button {
   overflow: hidden;
 }
 
-/* sidebars */
 .sidebar-left {
   position: absolute;
   top: 0;
@@ -305,13 +297,27 @@ button {
 }
 
 @keyframes slideInLeftSidebar {
-  from { transform: translateX(-40px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(-40px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @keyframes slideInRightSidebar {
-  from { transform: translateX(40px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(40px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 @media (min-width: 1401px) {
@@ -359,7 +365,7 @@ button {
   margin: 12px 12px 12px 0;
 }
 
-/* sidebar header */
+
 .sidebar-header {
   background-color: var(--color-dark-blue);
   color: var(--color-light-beige);
@@ -379,7 +385,7 @@ button {
   font-size: 1.6rem !important;
 }
 
-/* sidebar toggle */
+
 .sidebar-toggle-fab {
   display: flex;
   align-items: center;
@@ -426,7 +432,6 @@ button {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* sidebar navigation */
 .sidebar-list {
   flex: 1;
   overflow-y: auto;
@@ -435,7 +440,6 @@ button {
   flex-direction: column;
 }
 
-/* sidebar item */
 .sidebar-item {
   display: flex;
   justify-content: space-between;
@@ -486,7 +490,6 @@ button {
   opacity: 0.6;
 }
 
-/* toasts */
 .custom-toast {
   background: var(--color-light-beige) !important;
   color: var(--color-dark-brown) !important;
@@ -519,7 +522,6 @@ button {
   letter-spacing: 0.02em;
 }
 
-/* sidebar footer */
 .sidebar-footer {
   padding: 1rem;
   background-color: var(--color-light-beige);
@@ -541,7 +543,6 @@ button {
   transform: translateY(-1px);
 }
 
-/* sidebar search */
 .sidebar-search-box {
   position: relative;
 }
@@ -604,7 +605,6 @@ button {
   background-color: rgba(0, 0, 0, 0.06);
 }
 
-/* loading */
 .loading-screen {
   position: fixed;
   top: 0;
@@ -619,7 +619,7 @@ button {
 }
 
 .loading-icon {
-  color: rgba(0, 0, 0, 0.2);
+  color: rgba(42, 30, 34, 0.1) !important;
   animation: spinner 1.2s linear infinite;
 }
 
@@ -653,7 +653,6 @@ button {
   }
 }
 
-/* empty state */
 .empty-state-placeholder {
   display: flex !important;
   align-items: center !important;

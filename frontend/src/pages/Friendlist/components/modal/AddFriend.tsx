@@ -6,6 +6,7 @@ import { type User as UserType } from '../../../../types';
 import { searchUsers, sendFriendRequest } from '../../../../api';
 import toast from 'react-hot-toast';
 import { type AddFriendProps } from '../../../../types';
+import Avatar from '../../../../components/common/Avatar';
 
 const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
     const [query, setQuery] = useState('');
@@ -40,7 +41,6 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
         const success = await sendFriendRequest(userId);
         if (success) {
             toast.success('Friend request sent!');
-            // Update results locally
             setResults(prev => prev.map(u =>
                 u.id === userId ? { ...u, friend_status: 'pending', is_requester: true } : u
             ));
@@ -80,9 +80,9 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
                         results.map(user => (
                             <div key={user.id} className={styles.resultItem}>
                                 <div className={styles.userInfo}>
-                                    <img
-                                        src={user.avatar_url!}
-                                        alt={user.name}
+                                    <Avatar 
+                                        user={user} 
+                                        size={40}
                                         className={styles.avatar}
                                     />
                                     <div className={styles.userDetails}>

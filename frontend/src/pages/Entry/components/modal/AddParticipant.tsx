@@ -1,6 +1,7 @@
 import { X, UserPlus } from 'lucide-react';
 import styles from './AddParticipant.module.css';
 import { type AddParticipantProps } from '../../../../types';
+import Avatar from '../../../../components/common/Avatar';
 
 const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectFriend, friends }) => {
     return (
@@ -22,15 +23,7 @@ const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectFriend
                                 onClick={() => onSelectFriend(friend.id)}
                             >
                                 <div className={styles.userInfo}>
-                                    {friend.avatar_url ? (
-                                        <img
-                                            src={friend.avatar_url}
-                                            alt={friend.name}
-                                            className={styles.avatar}
-                                        />
-                                    ) : (
-                                        <div className={styles.avatar}>{friend.name.charAt(0)}</div>
-                                    )}
+                                    <Avatar user={friend} size={36} className={styles.avatar} />
                                     <div className={styles.userDetails}>
                                         <span className={styles.userName}>{friend.name}</span>
                                     </div>

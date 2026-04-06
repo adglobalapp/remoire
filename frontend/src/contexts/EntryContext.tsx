@@ -3,18 +3,30 @@ import toast from 'react-hot-toast';
 import { getEntries, createEntry as apiCreateEntry, updateEntry as apiUpdateEntry, deleteEntry as apiDeleteEntry } from '../api/entries';
 import { type Entry, type EntryContextValue, type EntryProviderProps } from '../types';
 import { useAutoSave } from '../hooks/useAutoSave';
+import { useAuth } from './AuthContext';
 
 export const EntryContext = createContext<EntryContextValue | null>(null);
 
 export const EntryProvider = ({ children }: EntryProviderProps) => {
     const [entries, setEntries] = useState<Entry[]>([]);
     const [activeEntry, setActiveEntry] = useState<Entry | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const { saveEntry } = useAutoSave(setEntries, setActiveEntry);
+
+    const { token } = useAuth();
 
     // Initialization
     useEffect(() => {
+        if (!token) {
+            setEntries([]);
+            setActiveEntry(null);
+            setIsLoading(false);
+            return;
+        }
+
+        setIsLoading(true);
         getEntries().then(async data => {
-            if (data.length > 0) {
+            if (data && data.length > 0) {
                 setEntries(data);
                 setActiveEntry(data[0]);
             } else if (!localStorage.getItem('remoire_initialized')) {
@@ -26,8 +38,10 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
                     setActiveEntry(newEntry);
                 }
             }
+        }).finally(() => {
+            setIsLoading(false);
         });
-    }, []);
+    }, [token]);
 
     // Entry management
     const selectEntry = useCallback((entry: Entry) => {
@@ -93,7 +107,7 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
     }, []);
 
     return (
-        <EntryContext.Provider value={{ entries, activeEntry, selectEntry, createEntry, deleteEntry, saveEntry, updateEntryTitle, updateEntryDate, updateEntryMetadata, updateEntryParticipants }}>
+        <EntryContext.Provider value={{ entries, activeEntry, isLoading, selectEntry, createEntry, deleteEntry, saveEntry, updateEntryTitle, updateEntryDate, updateEntryMetadata, updateEntryParticipants }}>
             {children}
         </EntryContext.Provider>
     );

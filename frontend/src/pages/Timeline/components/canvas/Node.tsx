@@ -6,6 +6,7 @@ import EntryPreview from '../modal/EntryPreview';
 import AddNode from '../modal/AddNode';
 import { formatDate } from '../../../../utils/dateUtils';
 import { getExcerpt, getImageUrl } from '../../../../utils/contentUtils';
+import Avatar from '../../../../components/common/Avatar';
 
 const Node = ({ entry, side, index = 0 }: NodeProps) => {
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -39,18 +40,13 @@ const Node = ({ entry, side, index = 0 }: NodeProps) => {
                                 {entry.participants && entry.participants.length > 0 && (
                                     <div className={styles.participantAvatars}>
                                         {entry.participants.slice(0, 4).map((p, i) => (
-                                            <div
+                                            <Avatar 
                                                 key={p.id}
+                                                user={p}
+                                                size={24}
                                                 className={styles.participantAvatar}
-                                                style={{ zIndex: entry.participants!.length - i }}
-                                                title={p.name}
-                                            >
-                                                {p.avatar_url ? (
-                                                    <img src={p.avatar_url} alt={p.name} />
-                                                ) : (
-                                                    p.name.charAt(0)
-                                                )}
-                                            </div>
+                                                // style handled by pure CSS or internal layout 
+                                            />
                                         ))}
                                         {entry.participants.length > 4 && (
                                             <div className={`${styles.participantAvatar} ${styles.participantAvatarMore}`}>

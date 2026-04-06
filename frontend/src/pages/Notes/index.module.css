@@ -4,6 +4,7 @@
     padding: 0;
     background-color: var(--color-dark-beige);
     min-height: calc(100vh - 70px);
+    position: relative;
 }
 
 .container {
@@ -25,11 +26,6 @@
     }
 }
 
-.loaderContainer {
-    display: flex;
-    justify-content: center;
-    padding: 60px 0;
-}
 
 .header {
     display: flex;

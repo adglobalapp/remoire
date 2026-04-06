@@ -3,6 +3,7 @@ import { X, Calendar, Mail, User as UserIcon, Clock, UserX } from 'lucide-react'
 import styles from './UserProfile.module.css';
 import { formatDate, formatRelativeDate } from '../../../../utils/dateUtils';
 import { type UserProfileProps } from '../../../../types';
+import Avatar from '../../../../components/common/Avatar';
 
 const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onBlock }) => {
     return (
@@ -13,11 +14,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onBlock }) => 
                 </button>
 
                 <div className={styles.profileHeader}>
-                    <img
-                        src={user.avatar_url || ''}
-                        alt={user.name}
-                        className={styles.profileAvatar}
-                    />
+                    <Avatar user={user} size={80} className={styles.profileAvatar} />
                     <div className={styles.profileNameSection}>
                         <div className={styles.nameHeader}>
                             <h2>

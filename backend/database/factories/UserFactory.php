@@ -30,7 +30,7 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
             'bio' => fake()->sentence(),
-            'avatar_url' => '/images/no_profile.jpg',
+            'avatar_url' => null,
             'last_seen_at' => fake()->dateTimeBetween('-1 month', 'now'),
         ];
     }

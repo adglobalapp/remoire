@@ -5,6 +5,9 @@
     position: relative;
     cursor: grab;
     user-select: none;
+    background-color: var(--color-dark-beige);
+    background-image: radial-gradient(rgba(0, 0, 0, 0.07) 1px, transparent 0);
+    background-size: 24px 24px;
 }
 
 .canvasContainer.dragging {

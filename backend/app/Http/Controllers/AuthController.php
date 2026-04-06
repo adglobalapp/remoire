@@ -47,6 +47,7 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->firstOrFail();
+        $user->update(['last_seen_at' => now()]);
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

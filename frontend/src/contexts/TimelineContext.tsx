@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import * as api from '../api/timelines';
 import { type Timeline, type TimelineContextValue, type TimelineProviderProps } from '../types';
+import { useAuth } from './AuthContext';
 
 const DEFAULT_TIMELINE: Timeline = {
     id: 0,
@@ -16,13 +17,22 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
     const [activeTimeline, setActiveTimeline] = useState<Timeline | null>(DEFAULT_TIMELINE);
     const [isLoading, setIsLoading] = useState(true);
 
+    const { token } = useAuth();
+
     // Initial fetch
     useEffect(() => {
+        if (!token) {
+            setTimelines([DEFAULT_TIMELINE]);
+            setActiveTimeline(DEFAULT_TIMELINE);
+            setIsLoading(false);
+            return;
+        }
+
         const fetchTimelines = async () => {
             setIsLoading(true);
             try {
                 const data = await api.getTimelines();
-                if (data.length > 0) {
+                if (data && data.length > 0) {
                     const sorted = [...data].sort((a, b) => (a.isDefault ? 1 : b.isDefault ? -1 : 0));
                     setTimelines(sorted);
                     // Set active to first one (most recently added or first custom)
@@ -31,12 +41,16 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
                     setTimelines([DEFAULT_TIMELINE]);
                     setActiveTimeline(DEFAULT_TIMELINE);
                 }
+            } catch (error) {
+                console.error('Failed to fetch timelines:', error);
+                setTimelines([DEFAULT_TIMELINE]);
+                setActiveTimeline(DEFAULT_TIMELINE);
             } finally {
                 setIsLoading(false);
             }
         };
         fetchTimelines();
-    }, []);
+    }, [token]);
 
     const selectTimeline = useCallback((timeline: Timeline) => {
         setActiveTimeline(timeline);

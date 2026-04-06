@@ -123,7 +123,7 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute($value)
     {
         if (!$value) {
-            return asset('images/no_profile.jpg');
+            return null;
         }
 
         if (str_starts_with($value, 'http')) {

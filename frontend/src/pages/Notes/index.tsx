@@ -81,35 +81,37 @@ const NotesPage = () => {
         <div className="page-container">
             <Navbar />
             <main className={styles.mainContent}>
-                <div className={styles.container}>
-                    <header className={styles.header}>
-                        <h1>Notes</h1>
-                        <div className={styles.actionButtons}>
-                            <button className="btn btn-dark" onClick={() => setShowAddModal(true)}>
-                                <Plus size={20} /> Add Note
-                            </button>
-                        </div>
-                    </header>
+                {isLoading ? (
+                    <Loader centered />
+                ) : (
+                    <div className={styles.container}>
+                        <header className={styles.header}>
+                            <h1>Notes</h1>
+                            <div className={styles.actionButtons}>
+                                <button className="btn btn-dark" onClick={() => setShowAddModal(true)}>
+                                    <Plus size={20} /> Add Note
+                                </button>
+                            </div>
+                        </header>
 
-                    {isLoading ? (
-                        <Loader className={styles.loaderContainer} />
-                    ) : notes.length === 0 ? (
-                        <div className={`${styles.emptyStateContainer} empty-state-placeholder`}>
-                            <p>No notes yet. Click "Add Note" to create one!</p>
-                        </div>
-                    ) : (
-                        <div className={styles.notesGrid}>
-                            {notes.map((note, i) => (
-                                <Note
-                                    key={note.id}
-                                    note={note}
-                                    index={i}
-                                    onClick={() => setSelectedNote(note)}
-                                />
-                            ))}
-                        </div>
-                    )}
-                </div>
+                        {notes.length === 0 ? (
+                            <div className={`${styles.emptyStateContainer} empty-state-placeholder`}>
+                                <p>No notes yet. Click "Add Note" to create one!</p>
+                            </div>
+                        ) : (
+                            <div className={styles.notesGrid}>
+                                {notes.map((note, i) => (
+                                    <Note
+                                        key={note.id}
+                                        note={note}
+                                        index={i}
+                                        onClick={() => setSelectedNote(note)}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 {(showAddModal || selectedNote) && (
                     <NoteModal

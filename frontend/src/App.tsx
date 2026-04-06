@@ -22,7 +22,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
             <div className="page-container">
                 <Navbar />
                 <main className="main-layout">
-                    <Loader />
+                    <Loader centered />
                 </main>
             </div>
         );
@@ -39,7 +39,7 @@ function LandingRoute({ children }: { children: React.ReactNode }) {
     const { isAuthenticated, isLoading } = useAuth();
     
     if (isLoading) {
-        return <Loader />;
+        return <Loader centered />;
     }
     
     if (isAuthenticated) {

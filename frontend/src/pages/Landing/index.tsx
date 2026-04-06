@@ -1,40 +1,76 @@
 import React from 'react';
-import { Book, History, Shield, Sparkles } from 'lucide-react';
+import { Book, History, StickyNote, Sparkles, Users, MapPin } from 'lucide-react';
 import styles from './index.module.css';
 import { type LandingPageProps } from '../../types';
+import Avatar from '../../components/common/Avatar';
 
 const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onRegister }) => {
     return (
         <div className={styles.landingContainer}>
             <header className={styles.hero}>
-                <div className={styles.heroContent}>
-                    <h1 className={styles.title}>
-                        <Sparkles className={styles.sparkle} />
-                        Remoire
-                    </h1>
-                    <p className={styles.subtitle}>Your life's journey, beautifully archived.</p>
-                    <div className={styles.ctaButtons}>
-                        <button onClick={onRegister} className={styles.primaryBtn}>Get Started</button>
-                        <button onClick={onLogin} className={styles.secondaryBtn}>Sign In</button>
-                    </div>
+                <h1 className={styles.title}>
+                    <Sparkles className={styles.sparkle} />
+                    Remoire
+                </h1>
+                <p className={styles.subtitle}>Your life's journey, beautifully archived.</p>
+                <div className={styles.ctaButtons}>
+                    <button onClick={onRegister} className={styles.primaryBtn}>Get Started</button>
+                    <button onClick={onLogin} className={styles.secondaryBtn}>Sign In</button>
                 </div>
             </header>
 
-            <section className={styles.features}>
-                <div className={styles.featureCard}>
-                    <Book className={styles.featureIcon} />
-                    <h3>Daily Narratives</h3>
-                    <p>Capture every thought and memory with our sleek Tiptap-powered editor. Drag and drop images, style your prose, and relive your days.</p>
+            <section className={styles.showcase}>
+                <div className={styles.showcaseCard}>
+                    <Book className={styles.cardIcon} />
+                    <h3 className={styles.cardTitle}>Daily Narratives</h3>
+                    <p className={styles.cardContent}>Capture every thought and memory with our sleek editor.</p>
+                    <div className={styles.mockNote}>
+                        <div className={styles.mockNotePin} />
+                        <div className={styles.mockTitle}>Morning Walk 🌲</div>
+                        <div className={styles.mockBody}>The air was crisp and the sun peeked through the trees...</div>
+                    </div>
                 </div>
-                <div className={styles.featureCard}>
-                    <History className={styles.featureIcon} />
-                    <h3>Visual Timelines</h3>
-                    <p>See your history unfold on a zoomable, interactive canvas. Organize your entries into custom timelines for different chapters of your life.</p>
+
+                <div className={styles.showcaseCard}>
+                    <History className={styles.cardIcon} />
+                    <h3 className={styles.cardTitle}>Visual Timelines</h3>
+                    <p className={styles.cardContent}>See your life story unfold on an interactive canvas. Track milestones and moments in a beautiful, flowing history.</p>
+                    <div className={styles.mockTimeline}>
+                        <div className={styles.timelineLine} />
+                        <div className={styles.timelineNodes}>
+                            <div className={styles.node} style={{ background: '#89dceb' }} />
+                            <div className={styles.node} style={{ background: '#fab387' }} />
+                            <div className={styles.node} style={{ background: '#cba6f7' }} />
+                            <div className={styles.node} style={{ background: '#f8a5c2' }} />
+                        </div>
+                    </div>
                 </div>
-                <div className={styles.featureCard}>
-                    <Shield className={styles.featureIcon} />
-                    <h3>Private & Secure</h3>
-                    <p>Your memories are yours alone. With per-user data isolation and secure authentication, your private reflections stay private.</p>
+
+                <div className={styles.showcaseCard}>
+                    <StickyNote className={styles.cardIcon} />
+                    <h3 className={styles.cardTitle}>Take Notes</h3>
+                    <p className={styles.cardContent}>Quick thoughts or detailed entries. Your personal space.</p>
+                    <div className={styles.mockStickyNote}>
+                        <div className={styles.stickyFold} />
+                        <div className={styles.stickyContent}>Don't forget to buy coffee! ☕️</div>
+                    </div>
+                </div>
+
+                <div className={styles.showcaseCard}>
+                    <Users className={styles.cardIcon} />
+                    <h3 className={styles.cardTitle}>Mindful Sharing</h3>
+                    <p className={styles.cardContent}>Share moments and locations with those who matter.</p>
+                    <div className={styles.mockCommunity}>
+                        <div className={styles.mockAvatars}>
+                            <Avatar user={{ id: 1, name: 'L B' } as any} size={36} className={styles.mockAvatarItem} />
+                            <Avatar user={{ id: 2, name: 'J D' } as any} size={36} className={styles.mockAvatarItem} />
+                            <Avatar user={{ id: 3, name: 'K L' } as any} size={36} className={styles.mockAvatarItem} />
+                        </div>
+                        <div className={styles.mockLocation}>
+                            <MapPin size={14} />
+                            <span>Central Park</span>
+                        </div>
+                    </div>
                 </div>
             </section>
 

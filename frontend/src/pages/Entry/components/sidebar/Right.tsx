@@ -7,6 +7,7 @@ import styles from './Right.module.css';
 import { getFriends } from '../../../../api';
 import { type User, type LeftProps } from '../../../../types';
 import AddParticipant from '../modal/AddParticipant';
+import Avatar from '../../../../components/common/Avatar';
 
 const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const { activeEntry, updateEntryDate, updateEntryParticipants } = useEntryContext();
@@ -128,13 +129,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                                 activeEntry.participants.map(user => (
                                     <div key={user.id} className={styles.participantRow}>
                                         <div className={styles.userItem}>
-                                            <div className={styles.avatar}>
-                                                {user.avatar_url ? (
-                                                    <img src={user.avatar_url} alt={user.name} />
-                                                ) : (
-                                                    user.name.charAt(0)
-                                                )}
-                                            </div>
+                                            <Avatar user={user} size={32} className={styles.avatar} />
                                             <span className={styles.userName}>{user.name}</span>
                                         </div>
                                         <button 

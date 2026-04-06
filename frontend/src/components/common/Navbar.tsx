@@ -3,6 +3,7 @@ import { BookMarked, Users, Map, StickyNote, NotebookText, TrendingUp, LogOut, U
 import { NavLink, useNavigate } from 'react-router-dom';
 import styles from './Navbar.module.css';
 import { useAuth } from '../../contexts/AuthContext';
+import Avatar from './Avatar';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
@@ -56,13 +57,7 @@ const Navbar = () => {
                             className={styles.userProfileTrigger}
                             onClick={() => setProfileMenuOpen(!profileMenuOpen)}
                         >
-                            <div className={styles.avatar}>
-                                {user.avatar_url ? (
-                                    <img src={user.avatar_url} alt={user.name} />
-                                ) : (
-                                    user.name.charAt(0)
-                                )}
-                            </div>
+                            <Avatar user={user} size={32} />
                             <span className={styles.userName}>{user.name}</span>
                         </div>
 
@@ -123,7 +118,7 @@ const Navbar = () => {
                     {user && (
                         <>
                             <div className={styles.mobileUserBadge}>
-                                <User size={18} />
+                                <Avatar user={user} size={28} />
                                 <span>{user.name}</span>
                             </div>
                             <button

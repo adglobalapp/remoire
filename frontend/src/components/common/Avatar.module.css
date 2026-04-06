@@ -1,0 +1,39 @@
+.avatarCircle {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    background-color: var(--color-light-beige);
+    flex-shrink: 0;
+}
+
+.avatarImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.initials {
+    font-family: var(--font-ui), sans-serif;
+    font-weight: 500;
+    color: var(--color-dark-brown);
+    user-select: none;
+    line-height: 1;
+    display: block;
+    text-align: center;
+}
+
+.avatarWrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.userName {
+    font-family: var(--font-ui), sans-serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--color-dark-brown);
+}

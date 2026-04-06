@@ -2,11 +2,12 @@ import Navbar from '../../components/common/Navbar';
 import LeftSidebar from './components/sidebar/Left';
 import RightSidebar from './components/sidebar/Right';
 import Canvas from './components/editor/Canvas';
+import Loader from '../../components/common/Loader';
 import { useEntryContext } from '../../contexts/EntryContext';
 import { useResponsiveSidebar } from '../../hooks/useResponsiveSidebar';
 
 const EntryPage = () => {
-    const { activeEntry } = useEntryContext();
+    const { activeEntry, isLoading } = useEntryContext();
     const {
         leftOpen,
         rightOpen,
@@ -19,23 +20,29 @@ const EntryPage = () => {
             <Navbar />
 
             <main className="main-layout">
-                <div className="sidebar-left">
-                    <LeftSidebar
-                        isOpen={leftOpen}
-                        onToggle={toggleLeft}
-                    />
-                </div>
+                {isLoading ? (
+                    <Loader centered />
+                ) : (
+                    <>
+                        <div className="sidebar-left">
+                            <LeftSidebar
+                                isOpen={leftOpen}
+                                onToggle={toggleLeft}
+                            />
+                        </div>
 
-                <section className="content-area-full">
-                    <Canvas key={activeEntry?.id ?? 'none'} />
-                </section>
+                        <section className="content-area-full">
+                            <Canvas key={activeEntry?.id ?? 'none'} />
+                        </section>
 
-                <div className="sidebar-right">
-                    <RightSidebar
-                        isOpen={rightOpen}
-                        onToggle={toggleRight}
-                    />
-                </div>
+                        <div className="sidebar-right">
+                            <RightSidebar
+                                isOpen={rightOpen}
+                                onToggle={toggleRight}
+                            />
+                        </div>
+                    </>
+                )}
             </main>
         </div>
     );

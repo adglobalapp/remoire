@@ -12,6 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'last_seen' => \App\Http\Middleware\UpdateLastSeen::class,
+        ]);
+
         $middleware->validateCsrfTokens(except: [
             '*'
         ]);

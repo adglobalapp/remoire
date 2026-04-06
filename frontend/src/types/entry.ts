@@ -4,6 +4,7 @@ import { type Entry } from './models';
 export interface EntryContextValue {
     entries: Entry[];
     activeEntry: Entry | null;
+    isLoading: boolean;
     selectEntry: (entry: Entry) => void;
     createEntry: () => Promise<void>;
     deleteEntry: (id: number) => Promise<void>;

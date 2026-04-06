@@ -67,3 +67,10 @@ export interface AddParticipantProps {
     onSelectFriend: (userId: number) => void;
     friends: User[];
 }
+
+export interface AvatarProps {
+    user: User | { name: string; avatar_url?: string | null; id?: number };
+    size?: number;
+    className?: string;
+    showName?: boolean;
+}

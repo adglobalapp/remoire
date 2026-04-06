@@ -3,6 +3,7 @@ import { Trash2, Check, Clock, X } from 'lucide-react';
 import styles from '../../index.module.css';
 import { formatDate } from '../../../../utils/dateUtils';
 import { type RowProps } from '../../../../types';
+import Avatar from '../../../../components/common/Avatar';
 
 const Row: React.FC<RowProps> = ({ user, type, onAccept, onDelete, onViewProfile, index = 0 }) => {
     const lastSeenText = user.last_seen_at
@@ -12,11 +13,7 @@ const Row: React.FC<RowProps> = ({ user, type, onAccept, onDelete, onViewProfile
     return (
         <div className={styles.friendRow} style={{ '--delay': index } as React.CSSProperties}>
             <div className={styles.friendMain}>
-                <img
-                    src={user.avatar_url || ''}
-                    alt={user.name}
-                    className={styles.avatar}
-                />
+                <Avatar user={user} size={42} className={styles.avatar} />
                 <div className={styles.info}>
                     <span className={styles.name} onClick={() => onViewProfile(user)}>
                         {user.name}
