@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Trash2, Plus, Search, PanelLeft, X } from 'lucide-react';
+import { Trash2, Plus, Search, PanelLeft, X, Loader2 } from 'lucide-react';
 import Confirmation from '../../../../components/common/modal/Confirmation';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { formatDateTime } from '../../../../utils/dateUtils';
@@ -12,14 +12,14 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const [activeFilter, setActiveFilter] = useState<string>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [itemToDelete, setItemToDelete] = useState<number | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
     const { pathname } = useLocation();
     const lastPage = useRef(pathname);
     const lastId = useRef(activeEntry?.id);
-
     const mobileOpen = propOpen || false;
     const toggle = onToggle || (() => { });
 
-    // Auto-close on page or entry change (only on mobile/tablet)
     useEffect(() => {
         const isLargeScreen = window.innerWidth > 1400;
         if (isLargeScreen) return;
@@ -65,10 +65,27 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         setItemToDelete(id);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (itemToDelete !== null) {
-            deleteEntry(itemToDelete);
-            setItemToDelete(null);
+            setIsDeleting(true);
+            try {
+                await deleteEntry(itemToDelete);
+            } finally {
+                setIsDeleting(false);
+                setItemToDelete(null);
+            }
+        }
+    };
+
+    const handleCreate = async () => {
+        setIsCreating(true);
+        try {
+            await createEntry();
+            if (window.innerWidth <= 1400 && onToggle && propOpen) {
+                onToggle();
+            }
+        } finally {
+            setIsCreating(false);
         }
     };
 
@@ -120,9 +137,10 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                 <div className="sidebar-footer">
                     <button
                         className="btn btn-primary w-full sidebar-btn-add"
-                        onClick={createEntry}
+                        onClick={handleCreate}
+                        disabled={isCreating}
                     >
-                        <Plus size={16} /> Add Entry
+                        {isCreating ? <><Loader2 size={16} className="animate-spin" /> Adding...</> : <><Plus size={16} /> Add Entry</>}
                     </button>
                     <div className="sidebar-search-box">
                         <input
@@ -156,6 +174,8 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                             </span>
                         }
                         confirmText="Delete"
+                        isLoading={isDeleting}
+                        loadingText="Deleting..."
                         onConfirm={confirmDelete}
                         onCancel={() => setItemToDelete(null)}
                     />

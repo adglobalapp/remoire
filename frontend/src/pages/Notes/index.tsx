@@ -16,6 +16,7 @@ const NotesPage = () => {
     const [selectedNote, setSelectedNote] = useState<NoteType | null>(null);
     const [showAddModal, setShowAddModal] = useState(false);
     const [noteToDelete, setNoteToDelete] = useState<number | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const sortNotes = (data: NoteType[]) => {
         return [...data].sort((a, b) => {
@@ -65,15 +66,19 @@ const NotesPage = () => {
 
     const handleDeleteNote = async () => {
         if (!noteToDelete) return;
+        setIsDeleting(true);
         try {
             const success = await deleteNote(noteToDelete);
             if (success) {
                 setNotes(prev => prev.filter(n => n.id !== noteToDelete));
                 toast.success('Note deleted');
                 setNoteToDelete(null);
+                setSelectedNote(null);
             }
-        } catch (error) {
+        } catch {
             toast.error('Failed to delete note');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -81,10 +86,10 @@ const NotesPage = () => {
         <div className="page-container">
             <Navbar />
             <main className={styles.mainContent}>
-                {isLoading ? (
+                {isLoading && notes.length === 0 ? (
                     <Loader centered />
                 ) : (
-                    <div className={styles.container}>
+                    <div className={styles.container} data-reloading={isLoading ? '' : undefined}>
                         <header className={styles.header}>
                             <h1>Notes</h1>
                             <div className={styles.actionButtons}>
@@ -122,7 +127,6 @@ const NotesPage = () => {
                         }}
                         onSave={handleSaveNote}
                         onDelete={(id) => {
-                            setSelectedNote(null);
                             setNoteToDelete(id);
                         }}
                     />
@@ -136,6 +140,8 @@ const NotesPage = () => {
                             <span>Are you sure you want to delete <strong>{notes.find(n => n.id === noteToDelete)?.title || 'Untitled'}</strong>? This action cannot be undone.</span>
                         }
                         confirmText="Delete"
+                        isLoading={isDeleting}
+                        loadingText="Deleting..."
                         onConfirm={handleDeleteNote}
                         onCancel={() => setNoteToDelete(null)}
                     />

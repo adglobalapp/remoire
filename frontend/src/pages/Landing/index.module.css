@@ -38,6 +38,7 @@
     z-index: 2;
     text-align: center;
     margin-bottom: 60px;
+    margin-top: -60px;
     animation: fadeInDown 1s ease-out;
 }
 
@@ -78,7 +79,7 @@
 }
 
 .subtitle {
-    font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+    font-size: clamp(1.1rem, 2.5vw, 1.3rem);
     font-family: var(--font-body);
     font-weight: 300;
     opacity: 0.75;
@@ -94,7 +95,7 @@
 
 .primaryBtn {
     padding: 12px 36px;
-    font-size: 1.3rem;
+    font-size: 1.6rem;
     font-weight: 500;
     background: var(--color-burgundy);
     color: var(--color-light-beige);
@@ -111,7 +112,7 @@
 
 .secondaryBtn {
     padding: 12px 36px;
-    font-size: 1.3rem;
+    font-size: 1.6rem;
     font-weight: 500;
     background: transparent;
     backdrop-filter: blur(8px);
@@ -153,6 +154,26 @@
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
     cursor: pointer;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.mockNode1 {
+    background: #89dceb;
+}
+
+.mockNode2 {
+    background: #fab387;
+}
+
+.mockNode3 {
+    background: #cba6f7;
+}
+
+.mockNode4 {
+    background: #f8a5c2;
 }
 
 .showcaseCard:hover {

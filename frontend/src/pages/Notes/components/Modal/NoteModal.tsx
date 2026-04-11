@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trash2, Bold, Italic, Underline, Heading1, Heading2, ListChecks, Type, Pin, X } from 'lucide-react';
+import { Trash2, Bold, Italic, Underline, Heading1, Heading2, ListChecks, Type, Pin, X, Loader2 } from 'lucide-react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TaskList from '@tiptap/extension-task-list';
@@ -12,6 +12,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
     const [title, setTitle] = useState(note?.title || '');
     const [color, setColor] = useState(note?.color || '#fdf9f3');
     const [isPinned, setIsPinned] = useState(note?.is_pinned || false);
+    const [isSaving, setIsSaving] = useState(false);
 
     const [, setSelectionCount] = useState(0);
 
@@ -60,16 +61,11 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
         editor.commands.setContent(content);
     }, [note, editor]);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!editor) return;
-
-        onSave({
-            title,
-            type: 'text',
-            content: editor.getHTML(),
-            color,
-            is_pinned: isPinned
-        });
+        setIsSaving(true);
+        await onSave({ title, type: 'text', content: editor.getHTML(), color, is_pinned: isPinned });
+        setIsSaving(false);
     };
 
     if (!editor) return null;
@@ -189,8 +185,8 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
                                 <Trash2 size={18} /> Delete
                             </button>
                         )}
-                        <button className="btn btn-dark" onClick={handleSave}>
-                            Save Changes
+                        <button className="btn btn-dark" onClick={handleSave} disabled={isSaving}>
+                            {isSaving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : 'Save Changes'}
                         </button>
                     </div>
                 </div>

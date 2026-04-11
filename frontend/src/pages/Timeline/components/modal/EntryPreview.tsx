@@ -4,12 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useLayoutEffect } from 'react';
 import styles from './EntryPreview.module.css';
 import editorStyles from '../../../Entry/components/editor/Canvas.module.css';
-import UserProfile from '../../../Friendlist/components/modal/UserProfile';
-import type { PageSettings, EntryPreviewProps, User } from '../../../../types';
-
+import type { PageSettings, EntryPreviewProps } from '../../../../types';
 import { X, Edit3, MapPin } from 'lucide-react';
 import Avatar from '../../../../components/common/Avatar';
-
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
@@ -23,7 +20,6 @@ import { DEFAULT_PAGE_SETTINGS } from '../../../../types';
 const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
     const { selectEntry } = useEntryContext();
     const navigate = useNavigate();
-    const [selectedParticipant, setSelectedParticipant] = useState<User | null>(null);
 
     const handleEdit = () => {
         selectEntry(entry);
@@ -78,7 +74,7 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
         const updateScale = () => {
             if (!containerRef.current) return;
             const containerWidth = containerRef.current.offsetWidth;
-            // Reference width 210mm is approx 794px. We'll use 800 similar to the editor.
+
             const newScale = Math.min(1, containerWidth / 800);
             setScale(newScale);
         };
@@ -108,8 +104,7 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
                         className={styles.previewCanvas}
                         style={{
                             transform: `scale(${scale})`,
-                            height: `${297 * scale}mm`, // Approximate A4 aspect height to prevent overflow issues
-                            minHeight: '100%'
+                            height: `${297 * scale}mm`,
                         }}
                     >
                         <div
@@ -137,13 +132,12 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
                         )}
 
                         {entry.participants && entry.participants.length > 0 && (
-                            <div className={styles.participantStack} title={entry.participants.map(p => p.name).join(', ')}>
+                            <div className={styles.participantStack}>
                                 {entry.participants.slice(0, 3).map((p, idx) => (
-                                    <div 
-                                        key={p.id} 
+                                    <div
+                                        key={p.id}
                                         className={styles.avatarMiniWrapper}
                                         style={{ zIndex: 10 - idx }}
-                                        onClick={() => setSelectedParticipant(p)}
                                     >
                                         <Avatar user={p} size={34} />
                                     </div>
@@ -176,13 +170,6 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
                 </div>
             </div>
 
-            {selectedParticipant && (
-                <UserProfile
-                    user={selectedParticipant}
-                    onClose={() => setSelectedParticipant(null)}
-                    onBlock={() => { }}
-                />
-            )}
         </div>,
         document.body
     );

@@ -13,12 +13,11 @@ const Navbar = () => {
 
     return (
         <nav className={styles.navbar}>
-            <div className={styles.logoSection} onClick={() => navigate('/entries')} style={{ cursor: 'pointer' }}>
+            <div className={styles.logoSection} onClick={() => navigate('/entries')}>
                 <BookMarked size={22} />
                 <span className={`font-logo ${styles.logoText}`}>Remoire</span>
             </div>
 
-            {/* Desktop menu */}
             <div className={styles.menuItems}>
                 <NavLink
                     to="/entries"
@@ -86,7 +85,6 @@ const Navbar = () => {
                     </div>
                 )}
 
-                {/* Hamburger button – only on mobile */}
                 <button
                     className={styles.hamburger}
                     onClick={() => setMenuOpen(o => !o)}
@@ -96,7 +94,6 @@ const Navbar = () => {
                 </button>
             </div>
 
-            {/* Mobile dropdown – absolute overlay so it doesn't shift content */}
             {menuOpen && (
                 <div className={styles.mobileMenu}>
                     <NavLink to="/entries" className={({ isActive }) => `${styles.mobileLink} ${isActive ? styles.active : ''}`} onClick={() => setMenuOpen(false)}>
@@ -115,9 +112,9 @@ const Navbar = () => {
                         <StickyNote size={18} /> Notes
                     </NavLink>
 
-                    <NavLink 
-                        to="/maps" 
-                        className={({ isActive }) => `${styles.mobileLink} ${isActive ? styles.active : ''}`} 
+                    <NavLink
+                        to="/maps"
+                        className={({ isActive }) => `${styles.mobileLink} ${isActive ? styles.active : ''}`}
                         onClick={() => setMenuOpen(false)}
                     >
                         <Map size={18} /> Map

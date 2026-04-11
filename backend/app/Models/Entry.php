@@ -26,32 +26,23 @@ class Entry extends Model
 
     public static function extractTitle($content)
     {
-        if (!$content || !is_string($content))
-            return null;
         $data = json_decode($content, true);
-        if (!$data || !isset($data['contentJSON']))
-            return null;
+        $json = $data['contentJSON'] ?? null;
+        if (!$json) return null;
 
-        $json = $data['contentJSON'];
         $title = static::findFirstText($json);
+        if (!$title) return null;
 
-        if (!$title)
-            return null;
         return mb_strlen($title) > 50 ? mb_substr($title, 0, 50) . '...' : $title;
     }
 
     private static function findFirstText($node)
     {
-        if (isset($node['text'])) {
-            $text = trim($node['text']);
-            return $text ?: null;
+        if (isset($node['text']) && $text = trim($node['text'])) {
+            return $text;
         }
-        if (isset($node['content']) && is_array($node['content'])) {
-            foreach ($node['content'] as $child) {
-                $found = static::findFirstText($child);
-                if ($found)
-                    return $found;
-            }
+        foreach ($node['content'] ?? [] as $child) {
+            if ($found = static::findFirstText($child)) return $found;
         }
         return null;
     }

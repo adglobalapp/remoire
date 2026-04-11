@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Search, UserPlus, Check, Clock, AlertCircle } from 'lucide-react';
+import { X, Search, UserPlus, Check, Clock, AlertCircle, Loader2 } from 'lucide-react';
 import classNames from 'classnames';
 import styles from './AddFriend.module.css';
 import { type User as UserType } from '../../../../types';
@@ -7,12 +7,15 @@ import { searchUsers, sendFriendRequest } from '../../../../api';
 import toast from 'react-hot-toast';
 import { type AddFriendProps } from '../../../../types';
 import Avatar from '../../../../components/common/Avatar';
+import { useUserProfile } from '../../../../contexts/UserProfileContext';
 
 const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<UserType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isAdding, setIsAdding] = useState<number | null>(null);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+    const { showProfile, isBlocked } = useUserProfile();
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -45,13 +48,16 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
     };
 
     const handleSendRequest = async (userId: number) => {
+        setIsAdding(userId);
         const success = await sendFriendRequest(userId);
+        setIsAdding(null);
         if (success) {
             toast.success('Friend request sent!');
             setResults(prev => prev.map(u =>
                 u.id === userId ? { ...u, friend_status: 'pending', is_requester: true } : u
             ));
             onRefresh();
+            onClose();
         } else {
             toast.error('Failed to send request');
         }
@@ -61,7 +67,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
         const errors = fieldErrors[fieldName];
         if (errors && errors.length > 0) {
             return (
-                <div className="field-errors-container" style={{ padding: '0 12px' }}>
+                <div className={`field-errors-container ${styles.fieldErrorsFixed}`}>
                     {errors.map((msg, idx) => (
                         <span key={idx} className="field-error-text">
                             <AlertCircle size={16} /> {msg}
@@ -102,8 +108,8 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
                         <div className="empty-state-placeholder">Searching...</div>
                     ) : results.length > 0 ? (
                         results.map(user => (
-                            <div key={user.id} className={styles.resultItem}>
-                                <div className={styles.userInfo}>
+                            <div key={user.id} className={classNames(styles.resultItem, { 'user-blocked': isBlocked(user.id) })}>
+                                <div className={styles.userInfoClickable} onClick={() => showProfile(user)}>
                                     <Avatar 
                                         user={user} 
                                         size={40}
@@ -124,8 +130,12 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
                                         <button
                                             className="btn btn-dark btn-sm"
                                             onClick={() => handleSendRequest(user.id)}
+                                            disabled={isAdding === user.id}
                                         >
-                                            <UserPlus size={18} /> Add
+                                            {isAdding === user.id
+                                                ? <><Loader2 size={16} className="animate-spin" /> Sending...</>
+                                                : <><UserPlus size={18} /> Add</>
+                                            }
                                         </button>
                                     )}
                                 </div>

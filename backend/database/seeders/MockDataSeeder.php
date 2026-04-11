@@ -22,14 +22,14 @@ class MockDataSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => Hash::make('password'),
-            'bio' => 'Digitizing my life memories one entry at a time. Lover of travel, coffee, and archival photography.',
+            'bio' => 'Journaling my experiences and memories. Interested in travel and photography.',
             'avatar_url' => 'https://i.pravatar.cc/300?u=test@example.com',
         ]);
 
         // 2. Create 20 Mock Users (potential friends)
         $users = User::factory(20)->create();
 
-        // 3. Establish Friendships for Main User
+        // Friendships for Main User
         // Accepted Friends (10)
         $acceptedFriends = $users->random(10);
         foreach ($acceptedFriends as $friend) {
@@ -75,7 +75,7 @@ class MockDataSeeder extends Seeder
 
         $cookingTimeline = Timeline::create([
             'user_id' => $mainUser->id,
-            'name' => 'My Cooking Journey',
+            'name' => 'Cooking',
             'is_default' => false
         ]);
 
@@ -92,7 +92,7 @@ class MockDataSeeder extends Seeder
             'user_id' => $mainUser->id
         ]);
 
-        // Evocative titles and content for some entries
+        // Titles for some entries
         $specialEntries = [
             ['title' => 'Sunset in Santorini', 'color' => '#f8a5c2'],
             ['title' => 'First Homemade Lasagna', 'color' => '#fab387'],

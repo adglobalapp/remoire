@@ -9,7 +9,7 @@ export interface NoteProps {
 export interface NoteModalProps {
     note?: Note | null;
     onClose: () => void;
-    onSave: (data: Partial<Note>) => void;
+    onSave: (data: Partial<Note>) => Promise<void>;
     onDelete?: (id: number) => void;
 }
 

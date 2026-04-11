@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
-import { X, Search, MapPin, Check, AlertCircle } from 'lucide-react';
+import { X, Search, MapPin, Check, AlertCircle, Loader2 } from 'lucide-react';
+import type { LocationPickerProps } from '../../../../types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import styles from './LocationPicker.module.css';
@@ -16,18 +17,6 @@ const createCustomIcon = () => {
 };
 
 const customIcon = createCustomIcon();
-
-interface LocationData {
-    name: string;
-    lat: number;
-    lng: number;
-}
-
-interface LocationPickerProps {
-    onClose: () => void;
-    onSelect: (location: LocationData) => void;
-    initialLocation?: { lat: number; lng: number; name?: string };
-}
 
 function MapEvents({ onClick }: { onClick: (latlng: L.LatLng) => void }) {
     useMapEvents({
@@ -55,6 +44,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
     );
     const [locationName, setLocationName] = useState(initialLocation?.name || '');
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -103,22 +93,28 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
         }
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         if (!locationName) return;
-        onSelect({
-            name: locationName,
-            lat: markerPos[0],
-            lng: markerPos[1]
-        });
+        setIsSaving(true);
+        try {
+            await onSelect({
+                name: locationName,
+                lat: markerPos[0],
+                lng: markerPos[1]
+            });
+            onClose();
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const renderFieldError = (fieldName: string) => {
         const errors = fieldErrors[fieldName];
         if (errors && errors.length > 0) {
             return (
-                <div className="field-errors-container" style={{ padding: '0 4px' }}>
+                <div className={`field-errors-container ${styles.fieldErrorsContainer}`}>
                     {errors.map((msg, idx) => (
-                        <span key={idx} className="field-error-text" style={{ fontSize: '0.9rem' }}>
+                        <span key={idx} className={`field-error-text ${styles.fieldErrorText}`}>
                             <AlertCircle size={16} /> {msg}
                         </span>
                     ))}
@@ -176,7 +172,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
                         <MapContainer
                             center={markerPos}
                             zoom={13}
-                            style={{ height: '100%', width: '100%' }}
+                            className={styles.mapWrapper}
                         >
                             <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -191,7 +187,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
                     <div className={styles.footer}>
                         <div className={styles.currentLocation}>
                             <MapPin size={16} className={styles.pinIcon} />
-                            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <div className={styles.currentLocationFlex}>
                                 <span className={styles.locationLabel}>
                                     {locationName || 'Click on map to pick a location'}
                                 </span>
@@ -200,9 +196,9 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
                         <button
                             className={`btn btn-dark ${styles.confirmBtn}`}
                             onClick={handleConfirm}
-                            disabled={!locationName}
+                            disabled={!locationName || isSaving}
                         >
-                            <Check size={18} /> Confirm Location
+                            {isSaving ? <><Loader2 size={18} className="animate-spin" /> Saving...</> : <><Check size={18} /> Save Location</>}
                         </button>
                     </div>
                 </div>

@@ -6,17 +6,14 @@ use App\Models\Friend;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class FriendController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
-
-        // Get all accepted friends
-        $friends = $user->friends()->get();
-
-        return response()->json($friends);
+        return response()->json($user->friends()->get());
     }
 
     public function requests()
@@ -41,7 +38,6 @@ class FriendController extends Controller
             return response()->json([]);
         }
 
-        // Get IDs of users who have blocked or are blocked by the current user
         $blockedUserIds = Friend::where(function ($q) use ($currentUser) {
             $q->where('user_id', $currentUser->id)->orWhere('friend_id', $currentUser->id);
         })->where('status', 'blocked')->get()->map(function ($f) use ($currentUser) {
@@ -56,7 +52,6 @@ class FriendController extends Controller
             ->whereNotIn('id', $blockedUserIds)
             ->get();
 
-        // Map friend status
         $users->map(function ($user) use ($currentUser) {
             $friendship = Friend::where(function ($q) use ($currentUser, $user) {
                 $q->where('user_id', $currentUser->id)->where('friend_id', $user->id);
@@ -65,7 +60,6 @@ class FriendController extends Controller
             })->first();
 
             $user->friend_status = $friendship ? $friendship->status : 'none';
-            // Also indicate who sent the request if pending
             if ($user->friend_status === 'pending') {
                 $user->is_requester = $friendship->user_id === $currentUser->id;
             }
@@ -88,7 +82,6 @@ class FriendController extends Controller
             return response()->json(['message' => 'You cannot friend yourself.'], 400);
         }
 
-        // Check if friendship already exists
         $existing = Friend::where(function ($q) use ($user, $friendId) {
             $q->where('user_id', $user->id)->where('friend_id', $friendId);
         })->orWhere(function ($q) use ($user, $friendId) {
@@ -96,7 +89,7 @@ class FriendController extends Controller
         })->first();
 
         if ($existing) {
-            return response()->json(['message' => 'Friendship already exists or is pending.'], 400);
+            return response()->json(['message' => 'Already friends or request pending.'], 400);
         }
 
         Friend::create([
@@ -153,8 +146,7 @@ class FriendController extends Controller
                 'friend_id' => $user->id,
                 'status' => 'blocked'
             ]);
-        }
-        else {
+        } else {
             Friend::create([
                 'user_id' => $currentUser->id,
                 'friend_id' => $user->id,

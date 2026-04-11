@@ -104,3 +104,14 @@
 .statusBadgePending {
     opacity: 0.6;
 }
+
+.fieldErrorsFixed {
+    padding: 0 12px;
+}
+
+.userInfoClickable {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}

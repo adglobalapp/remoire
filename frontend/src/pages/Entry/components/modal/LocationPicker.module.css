@@ -220,3 +220,21 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+.fieldErrorsContainer {
+    padding: 0 4px;
+}
+
+.fieldErrorText {
+    font-size: 0.9rem;
+}
+
+.mapWrapper {
+    height: 100%;
+    width: 100%;
+}
+
+.currentLocationFlex {
+    display: flex;
+    flex-direction: column;
+}

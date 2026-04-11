@@ -4,18 +4,26 @@ import styles from '../../index.module.css';
 import { formatDate } from '../../../../utils/dateUtils';
 import { type RowProps } from '../../../../types';
 import Avatar from '../../../../components/common/Avatar';
+import { useUserProfile } from '../../../../contexts/UserProfileContext';
+import classNames from 'classnames';
 
 const Row: React.FC<RowProps> = ({ user, type, onAccept, onDelete, onViewProfile, index = 0 }) => {
+    const { isBlocked } = useUserProfile();
     const lastSeenText = user.last_seen_at
         ? `Last seen: ${formatDate(user.last_seen_at)}`
         : `Joined: ${formatDate(user.created_at)}`;
 
+    const isUserBlocked = isBlocked(user.id);
+
     return (
-        <div className={styles.friendRow} style={{ '--delay': index } as React.CSSProperties}>
-            <div className={styles.friendMain}>
+        <div 
+            className={classNames(styles.friendRow, { 'user-blocked': isUserBlocked })} 
+            style={{ '--delay': index } as React.CSSProperties}
+        >
+            <div className={styles.friendMain} onClick={() => onViewProfile(user)}>
                 <Avatar user={user} size={42} className={styles.avatar} />
                 <div className={styles.info}>
-                    <span className={styles.name} onClick={() => onViewProfile(user)}>
+                    <span className={styles.name}>
                         {user.name}
                     </span>
                     <span className={styles.subText}>{type === 'friend' ? lastSeenText : user.email}</span>

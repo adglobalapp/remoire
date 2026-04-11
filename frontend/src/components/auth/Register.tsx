@@ -114,9 +114,9 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
                         {renderFieldError('password_confirmation')}
                     </div>
 
-                    <button type="submit" className={styles.submitBtn} disabled={isLoading} style={{ marginTop: '16px' }}>
+                    <button type="submit" className={styles.submitBtn} disabled={isLoading}>
                         {isLoading ? (
-                            <Loader2 className="loading-icon animate-spin" size={24} />
+                            <Loader2 className="animate-spin" size={24} />
                         ) : (
                             <>
                                 <UserPlus size={20} />

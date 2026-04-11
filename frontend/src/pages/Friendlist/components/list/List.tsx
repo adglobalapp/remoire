@@ -1,20 +1,7 @@
-import type { User as UserType } from '../../../../types';
+import type { FriendListProps } from '../../../../types';
 import Row from './Row';
 import classNames from 'classnames';
 import styles from '../../index.module.css';
-
-interface FriendListProps {
-    title: string;
-    users: UserType[];
-    type: 'pending' | 'sent' | 'friend';
-    onAccept?: (id: number) => void;
-    onDelete: (user: UserType) => void;
-    onViewProfile: (user: UserType) => void;
-    titleClassName?: string;
-    showEmptyState?: boolean;
-    emptyMessage?: string;
-    delay?: number;
-}
 
 const FriendList = ({
     title,

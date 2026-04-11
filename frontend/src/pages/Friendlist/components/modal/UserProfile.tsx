@@ -1,11 +1,46 @@
-import React from 'react';
-import { X, Calendar, Mail, User as UserIcon, Clock, UserX } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Calendar, Mail, User as UserIcon, Clock, UserX, UserMinus } from 'lucide-react';
 import styles from './UserProfile.module.css';
 import { formatDate, formatRelativeDate } from '../../../../utils/dateUtils';
 import { type UserProfileProps } from '../../../../types';
 import Avatar from '../../../../components/common/Avatar';
+import { useAuth } from '../../../../contexts/AuthContext';
+import Confirmation from '../../../../components/common/modal/Confirmation';
+import { useUserProfile } from '../../../../contexts/UserProfileContext';
 
-const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onBlock }) => {
+const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
+    const { user: authUser } = useAuth();
+    const { blockUser, unblockUser } = useUserProfile();
+    const [showBlockConfirm, setShowBlockConfirm] = useState(false);
+    const [isUnblocking, setIsUnblocking] = useState(false);
+    const [isBlocking, setIsBlocking] = useState(false);
+
+    const isSelf = authUser?.id === user.id;
+    const friendStatus = user.friend_status || 'none';
+
+    const handleBlockClick = () => {
+        setShowBlockConfirm(true);
+    };
+
+    const executeBlock = async () => {
+        setIsBlocking(true);
+        const success = await blockUser(user.id);
+        setIsBlocking(false);
+        if (success) {
+            onClose();
+        }
+        setShowBlockConfirm(false);
+    };
+
+    const handleUnblockClick = async () => {
+        setIsUnblocking(true);
+        const success = await unblockUser(user.id);
+        if (success) {
+            onClose();
+        }
+        setIsUnblocking(false);
+    };
+
     return (
         <div className="global-modal-overlay" onClick={onClose}>
             <div className="global-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -72,17 +107,35 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onClose, onBlock }) => 
                     </div>
                 </div>
 
-                <div className={styles.modalFooter}>
-                    <button className="btn btn-danger" onClick={() => onBlock(user.id)}>
-                        <UserX size={18} /> Block User
-                    </button>
-                    {user.friend_status === 'none' && (
-                        <button className="btn btn-primary">
-                            Send Friend Request
-                        </button>
-                    )}
-                </div>
+                {!isSelf && (
+                    <div className={styles.modalFooter}>
+                        {friendStatus === 'blocked' ? (
+                            <button className="btn btn-secondary" onClick={handleUnblockClick} disabled={isUnblocking}>
+                                <UserMinus size={18} /> {isUnblocking ? 'Unblocking...' : 'Unblock User'}
+                            </button>
+                        ) : (
+                            <>
+                                <button className="btn btn-danger" onClick={handleBlockClick}>
+                                    <UserX size={18} /> Block User
+                                </button>
+                            </>
+                        )}
+                    </div>
+                )}
             </div>
+
+            {showBlockConfirm && (
+                <Confirmation
+                    title="Block User?"
+                    variant="danger"
+                    message={<span>Are you sure you want to block <strong>{user.name}</strong>? They won't be able to search for you or send requests.</span>}
+                    confirmText="Block User"
+                    isLoading={isBlocking}
+                    loadingText="Blocking..."
+                    onConfirm={executeBlock}
+                    onCancel={() => setShowBlockConfirm(false)}
+                />
+            )}
         </div>
     );
 };

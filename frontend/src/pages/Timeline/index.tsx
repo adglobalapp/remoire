@@ -7,17 +7,17 @@ import { useResponsiveSidebar } from '../../hooks/useResponsiveSidebar';
 
 const TimelinePage = () => {
     const { leftOpen: isLeftOpen, toggleLeft } = useResponsiveSidebar();
-    const { isLoading } = useTimelineContext();
+    const { isLoading, activeTimeline } = useTimelineContext();
 
     return (
         <div className="page-container">
             <Navbar />
 
             <main className="main-layout">
-                {isLoading ? (
+                {isLoading && !activeTimeline ? (
                     <Loader centered />
                 ) : (
-                    <>
+                    <div className="display-contents" data-reloading={isLoading ? '' : undefined}>
                         <div className="sidebar-left">
                             <Sidebar
                                 isOpen={isLeftOpen}
@@ -28,7 +28,7 @@ const TimelinePage = () => {
                         <section className="content-area-full">
                             <Canvas />
                         </section>
-                    </>
+                    </div>
                 )}
             </main>
         </div>

@@ -20,7 +20,7 @@
 }
 
 .profileNameSection h2 {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     font-weight: 400;
     color: var(--color-dark-brown);
     margin: 0;
@@ -31,7 +31,7 @@
 }
 
 .friendCodeBadge {
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     opacity: 0.4;
     font-weight: 400;
 }

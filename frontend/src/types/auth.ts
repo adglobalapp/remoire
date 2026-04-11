@@ -1,3 +1,4 @@
+import { type ReactNode } from 'react';
 import { type User } from './models';
 
 export interface LoginCredentials {
@@ -21,4 +22,8 @@ export interface AuthContextType {
     logout: () => void;
     setUser: (user: User | null) => void;
     isAuthenticated: boolean;
+}
+
+export interface AuthProviderProps {
+    children: ReactNode;
 }

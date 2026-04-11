@@ -15,7 +15,6 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
 
     const { token } = useAuth();
 
-    // Initialization
     useEffect(() => {
         if (!token) {
             setEntries([]);
@@ -30,7 +29,6 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
                 setEntries(data);
                 setActiveEntry(data[0]);
             } else if (!localStorage.getItem('remoire_initialized')) {
-                // automatically create new Untitled entry on first run
                 localStorage.setItem('remoire_initialized', '1');
                 const newEntry = await apiCreateEntry('Untitled');
                 if (newEntry) {
@@ -43,7 +41,6 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
         });
     }, [token]);
 
-    // Entry management
     const selectEntry = useCallback((entry: Entry) => {
         setActiveEntry(entry);
     }, []);
@@ -76,35 +73,30 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
         toast.success('Entry deleted.');
     }, []);
 
-    // update entry title on screen (live)
-    const updateEntryTitle = useCallback((id: number, title: string) => {
+    const updateEntryTitle = useCallback(async (id: number, title: string) => {
         setEntries(prev => prev.map(e => e.id === id ? { ...e, title } : e));
         setActiveEntry(prev => prev?.id === id ? { ...prev, title } : prev);
+        await apiUpdateEntry(id, { title });
     }, []);
 
-    // update entry date and persist to API
-    const updateEntryDate = useCallback(async (id: number, date: string) => {
-        const updated = await apiUpdateEntry(id, { date });
-        if (!updated) return;
-        setEntries(prev => prev.map(e => e.id === id ? updated : e));
-        setActiveEntry(prev => prev?.id === id ? updated : prev);
-    }, []);
-
-    // update entry metadata like color and cover_image
-    const updateEntryMetadata = useCallback(async (id: number, data: Partial<Entry>) => {
+    const syncEntryUpdate = useCallback(async (id: number, data: any) => {
         const updated = await apiUpdateEntry(id, data);
         if (!updated) return;
         setEntries(prev => prev.map(e => e.id === id ? updated : e));
         setActiveEntry(prev => prev?.id === id ? updated : prev);
     }, []);
 
-    // update entry participants
+    const updateEntryDate = useCallback(async (id: number, date: string) => {
+        await syncEntryUpdate(id, { date });
+    }, [syncEntryUpdate]);
+
+    const updateEntryMetadata = useCallback(async (id: number, data: Partial<Entry>) => {
+        await syncEntryUpdate(id, data);
+    }, [syncEntryUpdate]);
+
     const updateEntryParticipants = useCallback(async (id: number, participantIds: number[]) => {
-        const updated = await apiUpdateEntry(id, { participant_ids: participantIds } as any);
-        if (!updated) return;
-        setEntries(prev => prev.map(e => e.id === id ? updated : e));
-        setActiveEntry(prev => prev?.id === id ? updated : prev);
-    }, []);
+        await syncEntryUpdate(id, { participant_ids: participantIds } as any);
+    }, [syncEntryUpdate]);
 
     return (
         <EntryContext.Provider value={{ entries, activeEntry, isLoading, selectEntry, createEntry, deleteEntry, saveEntry, updateEntryTitle, updateEntryDate, updateEntryMetadata, updateEntryParticipants }}>

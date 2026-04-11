@@ -89,6 +89,7 @@
     align-items: flex-start;
     transform-origin: top center;
     width: 100%;
+    min-height: 100%;
 }
 
 .previewPaper {
@@ -158,16 +159,9 @@
 
 .avatarMiniWrapper {
     margin-left: -12px;
-    cursor: pointer;
-    transition: transform 0.2s;
     background: transparent;
     border: none;
     z-index: 1;
-}
-
-.avatarMiniWrapper:hover {
-    transform: translateY(-2px);
-    z-index: 100 !important;
 }
 
 .avatarMiniWrapper:first-child {

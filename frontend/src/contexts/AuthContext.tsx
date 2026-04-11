@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setToken(data.access_token);
             setUser(data.user);
             localStorage.setItem('auth_token', data.access_token);
-            toast.success('Successfully logged in!');
+            toast.success('Logged in');
             return data;
         } catch (error: any) {
             toast.error(error.message || 'Login failed');
@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setToken(data.access_token);
             setUser(data.user);
             localStorage.setItem('auth_token', data.access_token);
-            toast.success('Registration successful!');
+            toast.success('Registered');
             return data;
         } catch (error: any) {
             toast.error(error.message || 'Registration failed');
@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setToken(null);
         setUser(null);
         localStorage.removeItem('auth_token');
-        toast.success('Logged out.', { id: 'logout-success' });
+        toast.success('Logged out', { id: 'logout-success' });
     };
 
     return (

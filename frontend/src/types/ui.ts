@@ -28,6 +28,8 @@ export interface ConfirmationProps {
     confirmText?: string;
     cancelText?: string;
     variant?: 'default' | 'danger';
+    isLoading?: boolean;
+    loadingText?: string;
     onConfirm: () => void;
     onCancel: () => void;
 }
@@ -45,7 +47,6 @@ export interface LoginProps {
 export interface UserProfileProps {
     user: User;
     onClose: () => void;
-    onBlock: (id: number) => void;
 }
 
 export interface RowProps {
@@ -57,9 +58,34 @@ export interface RowProps {
     index?: number;
 }
 
+export interface LocationData {
+    name: string;
+    lat: number;
+    lng: number;
+}
+
+export interface LocationPickerProps {
+    onClose: () => void;
+    onSelect: (location: LocationData) => void;
+    initialLocation?: { lat: number; lng: number; name?: string };
+}
+
 export interface AddFriendProps {
     onClose: () => void;
     onRefresh: () => void;
+}
+
+export interface FriendListProps {
+    title: string;
+    users: User[];
+    type: 'pending' | 'sent' | 'friend';
+    onAccept?: (id: number) => void;
+    onDelete: (user: User) => void;
+    onViewProfile: (user: User) => void;
+    titleClassName?: string;
+    showEmptyState?: boolean;
+    emptyMessage?: string;
+    delay?: number;
 }
 
 export interface AddParticipantProps {
@@ -76,4 +102,13 @@ export interface AvatarProps {
     showName?: boolean;
     backgroundColor?: string;
     color?: string;
+}
+
+export interface UserProfileContextType {
+    showProfile: (user: User) => void;
+    blockedUserIds: Set<number>;
+    isBlocked: (userId: number) => boolean;
+    refreshBlockedUsers: () => Promise<void>;
+    blockUser: (userId: number) => Promise<boolean>;
+    unblockUser: (userId: number) => Promise<boolean>;
 }

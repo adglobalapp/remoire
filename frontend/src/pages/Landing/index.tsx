@@ -12,7 +12,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onRegister }) => {
                     <Sparkles className={styles.sparkle} />
                     Remoire
                 </h1>
-                <p className={styles.subtitle}>Your life's journey, beautifully archived.</p>
+                <p className={styles.subtitle}>Keep track of your moments and memories.</p>
                 <div className={styles.ctaButtons}>
                     <button onClick={onRegister} className={styles.primaryBtn}>Get Started</button>
                     <button onClick={onLogin} className={styles.secondaryBtn}>Sign In</button>
@@ -22,8 +22,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onRegister }) => {
             <section className={styles.showcase}>
                 <div className={styles.showcaseCard}>
                     <Book className={styles.cardIcon} />
-                    <h3 className={styles.cardTitle}>Daily Narratives</h3>
-                    <p className={styles.cardContent}>Capture every thought and memory with our sleek editor.</p>
+                    <h3 className={styles.cardTitle}>Daily Journals</h3>
+                    <p className={styles.cardContent}>Capture your thoughts and experiences with ease.</p>
                     <div className={styles.mockNote}>
                         <div className={styles.mockNotePin} />
                         <div className={styles.mockTitle}>Morning Walk 🌲</div>
@@ -33,15 +33,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onRegister }) => {
 
                 <div className={styles.showcaseCard}>
                     <History className={styles.cardIcon} />
-                    <h3 className={styles.cardTitle}>Visual Timelines</h3>
-                    <p className={styles.cardContent}>See your life story unfold on an interactive canvas. Track milestones and moments in a beautiful, flowing history.</p>
+                    <h3 className={styles.cardTitle}>Timelines</h3>
+                    <p className={styles.cardContent}>Visualize your journey on an interactive canvas. Track your progress and memories over time.</p>
                     <div className={styles.mockTimeline}>
                         <div className={styles.timelineLine} />
                         <div className={styles.timelineNodes}>
-                            <div className={styles.node} style={{ background: '#89dceb' }} />
-                            <div className={styles.node} style={{ background: '#fab387' }} />
-                            <div className={styles.node} style={{ background: '#cba6f7' }} />
-                            <div className={styles.node} style={{ background: '#f8a5c2' }} />
+                                <div className={`${styles.node} ${styles.mockNode1}`} />
+                                <div className={`${styles.node} ${styles.mockNode2}`} />
+                                <div className={`${styles.node} ${styles.mockNode3}`} />
+                                <div className={`${styles.node} ${styles.mockNode4}`} />
                         </div>
                     </div>
                 </div>
@@ -58,8 +58,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onRegister }) => {
 
                 <div className={styles.showcaseCard}>
                     <Users className={styles.cardIcon} />
-                    <h3 className={styles.cardTitle}>Mindful Sharing</h3>
-                    <p className={styles.cardContent}>Share moments and locations with those who matter.</p>
+                    <h3 className={styles.cardTitle}>Friends & Sharing</h3>
+                    <p className={styles.cardContent}>Share your locations and entries with friends.</p>
                     <div className={styles.mockCommunity}>
                         <div className={styles.mockAvatars}>
                             <Avatar user={{ id: 1, name: 'L B' } as any} size={36} className={styles.mockAvatarItem} />
@@ -75,7 +75,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onRegister }) => {
             </section>
 
             <footer className={styles.footer}>
-                <p>&copy; 2026 Remoire. Designed for the mindful storyteller.</p>
+                <p>&copy; 2026 Remoire. Organize your life's story.</p>
             </footer>
         </div>
     );

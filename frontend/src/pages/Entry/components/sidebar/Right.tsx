@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { MapPin, Calendar, Plus, Users, PanelRight, X, Trash2, Pencil } from 'lucide-react';
+import { MapPin, Calendar, Plus, Users, PanelRight, X, Trash2, Pencil, Loader2 } from 'lucide-react';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { useLocation } from 'react-router-dom';
 import styles from './Right.module.css';
@@ -10,7 +10,9 @@ import AddParticipant from '../modal/AddParticipant';
 import LocationPicker from '../modal/LocationPicker';
 import Avatar from '../../../../components/common/Avatar';
 import Confirmation from '../../../../components/common/modal/Confirmation';
+import { useUserProfile } from '../../../../contexts/UserProfileContext';
 import toast from 'react-hot-toast';
+import classNames from 'classnames';
 
 const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const { activeEntry, updateEntryDate, updateEntryParticipants, updateEntryMetadata } = useEntryContext();
@@ -20,16 +22,16 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
     const [showLocationConfirm, setShowLocationConfirm] = useState(false);
-
+    const [isRemovingLocation, setIsRemovingLocation] = useState(false);
+    const [isRemovingParticipant, setIsRemovingParticipant] = useState<number | null>(null);
+    const { showProfile, isBlocked } = useUserProfile();
     const mobileOpen = propOpen || false;
     const toggle = onToggle || (() => { });
 
-    // Load friends for participant selection
     useEffect(() => {
         getFriends().then(setFriends);
     }, []);
 
-    // Auto-close on page change (only on mobile/tablet)
     useEffect(() => {
         const isLargeScreen = window.innerWidth > 1400;
         if (isLargeScreen) return;
@@ -49,50 +51,61 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         }
     };
 
-    const removeParticipant = (userId: number) => {
+    const removeParticipant = async (userId: number) => {
         if (activeEntry) {
-            const currentIds = activeEntry.participants?.map(p => p.id) || [];
-            updateEntryParticipants(activeEntry.id, currentIds.filter(id => id !== userId));
-            toast.success('Participant removed');
+            setIsRemovingParticipant(userId);
+            try {
+                const currentIds = activeEntry.participants?.map(p => p.id) || [];
+                await updateEntryParticipants(activeEntry.id, currentIds.filter(id => id !== userId));
+                toast.success('Participant removed');
+            } catch {
+                toast.error('Failed to remove participant');
+            } finally {
+                setIsRemovingParticipant(null);
+            }
         }
     };
 
-    const addParticipant = (userId: number) => {
+    const addParticipant = async (userId: number) => {
         if (activeEntry) {
             const currentIds = activeEntry.participants?.map(p => p.id) || [];
             if (!currentIds.includes(userId)) {
-                updateEntryParticipants(activeEntry.id, [...currentIds, userId]);
+                await updateEntryParticipants(activeEntry.id, [...currentIds, userId]);
                 toast.success('Participant added');
             }
-            setIsModalOpen(false);
         }
     };
 
-    const handleLocationSelect = (location: { name: string, lat: number, lng: number }) => {
+    const handleLocationSelect = async (location: { name: string, lat: number, lng: number }) => {
         if (activeEntry) {
-            updateEntryMetadata(activeEntry.id, {
+            await updateEntryMetadata(activeEntry.id, {
                 location_name: location.name,
                 latitude: location.lat,
                 longitude: location.lng
             });
             toast.success('Location updated');
-            setIsLocationModalOpen(false);
         }
     };
 
-    const handleRemoveLocation = () => {
+    const handleRemoveLocation = async () => {
         if (activeEntry) {
-            updateEntryMetadata(activeEntry.id, {
-                location_name: null as any,
-                latitude: null as any,
-                longitude: null as any
-            });
-            toast.success('Location removed');
-            setShowLocationConfirm(false);
+            setIsRemovingLocation(true);
+            try {
+                await updateEntryMetadata(activeEntry.id, {
+                    location_name: null as any,
+                    latitude: null as any,
+                    longitude: null as any
+                });
+                toast.success('Location removed');
+            } catch {
+                toast.error('Failed to remove location');
+            } finally {
+                setIsRemovingLocation(false);
+                setShowLocationConfirm(false);
+            }
         }
     };
 
-    // Format stored date (YYYY-MM-DD) for the date input
     const dateValue = activeEntry?.date
         ? activeEntry.date.substring(0, 10)
         : '';
@@ -187,17 +200,22 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                         <div className={styles.participantList}>
                             {activeEntry?.participants && activeEntry.participants.length > 0 ? (
                                 activeEntry.participants.map(user => (
-                                    <div key={user.id} className={styles.participantRow}>
-                                        <div className={styles.userItem}>
-                                            <Avatar user={user} size={32} className={styles.avatar} />
+                                    <div key={user.id} className={classNames(styles.participantRow, { 'user-blocked': isBlocked(user.id) })}>
+                                        <div className={styles.userItem} onClick={() => showProfile(user)}>
+                                            <Avatar
+                                                user={user}
+                                                size={32}
+                                                className={styles.avatar}
+                                            />
                                             <span className={styles.userName}>{user.name}</span>
                                         </div>
                                         <button
                                             className={styles.removeBtn}
                                             onClick={() => removeParticipant(user.id)}
+                                            disabled={isRemovingParticipant === user.id}
                                             title="Remove Participant"
                                         >
-                                            <Trash2 size={16} />
+                                            {isRemovingParticipant === user.id ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />}
                                         </button>
                                     </div>
                                 ))
@@ -248,6 +266,8 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                     confirmText="Remove"
                     cancelText="Cancel"
                     variant="danger"
+                    isLoading={isRemovingLocation}
+                    loadingText="Removing..."
                     onConfirm={handleRemoveLocation}
                     onCancel={() => setShowLocationConfirm(false)}
                 />

@@ -13,11 +13,6 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -28,21 +23,11 @@ class User extends Authenticatable
         'last_seen_at',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -89,20 +74,10 @@ class User extends Authenticatable
 
     public function friends()
     {
-        $userId = $this->id;
-
-        return User::whereIn('id', function ($query) use ($userId) {
-            $query->select('friend_id')
-                ->from('friends')
-                ->where('user_id', $userId)
-                ->where('status', 'accepted')
-                ->union(
-                    $query->newQuery()
-                        ->select('user_id')
-                        ->from('friends')
-                        ->where('friend_id', $userId)
-                        ->where('status', 'accepted')
-                );
+        $id = $this->id;
+        return User::whereIn('id', function ($q) use ($id) {
+            $q->select('friend_id')->from('friends')->where(['user_id' => $id, 'status' => 'accepted'])
+                ->union($q->newQuery()->select('user_id')->from('friends')->where(['friend_id' => $id, 'status' => 'accepted']));
         });
     }
 

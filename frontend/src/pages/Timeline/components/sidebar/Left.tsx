@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Trash2, Plus, Search, PanelLeft, X } from 'lucide-react';
+import { Trash2, Plus, Search, PanelLeft, X, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Confirmation from '../../../../components/common/modal/Confirmation';
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
@@ -11,16 +11,16 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const { timelines, activeTimeline, selectTimeline, createTimeline, deleteTimeline, isLoading } = useTimelineContext();
     const [searchQuery, setSearchQuery] = useState('');
     const [isCreating, setIsCreating] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const [newName, setNewName] = useState('');
     const [itemToDelete, setItemToDelete] = useState<number | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     const { pathname } = useLocation();
     const lastPage = useRef(pathname);
     const lastId = useRef(activeTimeline?.id);
-
     const mobileOpen = propOpen || false;
-    const toggle = onToggle || (() => {});
+    const toggle = onToggle || (() => { });
 
-    // Auto-close on page or timeline change (only on mobile/tablet)
     useEffect(() => {
         const isLargeScreen = window.innerWidth > 1400;
         if (isLargeScreen) return;
@@ -47,15 +47,21 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const handleCreate = async () => {
         const name = newName.trim();
         if (name) {
+            setIsSaving(true);
             try {
                 await createTimeline(name);
                 toast.success('Timeline created!');
-            } catch (error) {
+                setNewName('');
+                setIsCreating(false);
+            } catch {
                 toast.error('Failed to create timeline.');
+            } finally {
+                setIsSaving(false);
             }
+        } else {
+            setNewName('');
+            setIsCreating(false);
         }
-        setNewName('');
-        setIsCreating(false);
     };
 
     const handleDelete = (e: React.MouseEvent, id: number) => {
@@ -65,13 +71,16 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
 
     const confirmDelete = async () => {
         if (itemToDelete !== null) {
+            setIsDeleting(true);
             try {
                 await deleteTimeline(itemToDelete);
                 toast.success('Timeline deleted.');
-            } catch (error) {
+            } catch {
                 toast.error('Failed to delete timeline.');
+            } finally {
+                setIsDeleting(false);
+                setItemToDelete(null);
             }
-            setItemToDelete(null);
         }
     };
 
@@ -142,8 +151,8 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                                     if (e.key === 'Escape') { setIsCreating(false); setNewName(''); }
                                 }}
                             />
-                            <button className={styles.confirmBtn} onClick={handleCreate}>
-                                <Plus size={16} />
+                            <button className={styles.confirmBtn} onClick={handleCreate} disabled={isSaving}>
+                                {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                             </button>
                         </div>
                     ) : (
@@ -175,6 +184,8 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                             </span>
                         }
                         confirmText="Delete"
+                        isLoading={isDeleting}
+                        loadingText="Deleting..."
                         onConfirm={confirmDelete}
                         onCancel={() => setItemToDelete(null)}
                     />

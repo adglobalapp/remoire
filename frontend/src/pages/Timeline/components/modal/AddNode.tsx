@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Upload, Palette, ChevronDown, Plus, Trash2, AlertCircle } from 'lucide-react';
+import { X, Upload, Palette, ChevronDown, Plus, Trash2, AlertCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadImage } from '../../../../api';
 import { useEntryContext } from '../../../../contexts/EntryContext';
@@ -116,7 +116,7 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
             await removeEntryFromTimeline(activeTimeline.id, entryToEdit.id);
             toast.success('Entry removed from timeline.');
             onClose();
-        } catch (error) {
+        } catch {
             toast.error('Failed to remove entry.');
         } finally {
             setIsDeleting(false);
@@ -311,7 +311,7 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                             disabled={!selectedEntryId || isLoading || isDeleting || isUploading}
                             onClick={handleSave}
                         >
-                            {isLoading ? 'Saving...' : 'Save'}
+                            {isLoading ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : 'Save'}
                         </button>
                     </div>
                 </div>
@@ -327,6 +327,8 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                         </span>
                     }
                     confirmText="Remove"
+                    isLoading={isDeleting}
+                    loadingText="Removing..."
                     onConfirm={handleConfirmDelete}
                     onCancel={() => setIsConfirmOpen(false)}
                 />

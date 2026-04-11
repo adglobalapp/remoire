@@ -15,10 +15,11 @@ import Register from './components/auth/Register';
 import { EntryProvider } from './contexts/EntryContext';
 import { TimelineProvider } from './contexts/TimelineContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { UserProfileProvider } from './contexts/UserProfileContext';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
     const { isAuthenticated, isLoading } = useAuth();
-    
+
     if (isLoading) {
         return (
             <div className="page-container">
@@ -29,25 +30,25 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
             </div>
         );
     }
-    
+
     if (!isAuthenticated) {
         return <Navigate to="/" replace />;
     }
-    
+
     return <>{children}</>;
 }
 
 function LandingRoute({ children }: { children: React.ReactNode }) {
     const { isAuthenticated, isLoading } = useAuth();
-    
+
     if (isLoading) {
         return <Loader centered />;
     }
-    
+
     if (isAuthenticated) {
         return <Navigate to="/entries" replace />;
     }
-    
+
     return <>{children}</>;
 }
 
@@ -87,31 +88,31 @@ function AppContent() {
                             </>
                         </LandingRoute>
                     } />
-                    
+
                     <Route path="/entries" element={
                         <ProtectedRoute>
                             <EntryPage />
                         </ProtectedRoute>
                     } />
-                    
+
                     <Route path="/timelines" element={
                         <ProtectedRoute>
                             <TimelinePage />
                         </ProtectedRoute>
                     } />
-                    
+
                     <Route path="/friends" element={
                         <ProtectedRoute>
                             <FriendlistPage />
                         </ProtectedRoute>
                     } />
-                    
+
                     <Route path="/notes" element={
                         <ProtectedRoute>
                             <NotesPage />
                         </ProtectedRoute>
                     } />
-                    
+
                     <Route path="/maps" element={
                         <ProtectedRoute>
                             <MapsPage />
@@ -139,31 +140,33 @@ function AppContent() {
 function App() {
     return (
         <AuthProvider>
-            <BrowserRouter>
-                <Toaster
-                    position="bottom-right"
-                    containerStyle={{ zIndex: 10000000 }}
-                    toastOptions={{
-                        duration: 3000,
-                        className: 'custom-toast',
-                        success: {
-                            className: 'custom-toast custom-toast-success',
-                            iconTheme: {
-                                primary: 'var(--color-success)',
-                                secondary: 'var(--color-light-beige)',
+            <UserProfileProvider>
+                <BrowserRouter>
+                    <Toaster
+                        position="bottom-right"
+                        containerStyle={{ zIndex: 10000000 }}
+                        toastOptions={{
+                            duration: 3000,
+                            className: 'custom-toast',
+                            success: {
+                                className: 'custom-toast custom-toast-success',
+                                iconTheme: {
+                                    primary: 'var(--color-success)',
+                                    secondary: 'var(--color-light-beige)',
+                                },
                             },
-                        },
-                        error: {
-                            className: 'custom-toast custom-toast-error',
-                            iconTheme: {
-                                primary: 'var(--color-error)',
-                                secondary: 'var(--color-light-beige)',
+                            error: {
+                                className: 'custom-toast custom-toast-error',
+                                iconTheme: {
+                                    primary: 'var(--color-error)',
+                                    secondary: 'var(--color-light-beige)',
+                                },
                             },
-                        },
-                    }}
-                />
-                <AppContent />
-            </BrowserRouter>
+                        }}
+                    />
+                    <AppContent />
+                </BrowserRouter>
+            </UserProfileProvider>
         </AuthProvider>
     );
 }

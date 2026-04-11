@@ -485,11 +485,6 @@ button {
   word-break: break-word;
 }
 
-[data-reloading] {
-  pointer-events: none;
-  opacity: 0.6;
-}
-
 .custom-toast {
   background: var(--color-light-beige) !important;
   color: var(--color-dark-brown) !important;
@@ -620,7 +615,11 @@ button {
 
 .loading-icon {
   color: var(--color-burgundy) !important;
-  animation: spinner 1.2s linear infinite;
+  animation: spinner 1s linear infinite;
+}
+
+.animate-spin {
+  animation: spinner 1s linear infinite;
 }
 
 .btn .loading-icon,
@@ -704,8 +703,17 @@ button {
     opacity: 0;
     transform: translateY(-5px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.user-blocked {
+  opacity: 0.5 !important;
+}
+
+.display-contents {
+  display: contents;
 }

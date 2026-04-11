@@ -1,4 +1,4 @@
-import { X, AlertTriangle } from 'lucide-react';
+import { X, AlertTriangle, Loader2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import styles from './Confirmation.module.css';
 import { type ConfirmationProps } from '../../../types';
@@ -10,20 +10,22 @@ const Confirmation: React.FC<ConfirmationProps> = ({
     cancelText = 'Cancel',
     onConfirm,
     onCancel,
-    variant = 'default'
+    variant = 'default',
+    isLoading = false,
+    loadingText
 }) => {
     const isDanger = variant === 'danger';
     const confirmBtnClass = isDanger ? 'btn-danger' : 'btn-primary';
 
     return createPortal(
-        <div className="global-modal-overlay" onClick={onCancel}>
+        <div className="global-modal-overlay" onClick={isLoading ? undefined : onCancel}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
                     <div className={styles.headerTitleContainer}>
                         {isDanger && <AlertTriangle className={styles.alertIcon} size={24} />}
                         <h3>{title}</h3>
                     </div>
-                    <button className="global-modal-close-btn" onClick={onCancel}>
+                    <button className="global-modal-close-btn" onClick={onCancel} disabled={isLoading}>
                         <X size={20} />
                     </button>
                 </div>
@@ -35,11 +37,14 @@ const Confirmation: React.FC<ConfirmationProps> = ({
                 </div>
 
                 <div className={styles.modalFooter}>
-                    <button className="btn btn-secondary" onClick={onCancel}>
+                    <button className="btn btn-secondary" onClick={onCancel} disabled={isLoading}>
                         {cancelText}
                     </button>
-                    <button className={`btn ${confirmBtnClass}`} onClick={onConfirm}>
-                        {confirmText}
+                    <button className={`btn ${confirmBtnClass}`} onClick={onConfirm} disabled={isLoading}>
+                        {isLoading
+                            ? <><Loader2 size={16} className="animate-spin" /> {loadingText || 'Processing...'}</>
+                            : confirmText
+                        }
                     </button>
                 </div>
             </div>

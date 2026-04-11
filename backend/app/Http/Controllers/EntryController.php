@@ -12,14 +12,10 @@ class EntryController extends Controller
     {
         $user = auth()->user();
         
-        // Own entries
-        $ownedEntries = $user->entries()->with('participants')->get();
+        $owned = $user->entries()->with('participants')->get();
+        $participated = $user->participatedEntries()->with('participants')->get();
         
-        // Shared entries
-        $participatedEntries = $user->participatedEntries()->with('participants')->get();
-        
-        // Combine and sort by date descending
-        return $ownedEntries->concat($participatedEntries)
+        return $owned->concat($participated)
             ->unique('id')
             ->sortByDesc('date')
             ->values();

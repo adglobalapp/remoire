@@ -89,9 +89,9 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister }) => {
                         {renderFieldError('password')}
                     </div>
 
-                    <button type="submit" className={styles.submitBtn} disabled={isLoading} style={{ marginTop: '16px' }}>
+                    <button type="submit" className={styles.submitBtn} disabled={isLoading}>
                         {isLoading ? (
-                            <Loader2 className="loading-icon animate-spin" size={24} />
+                            <Loader2 className="animate-spin" size={24} />
                         ) : (
                             <>
                                 <LogIn size={20} />

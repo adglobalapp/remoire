@@ -1,9 +1,26 @@
-import { X, UserPlus } from 'lucide-react';
+import { X, UserPlus, Loader2 } from 'lucide-react';
+import { useState } from 'react';
 import styles from './AddParticipant.module.css';
 import { type AddParticipantProps } from '../../../../types';
 import Avatar from '../../../../components/common/Avatar';
+import { useUserProfile } from '../../../../contexts/UserProfileContext';
+import classNames from 'classnames';
 
 const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectFriend, friends }) => {
+    const { showProfile, isBlocked } = useUserProfile();
+    const [isAdding, setIsAdding] = useState<number | null>(null);
+
+    const handleSelect = async (e: React.MouseEvent, id: number) => {
+        e.stopPropagation();
+        setIsAdding(id);
+        try {
+            await onSelectFriend(id);
+            onClose();
+        } finally {
+            setIsAdding(null);
+        }
+    };
+
     return (
         <div className="global-modal-overlay" onClick={onClose}>
             <div className="global-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -15,15 +32,22 @@ const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectFriend
                 </div>
 
                 <div className={styles.resultsList}>
-                    {friends.length > 0 ? (
-                        friends.map(friend => (
+                    {friends.filter(f => !isBlocked(f.id)).length > 0 ? (
+                        friends.filter(f => !isBlocked(f.id)).map(friend => (
                             <div
                                 key={friend.id}
-                                className={styles.resultItem}
-                                onClick={() => onSelectFriend(friend.id)}
+                                className={classNames(styles.resultItem, { 'user-blocked': isBlocked(friend.id) })}
+                                onClick={() => { onSelectFriend(friend.id); onClose(); }}
                             >
-                                <div className={styles.userInfo}>
-                                    <Avatar user={friend} size={36} className={styles.avatar} />
+                                <div 
+                                    className={styles.userInfo} 
+                                    onClick={(e) => { e.stopPropagation(); showProfile(friend); }}
+                                >
+                                    <Avatar 
+                                        user={friend} 
+                                        size={36} 
+                                        className={styles.avatar} 
+                                    />
                                     <div className={styles.userDetails}>
                                         <span className={styles.userName}>{friend.name}</span>
                                     </div>
@@ -31,9 +55,10 @@ const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectFriend
 
                                 <button
                                     className="btn btn-dark btn-sm"
-                                    onClick={(e) => { e.stopPropagation(); onSelectFriend(friend.id); }}
+                                    onClick={(e) => handleSelect(e, friend.id)}
+                                    disabled={isAdding === friend.id}
                                 >
-                                    <UserPlus size={16} /> Add
+                                    {isAdding === friend.id ? <><Loader2 size={16} className="animate-spin" /> Adding...</> : <><UserPlus size={16} /> Add</>}
                                 </button>
                             </div>
                         ))

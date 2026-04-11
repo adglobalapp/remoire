@@ -4,10 +4,10 @@ import Loader from '../../components/common/Loader';
 import Navbar from '../../components/common/Navbar';
 import styles from './index.module.css';
 import { type User as UserType } from '../../types';
-import { getFriends, getFriendRequests, acceptFriendRequest, deleteFriendship, blockUser } from '../../api';
+import { getFriends, getFriendRequests, acceptFriendRequest, deleteFriendship } from '../../api';
 import List from './components/list/List';
 import AddFriend from './components/modal/AddFriend';
-import UserProfile from './components/modal/UserProfile';
+import { useUserProfile } from '../../contexts/UserProfileContext';
 import Confirmation from '../../components/common/modal/Confirmation';
 import toast from 'react-hot-toast';
 
@@ -17,7 +17,8 @@ const FriendlistPage = () => {
     const [sentRequests, setSentRequests] = useState<UserType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
+    const [isConfirming, setIsConfirming] = useState(false);
+    const { showProfile, blockedUserIds, blockUser } = useUserProfile();
 
     const [confirmAction, setConfirmAction] = useState<{
         type: 'delete' | 'block';
@@ -35,16 +36,19 @@ const FriendlistPage = () => {
             setFriends(friendsData);
             setPendingRequests(requestsData.pending);
             setSentRequests(requestsData.sent);
-        } catch (error) {
+        } catch {
             toast.error('Failed to load friends');
         } finally {
             setIsLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    useEffect(() => { fetchData(); }, []);
+
+    const isBlocked = (id: number) => blockedUserIds.has(id);
+    const visiblePending = pendingRequests.filter(u => !isBlocked(u.id));
+    const visibleSent = sentRequests.filter(u => !isBlocked(u.id));
+    const visibleFriends = friends.filter(u => !isBlocked(u.id));
 
     const handleAccept = async (id: number) => {
         const success = await acceptFriendRequest(id);
@@ -56,45 +60,29 @@ const FriendlistPage = () => {
         }
     };
 
-    const executeDelete = async (id: number) => {
-        const success = await deleteFriendship(id);
-        if (success) {
-            toast.success('Connection removed');
-            fetchData();
-        } else {
-            toast.error('Failed to remove connection');
-        }
-    };
-
-    const executeBlock = async (id: number) => {
-        const success = await blockUser(id);
-        if (success) {
-            toast.success('User blocked');
-            fetchData();
-        } else {
-            toast.error('Failed to block user');
-        }
-    };
-
-    const handleConfirmAction = () => {
+    const handleConfirmAction = async () => {
         if (!confirmAction) return;
+        setIsConfirming(true);
         if (confirmAction.type === 'delete') {
-            executeDelete(confirmAction.userId);
+            const success = await deleteFriendship(confirmAction.userId);
+            if (success) { toast.success('Connection removed'); fetchData(); }
+            else toast.error('Failed to remove connection');
         } else {
-            executeBlock(confirmAction.userId);
+            await blockUser(confirmAction.userId);
+            fetchData();
         }
+        setIsConfirming(false);
         setConfirmAction(null);
     };
-
 
     return (
         <div className="page-container">
             <Navbar />
             <main className={styles.mainContent}>
-                {isLoading ? (
+                {isLoading && friends.length === 0 && pendingRequests.length === 0 ? (
                     <Loader centered />
                 ) : (
-                    <div className={styles.container}>
+                    <div className={styles.container} data-reloading={isLoading ? '' : undefined}>
                         <header className={styles.header}>
                             <h1>Friends</h1>
                             <div className={styles.actionButtons}>
@@ -106,65 +94,56 @@ const FriendlistPage = () => {
 
                         <List
                             title="Pending Requests"
-                            users={pendingRequests}
+                            users={visiblePending}
                             type="pending"
                             delay={0}
                             onAccept={handleAccept}
                             onDelete={(user) => setConfirmAction({ type: 'delete', userId: user.id, userName: user.name })}
-                            onViewProfile={setSelectedUser}
+                            onViewProfile={showProfile}
                             titleClassName={styles.bgDarkBlue}
                         />
 
                         <List
                             title="Sent Requests"
-                            users={sentRequests}
+                            users={visibleSent}
                             type="sent"
                             delay={1}
                             onDelete={(user) => setConfirmAction({ type: 'delete', userId: user.id, userName: user.name })}
-                            onViewProfile={setSelectedUser}
+                            onViewProfile={showProfile}
                             titleClassName={styles.bgDarkBlue}
                         />
 
                         <List
                             title="My Friends"
-                            users={friends}
+                            users={visibleFriends}
                             type="friend"
                             delay={2}
                             onDelete={(user) => setConfirmAction({ type: 'delete', userId: user.id, userName: user.name })}
-                            onViewProfile={setSelectedUser}
+                            onViewProfile={showProfile}
                             showEmptyState
                         />
-
-                        {showAddModal && (
-                            <AddFriend
-                                onClose={() => setShowAddModal(false)}
-                                onRefresh={fetchData}
-                            />
-                        )}
-
-                        {selectedUser && (
-                            <UserProfile
-                                user={selectedUser}
-                                onClose={() => setSelectedUser(null)}
-                                onBlock={(id) => setConfirmAction({ type: 'block', userId: id, userName: selectedUser.name })}
-                            />
-                        )}
-
-                        {confirmAction && (
-                            <Confirmation
-                                title={confirmAction.type === 'delete' ? 'Remove Connection?' : 'Block User?'}
-                                variant="danger"
-                                message={
-                                    confirmAction.type === 'delete'
-                                        ? <span>Are you sure you want to remove <strong>{confirmAction.userName}</strong> from your friends?</span>
-                                        : <span>Are you sure you want to block <strong>{confirmAction.userName}</strong>? They won't be able to search for you or send requests.</span>
-                                }
-                                confirmText={confirmAction.type === 'delete' ? 'Remove' : 'Block User'}
-                                onConfirm={handleConfirmAction}
-                                onCancel={() => setConfirmAction(null)}
-                            />
-                        )}
                     </div>
+                )}
+
+                {showAddModal && (
+                    <AddFriend onClose={() => setShowAddModal(false)} onRefresh={fetchData} />
+                )}
+
+                {confirmAction && (
+                    <Confirmation
+                        title={confirmAction.type === 'delete' ? 'Remove Friend?' : 'Block User?'}
+                        variant="danger"
+                        message={
+                            confirmAction.type === 'delete'
+                                ? <span>Are you sure you want to remove <strong>{confirmAction.userName}</strong> from your friends?</span>
+                                : <span>Are you sure you want to block <strong>{confirmAction.userName}</strong>? They won't be able to search for you or send requests.</span>
+                        }
+                        confirmText={confirmAction.type === 'delete' ? 'Remove' : 'Block User'}
+                        isLoading={isConfirming}
+                        loadingText={confirmAction.type === 'delete' ? 'Removing...' : 'Blocking...'}
+                        onConfirm={handleConfirmAction}
+                        onCancel={() => setConfirmAction(null)}
+                    />
                 )}
             </main>
         </div>

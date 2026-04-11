@@ -3,17 +3,21 @@ import { useAuth } from '../../contexts/AuthContext';
 import styles from './index.module.css';
 import Avatar from '../../components/common/Avatar';
 import { User, Lock, Camera, Copy, Check, UserMinus, AlertCircle, Loader2 } from 'lucide-react';
-import { updateProfile, updatePassword, getBlockedUsers, unblockUser } from '../../api/profile';
+import { updateProfile, updatePassword, getBlockedUsers } from '../../api/profile';
 import { uploadImage } from '../../api/entries';
 import toast from 'react-hot-toast';
+import { useUserProfile } from '../../contexts/UserProfileContext';
 
 const Profile = () => {
     const { user, setUser } = useAuth();
     const [blocked, setBlocked] = useState<any[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [isProfileLoading, setIsProfileLoading] = useState(false);
+    const [isPasswordLoading, setIsPasswordLoading] = useState(false);
     const [blockedLoading, setBlockedLoading] = useState(false);
+    const [unblockingId, setUnblockingId] = useState<number | null>(null);
     const [copied, setCopied] = useState(false);
-    
+    const { showProfile, blockedUserIds, unblockUser } = useUserProfile();
+
     const [name, setName] = useState(user?.name || '');
     const [bio, setBio] = useState(user?.bio || '');
     const [passwords, setPasswords] = useState({
@@ -27,24 +31,24 @@ const Profile = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        fetchBlocked();
-    }, []);
+        fetchBlocked(blocked.length > 0);
+    }, [blockedUserIds.size]);
 
-    const fetchBlocked = async () => {
-        setBlockedLoading(true);
+    const fetchBlocked = async (silent = false) => {
+        if (!silent) setBlockedLoading(true);
         try {
             const data = await getBlockedUsers();
-            setBlocked(data);
+            setBlocked(data.map((u: any) => ({ ...u, friend_status: 'blocked' })));
         } catch (err) {
             console.error(err);
         } finally {
-            setBlockedLoading(false);
+            if (!silent) setBlockedLoading(false);
         }
     };
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
+        setIsProfileLoading(true);
         setFieldErrors({});
         try {
             const res = await updateProfile({ name, bio });
@@ -57,13 +61,13 @@ const Profile = () => {
                 toast.error(err.message || 'Update failed');
             }
         } finally {
-            setLoading(false);
+            setIsProfileLoading(false);
         }
     };
 
     const handleChangePassword = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
+        setIsPasswordLoading(true);
         setFieldErrors({});
         try {
             await updatePassword(passwords);
@@ -76,7 +80,7 @@ const Profile = () => {
                 toast.error(err.message || 'Security update failed');
             }
         } finally {
-            setLoading(false);
+            setIsPasswordLoading(false);
         }
     };
 
@@ -84,12 +88,12 @@ const Profile = () => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        setLoading(true);
+        setIsProfileLoading(true);
         try {
             const uploadRes = await uploadImage(file);
             if (uploadRes.error) throw new Error(uploadRes.error);
             const newUrl = uploadRes.url;
-            
+
             if (newUrl) {
                 const profileRes = await updateProfile({ name, bio, avatar_url: newUrl });
                 setUser(profileRes.user);
@@ -98,18 +102,15 @@ const Profile = () => {
         } catch (err: any) {
             toast.error(err.message || 'Failed to upload image');
         } finally {
-            setLoading(false);
+            setIsProfileLoading(false);
         }
     };
 
     const handleUnblock = async (id: number) => {
-        try {
-            await unblockUser(id);
-            setBlocked(prev => prev.filter(u => u.id !== id));
-            toast.success('User unblocked');
-        } catch (err) {
-            toast.error('Failed to unblock user');
-        }
+        setUnblockingId(id);
+        await unblockUser(id);
+        setBlocked(prev => prev.filter(u => u.id !== id));
+        setUnblockingId(null);
     };
 
     const copyFriendCode = () => {
@@ -150,15 +151,15 @@ const Profile = () => {
                         <div className={styles.editAvatarOverlay} onClick={() => fileInputRef.current?.click()}>
                             <Camera size={16} />
                         </div>
-                        <input 
-                            type="file" 
-                            ref={fileInputRef} 
-                            style={{ display: 'none' }} 
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            className={styles.hiddenFileInput}
                             accept="image/*"
                             onChange={handleAvatarUpload}
                         />
                     </div>
-                    
+
                     <div className={styles.headerMain}>
                         <h1>{user.name}</h1>
                         <p>{user.email}</p>
@@ -167,7 +168,7 @@ const Profile = () => {
                     <div className={styles.headerStats}>
                         <div className={styles.statItem}>
                             <span className={styles.statLabel}>Friend Code</span>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div className={styles.statFlexContainer}>
                                 <span className={`${styles.statValue} ${styles.friendCode}`}>{user.friend_code}</span>
                                 <button onClick={copyFriendCode} className={styles.copyBtn} title="Copy Friend Code">
                                     {copied ? <Check size={18} color="green" /> : <Copy size={18} />}
@@ -185,10 +186,10 @@ const Profile = () => {
                         <form className={styles.form} onSubmit={handleUpdateProfile} noValidate>
                             <div className={styles.inputGroup}>
                                 <label>What should we call you?</label>
-                                <input 
-                                    type="text" 
-                                    value={name} 
-                                    onChange={(e) => setName(e.target.value)} 
+                                <input
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
                                     className={fieldErrors.name ? 'input-error' : ''}
                                     placeholder="Your displayed name"
                                 />
@@ -196,18 +197,19 @@ const Profile = () => {
                             </div>
                             <div className={styles.inputGroup}>
                                 <label>Bio</label>
-                                <textarea 
-                                    value={bio} 
-                                    onChange={(e) => setBio(e.target.value)} 
-                                    className={fieldErrors.bio ? 'input-error' : ''}
+                                <textarea
+                                    value={bio}
+                                    onChange={(e) => setBio(e.target.value)}
+                                    className={`${fieldErrors.bio ? 'input-error' : ''} ${styles.bioTextarea}`}
                                     placeholder="Bio, status, or notes..."
-                                    rows={3}
+                                    rows={4}
+                                    maxLength={160}
                                 />
                                 {renderFieldError('bio')}
                             </div>
-                            
-                            <button type="submit" className={styles.saveBtn} disabled={loading}>
-                                Save
+
+                            <button type="submit" className={styles.saveBtn} disabled={isProfileLoading}>
+                                {isProfileLoading ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : 'Save'}
                             </button>
                         </form>
                     </section>
@@ -219,67 +221,68 @@ const Profile = () => {
                         <form className={styles.form} onSubmit={handleChangePassword} noValidate>
                             <div className={styles.inputGroup}>
                                 <label>Current Password</label>
-                                <input 
-                                    type="password" 
+                                <input
+                                    type="password"
                                     value={passwords.current_password}
-                                    onChange={(e) => setPasswords({...passwords, current_password: e.target.value})}
+                                    onChange={(e) => setPasswords({ ...passwords, current_password: e.target.value })}
                                     className={fieldErrors.current_password ? 'input-error' : ''}
                                 />
                                 {renderFieldError('current_password')}
                             </div>
                             <div className={styles.inputGroup}>
                                 <label>New Password</label>
-                                <input 
-                                    type="password" 
+                                <input
+                                    type="password"
                                     value={passwords.password}
-                                    onChange={(e) => setPasswords({...passwords, password: e.target.value})}
+                                    onChange={(e) => setPasswords({ ...passwords, password: e.target.value })}
                                     className={fieldErrors.password ? 'input-error' : ''}
                                 />
                                 {renderFieldError('password')}
                             </div>
                             <div className={styles.inputGroup}>
                                 <label>Confirm Password</label>
-                                <input 
-                                    type="password" 
+                                <input
+                                    type="password"
                                     value={passwords.password_confirmation}
-                                    onChange={(e) => setPasswords({...passwords, password_confirmation: e.target.value})}
+                                    onChange={(e) => setPasswords({ ...passwords, password_confirmation: e.target.value })}
                                     className={fieldErrors.password_confirmation ? 'input-error' : ''}
                                 />
                                 {renderFieldError('password_confirmation')}
                             </div>
-                            <button type="submit" className={styles.saveBtn} disabled={loading}>
-                                Update
+                            <button type="submit" className={styles.saveBtn} disabled={isPasswordLoading}>
+                                {isPasswordLoading ? <><Loader2 size={16} className="animate-spin" /> Updating...</> : 'Update'}
                             </button>
                         </form>
                     </section>
                 </div>
-                
+
                 <div className={styles.standaloneList}>
                     <div className={styles.listHeader}>
                         Blocked Users
                     </div>
                     <div className={styles.listContainer}>
                         {blockedLoading ? (
-                            <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
-                                <Loader2 className="animate-spin" size={32} opacity={0.3} />
+                            <div className={styles.loadingWrapper}>
+                                <Loader2 className={`animate-spin ${styles.dimmed}`} size={32} />
                             </div>
                         ) : blocked.length === 0 ? (
-                            <p style={{ padding: '24px', opacity: 0.4, fontStyle: 'italic', fontSize: '1.3rem', fontFamily: 'var(--font-ui)', fontWeight: 400 }}>
-                                Your peace of mind is intact. No blocked users.
-                            </p>
+                            <div className={`empty-state-placeholder ${styles.emptyPadded}`}>
+                                No blocked users.
+                            </div>
                         ) : (
                             blocked.map(u => (
                                 <div key={u.id} className={styles.listRow}>
-                                    <div className={styles.listUser}>
+                                    <div className={`${styles.listUser} ${styles.clickable}`} onClick={() => showProfile(u)}>
                                         <Avatar user={u} size={36} />
                                         <span>{u.name}</span>
                                     </div>
-                                    <button 
+                                    <button
                                         onClick={() => handleUnblock(u.id)}
                                         className={styles.badgeButton}
                                         title="Unblock User"
+                                        disabled={unblockingId === u.id}
                                     >
-                                        <UserMinus size={14} /> Unblock
+                                        <UserMinus size={14} /> {unblockingId === u.id ? 'Unblocking...' : 'Unblock'}
                                     </button>
                                 </div>
                             ))
