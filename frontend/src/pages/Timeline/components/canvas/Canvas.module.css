@@ -51,8 +51,13 @@
 }
 
 @keyframes growLine {
-    from { transform: translateX(-50%) scaleY(0); }
-    to { transform: translateX(-50%) scaleY(1); }
+    from {
+        transform: translateX(-50%) scaleY(0);
+    }
+
+    to {
+        transform: translateX(-50%) scaleY(1);
+    }
 }
 
 .addButton:disabled {

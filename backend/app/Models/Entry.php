@@ -10,7 +10,7 @@ class Entry extends Model
     /** @use HasFactory<\Database\Factories\EntryFactory> */
     use HasFactory;
 
-    protected $fillable = ['title', 'date', 'content', 'image_url', 'user_id', 'color'];
+    protected $fillable = ['title', 'date', 'content', 'image_url', 'user_id', 'color', 'location_name', 'latitude', 'longitude'];
 
     protected static function boot()
     {

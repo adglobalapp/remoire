@@ -18,6 +18,9 @@ return new class extends Migration {
             $table->text('content')->nullable();
             $table->string('image_url')->nullable();
             $table->string('color')->nullable();
+            $table->string('location_name')->nullable();
+            $table->double('latitude')->nullable();
+            $table->double('longitude')->nullable();
             $table->timestamps();
         });
     }

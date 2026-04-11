@@ -108,6 +108,10 @@
     opacity: 0.6;
 }
 
+.avatar span {
+    transform: none !important;
+}
+
 .sectionTitle {
     background: var(--color-burgundy);
     padding: 10px 24px;

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Upload, Palette, ChevronDown, Plus, Trash2 } from 'lucide-react';
+import { X, Upload, Palette, ChevronDown, Plus, Trash2, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadImage } from '../../../../api';
 import { useEntryContext } from '../../../../contexts/EntryContext';
@@ -10,7 +10,6 @@ import { type AddNodeProps } from '../../../../types';
 import { PRESET_COLORS } from '../../../../utils/constants';
 import styles from './AddNode.module.css';
 
-
 const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
     const { entries, updateEntryMetadata } = useEntryContext();
     const { activeTimeline, addEntryToTimeline, removeEntryFromTimeline } = useTimelineContext();
@@ -18,19 +17,19 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
     const [selectedEntryId, setSelectedEntryId] = useState<number | ''>(entryToEdit?.id || '');
     const [color, setColor] = useState<string>(entryToEdit?.color || '');
     const [imageUrl, setImageUrl] = useState<string>(entryToEdit?.image_url || '');
-    const [isSaving, setIsSaving] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
     const [customColor, setCustomColor] = useState<string>(
         PRESET_COLORS.includes(entryToEdit?.color || '') ? '' : (entryToEdit?.color || '')
     );
     const dropdownRef = useRef<HTMLDivElement>(null);
     const colorPickerRef = useRef<HTMLInputElement>(null);
 
-    // Close dropdown on outside click
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -41,7 +40,6 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Provide entries not currently in this timeline (unless it's default)
     const availableEntries = entries.filter(e => {
         if (!activeTimeline) return false;
         if (activeTimeline.isDefault) return true;
@@ -50,7 +48,6 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
 
     const selectedEntry = entries.find(e => e.id === selectedEntryId);
 
-    // Handle initial entry selection to populate fields
     const handleEntrySelect = (id: number) => {
         setSelectedEntryId(id);
         const entry = entries.find(ent => ent.id === id);
@@ -62,22 +59,30 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
             setImageUrl(entry.image_url || '');
         }
         setIsDropdownOpen(false);
+        setFieldErrors({});
     };
 
     const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setCustomColor(val);
-        setColor(''); // Clear preset selection
+        setColor('');
+        if (fieldErrors.color) {
+            setFieldErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors.color;
+                return newErrors;
+            });
+        }
     };
 
     const handleColorSave = () => {
-        // The actual value to save is either 'color' (preset) or 'customColor'
         return color || customColor || null;
     };
 
     const handleSave = async () => {
         if (!selectedEntryId) return;
-        setIsSaving(true);
+        setIsLoading(true);
+        setFieldErrors({});
         try {
             await updateEntryMetadata(Number(selectedEntryId), {
                 color: handleColorSave(),
@@ -92,10 +97,14 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
             }
 
             onClose();
-        } catch (error) {
-            toast.error('Failed to save.');
+        } catch (error: any) {
+            if (error.status === 422 && error.errors) {
+                setFieldErrors(error.errors);
+            } else {
+                toast.error(error.message || 'Failed to save.');
+            }
         } finally {
-            setIsSaving(false);
+            setIsLoading(false);
         }
     };
 
@@ -113,6 +122,22 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
             setIsDeleting(false);
             setIsConfirmOpen(false);
         }
+    };
+
+    const renderFieldError = (fieldName: string) => {
+        const errors = fieldErrors[fieldName];
+        if (errors && errors.length > 0) {
+            return (
+                <div className="field-errors-container">
+                    {errors.map((msg, idx) => (
+                        <span key={idx} className="field-error-text">
+                            <AlertCircle size={16} /> {msg}
+                        </span>
+                    ))}
+                </div>
+            );
+        }
+        return null;
     };
 
     return createPortal(
@@ -135,7 +160,7 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                         <div className={styles.formGroup} ref={dropdownRef}>
                             <label>Select Entry</label>
                             <div
-                                className={styles.selectTrigger}
+                                className={`${styles.selectTrigger} ${fieldErrors.entry_id ? 'input-error' : ''}`}
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                             >
                                 {selectedEntry ? (
@@ -148,6 +173,7 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                                 )}
                                 <ChevronDown size={18} className={`${styles.chevron} ${isDropdownOpen ? styles.chevronOpen : ''}`} />
                             </div>
+                            {renderFieldError('entry_id')}
 
                             {isDropdownOpen && (
                                 <div className={styles.dropdownMenu}>
@@ -178,7 +204,7 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
 
                     <div className={styles.formGroup}>
                         <label><Palette size={16} className={styles.iconInfo} /> Entry Accent Color</label>
-                        <div className={styles.colorPalette}>
+                        <div className={`${styles.colorPalette} ${fieldErrors.color ? 'input-error' : ''}`}>
                             {PRESET_COLORS.map(c => (
                                 <button
                                     key={c}
@@ -188,6 +214,11 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                                     onClick={() => {
                                         setColor(c === color ? '' : c);
                                         setCustomColor('');
+                                        setFieldErrors(prev => {
+                                            const newErrors = { ...prev };
+                                            delete newErrors.color;
+                                            return newErrors;
+                                        });
                                     }}
                                 />
                             ))}
@@ -209,6 +240,7 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                                 />
                             </button>
                         </div>
+                        {renderFieldError('color')}
                     </div>
 
                     <div className={styles.formGroup}>
@@ -220,7 +252,7 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                                 <button type="button" className="btn btn-secondary" onClick={() => setImageUrl('')}>Remove</button>
                             </div>
                         ) : (
-                            <label className={`btn btn-secondary ${styles.uploadLabel}`}>
+                            <label className={`btn btn-secondary ${styles.uploadLabel} ${fieldErrors.image_url ? 'input-error' : ''}`}>
                                 <span>{isUploading ? 'Uploading...' : 'Choose Image...'}</span>
                                 <input
                                     type="file"
@@ -230,6 +262,11 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                                         if (file) {
                                             setIsUploading(true);
                                             setUploadError(null);
+                                            setFieldErrors(prev => {
+                                                const newErrors = { ...prev };
+                                                delete newErrors.image_url;
+                                                return newErrors;
+                                            });
                                             const result = await uploadImage(file);
                                             if (result.url) {
                                                 setImageUrl(result.url);
@@ -247,7 +284,8 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                             </label>
                         )}
 
-                        {uploadError && <p className={styles.errorText}>{uploadError}</p>}
+                        {renderFieldError('image_url')}
+                        {uploadError && renderFieldError('image_url')}
                         <p className={styles.helpText}>Leave empty to use main image from content automatically.</p>
                     </div>
 
@@ -257,7 +295,7 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                                 type="button"
                                 className={`btn ${styles.deleteBtn}`}
                                 onClick={() => setIsConfirmOpen(true)}
-                                disabled={isSaving || isDeleting || isUploading || activeTimeline.isDefault}
+                                disabled={isLoading || isDeleting || isUploading || activeTimeline.isDefault}
                                 title={activeTimeline.isDefault ? "Cannot remove from default timeline" : undefined}
                             >
                                 <Trash2 size={16} />
@@ -270,10 +308,10 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                         <button
                             type="button"
                             className={`btn ${styles.saveBtn}`}
-                            disabled={!selectedEntryId || isSaving || isDeleting || isUploading}
+                            disabled={!selectedEntryId || isLoading || isDeleting || isUploading}
                             onClick={handleSave}
                         >
-                            {isSaving ? 'Saving...' : 'Save'}
+                            {isLoading ? 'Saving...' : 'Save'}
                         </button>
                     </div>
                 </div>

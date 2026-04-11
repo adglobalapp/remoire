@@ -6,6 +6,9 @@ export interface Entry {
     content: string | null;
     image_url?: string;
     color?: string | null;
+    location_name?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
     created_at: string;
     updated_at: string;
     participants?: User[];

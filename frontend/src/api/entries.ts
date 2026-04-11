@@ -44,7 +44,7 @@ export const createEntry = async (title: string): Promise<Entry | null> => {
 
 export const updateEntry = async (
     id: number,
-    data: Partial<Pick<Entry, 'title' | 'date' | 'content' | 'color' | 'image_url'>> & { participant_ids?: number[] }
+    data: Partial<Pick<Entry, 'title' | 'date' | 'content' | 'color' | 'image_url' | 'location_name' | 'latitude' | 'longitude'>> & { participant_ids?: number[] }
 ): Promise<Entry | null> => {
     try {
         const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
@@ -52,8 +52,17 @@ export const updateEntry = async (
             headers: getHeaders(),
             body: JSON.stringify(data),
         });
-        if (!response.ok) throw new Error(`Error: ${response.status}`);
-        return await response.json();
+        
+        const resData = await response.json();
+        
+        if (!response.ok) {
+            const error = new Error(resData.message || 'Failed to update entry') as any;
+            error.status = response.status;
+            error.errors = resData.errors;
+            throw error;
+        }
+        
+        return resData;
     } catch (error) {
         return null;
     }

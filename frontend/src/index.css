@@ -619,7 +619,7 @@ button {
 }
 
 .loading-icon {
-  color: rgba(42, 30, 34, 0.1) !important;
+  color: var(--color-burgundy) !important;
   animation: spinner 1.2s linear infinite;
 }
 
@@ -665,4 +665,47 @@ button {
   font-style: italic !important;
   text-align: center !important;
   width: 100% !important;
+}
+
+/* Global Form Validation Styles */
+.input-error {
+  border-color: var(--color-error) !important;
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 4px rgba(var(--color-error-rgb), 0.1) !important;
+}
+
+.field-error-text {
+  color: var(--color-error);
+  font-size: 0.95rem;
+  margin-top: 4px;
+  font-family: var(--font-body);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: fadeInDown 0.2s ease-out;
+  line-height: 1.2;
+}
+
+.field-errors-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+}
+
+.field-errors-container .field-error-text {
+  margin-top: 2px;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

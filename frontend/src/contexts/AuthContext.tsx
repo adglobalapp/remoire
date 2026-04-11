@@ -17,7 +17,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     const userData = await api.getCurrentUser();
                     setUser(userData);
                 } catch (error: any) {
-                    console.error('Failed to fetch user:', error);
+                    toast.error('Authentication failed');
                     if (error.status === 401) {
                         logout();
                     }
@@ -73,6 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 login,
                 register,
                 logout,
+                setUser,
                 isAuthenticated: !!token && !!user,
             }}
         >

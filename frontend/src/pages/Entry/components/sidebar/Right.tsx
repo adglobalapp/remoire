@@ -1,20 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { MapPin, Calendar, Plus, Users, PanelRight, X, Trash2 } from 'lucide-react';
+import { MapPin, Calendar, Plus, Users, PanelRight, X, Trash2, Pencil } from 'lucide-react';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { useLocation } from 'react-router-dom';
 import styles from './Right.module.css';
 import { getFriends } from '../../../../api';
 import { type User, type LeftProps } from '../../../../types';
 import AddParticipant from '../modal/AddParticipant';
+import LocationPicker from '../modal/LocationPicker';
 import Avatar from '../../../../components/common/Avatar';
+import Confirmation from '../../../../components/common/modal/Confirmation';
+import toast from 'react-hot-toast';
 
 const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
-    const { activeEntry, updateEntryDate, updateEntryParticipants } = useEntryContext();
+    const { activeEntry, updateEntryDate, updateEntryParticipants, updateEntryMetadata } = useEntryContext();
     const { pathname } = useLocation();
     const lastPage = useRef(pathname);
     const [friends, setFriends] = useState<User[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+    const [showLocationConfirm, setShowLocationConfirm] = useState(false);
 
     const mobileOpen = propOpen || false;
     const toggle = onToggle || (() => { });
@@ -40,6 +45,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (activeEntry) {
             updateEntryDate(activeEntry.id, e.target.value);
+            toast.success('Date updated');
         }
     };
 
@@ -47,6 +53,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         if (activeEntry) {
             const currentIds = activeEntry.participants?.map(p => p.id) || [];
             updateEntryParticipants(activeEntry.id, currentIds.filter(id => id !== userId));
+            toast.success('Participant removed');
         }
     };
 
@@ -55,8 +62,33 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
             const currentIds = activeEntry.participants?.map(p => p.id) || [];
             if (!currentIds.includes(userId)) {
                 updateEntryParticipants(activeEntry.id, [...currentIds, userId]);
+                toast.success('Participant added');
             }
             setIsModalOpen(false);
+        }
+    };
+
+    const handleLocationSelect = (location: { name: string, lat: number, lng: number }) => {
+        if (activeEntry) {
+            updateEntryMetadata(activeEntry.id, {
+                location_name: location.name,
+                latitude: location.lat,
+                longitude: location.lng
+            });
+            toast.success('Location updated');
+            setIsLocationModalOpen(false);
+        }
+    };
+
+    const handleRemoveLocation = () => {
+        if (activeEntry) {
+            updateEntryMetadata(activeEntry.id, {
+                location_name: null as any,
+                latitude: null as any,
+                longitude: null as any
+            });
+            toast.success('Location removed');
+            setShowLocationConfirm(false);
         }
     };
 
@@ -65,7 +97,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         ? activeEntry.date.substring(0, 10)
         : '';
 
-    const availableFriends = friends.filter(f => 
+    const availableFriends = friends.filter(f =>
         !activeEntry?.participants?.some(p => p.id === f.id)
     );
 
@@ -94,11 +126,39 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                             <label>Location</label>
                         </div>
                         <div className={styles.metaValue}>
-                            <span className="empty-state-placeholder">No location set</span>
+                            {activeEntry?.location_name ? (
+                                <div className={styles.locationDisplay}>
+                                    <span className={styles.locationName}>{activeEntry.location_name}</span>
+                                    <div className={styles.locationActions}>
+                                        <button
+                                            className={styles.editLocationBtn}
+                                            onClick={() => setIsLocationModalOpen(true)}
+                                            title="Edit location"
+                                        >
+                                            <Pencil size={15} />
+                                        </button>
+                                        <button
+                                            className={styles.removeLocationBtn}
+                                            onClick={() => setShowLocationConfirm(true)}
+                                            title="Remove location"
+                                        >
+                                            <Trash2 size={15} />
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className={styles.emptyLocation}>
+                                    <span className="empty-state-placeholder">No location set</span>
+                                    <button
+                                        className={`btn btn-secondary btn-sm ${styles.fullWidth}`}
+                                        onClick={() => setIsLocationModalOpen(true)}
+                                        disabled={!activeEntry}
+                                    >
+                                        <Plus size={14} /> Add Location
+                                    </button>
+                                </div>
+                            )}
                         </div>
-                        <button className={`btn btn-secondary btn-sm ${styles.fullWidth}`}>
-                            <Plus size={14} /> Add Location
-                        </button>
                     </div>
 
                     <div className={styles.metaGroup}>
@@ -123,7 +183,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                             <Users size={16} />
                             <label>Participants</label>
                         </div>
-                        
+
                         <div className={styles.participantList}>
                             {activeEntry?.participants && activeEntry.participants.length > 0 ? (
                                 activeEntry.participants.map(user => (
@@ -132,7 +192,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                                             <Avatar user={user} size={32} className={styles.avatar} />
                                             <span className={styles.userName}>{user.name}</span>
                                         </div>
-                                        <button 
+                                        <button
                                             className={styles.removeBtn}
                                             onClick={() => removeParticipant(user.id)}
                                             title="Remove Participant"
@@ -148,8 +208,8 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                             )}
                         </div>
 
-                        <button 
-                            className="btn btn-secondary btn-sm addParticipantBtn" 
+                        <button
+                            className="btn btn-secondary btn-sm addParticipantBtn"
                             onClick={() => setIsModalOpen(true)}
                             disabled={!activeEntry}
                         >
@@ -160,12 +220,37 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
             </aside>
 
             {isModalOpen && createPortal(
-                <AddParticipant 
-                    friends={availableFriends} 
-                    onClose={() => setIsModalOpen(false)} 
-                    onSelectFriend={addParticipant} 
+                <AddParticipant
+                    friends={availableFriends}
+                    onClose={() => setIsModalOpen(false)}
+                    onSelectFriend={addParticipant}
                 />,
                 document.body
+            )}
+
+            {isLocationModalOpen && createPortal(
+                <LocationPicker
+                    onClose={() => setIsLocationModalOpen(false)}
+                    onSelect={handleLocationSelect}
+                    initialLocation={activeEntry?.latitude ? {
+                        lat: activeEntry.latitude,
+                        lng: activeEntry.longitude!,
+                        name: activeEntry.location_name!
+                    } : undefined}
+                />,
+                document.body
+            )}
+
+            {showLocationConfirm && (
+                <Confirmation
+                    title="Remove Location"
+                    message="Are you sure you want to remove the location from this entry?"
+                    confirmText="Remove"
+                    cancelText="Cancel"
+                    variant="danger"
+                    onConfirm={handleRemoveLocation}
+                    onCancel={() => setShowLocationConfirm(false)}
+                />
             )}
         </div>
     );

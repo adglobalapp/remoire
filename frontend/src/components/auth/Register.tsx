@@ -13,30 +13,43 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
         password_confirmation: '',
     });
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null);
-
-        if (formData.password !== formData.password_confirmation) {
-            setError('Passwords do not match.');
-            return;
-        }
-
+        setFieldErrors({});
         setIsLoading(true);
+        
         try {
             const data = await register(formData);
             if (data) {
                 onClose();
-            } else {
-                setError('Registration failed. Email may be already taken.');
             }
         } catch (err: any) {
-            setError(err.message || 'An unexpected error occurred.');
+            if (err.status === 422 && err.errors) {
+                setFieldErrors(err.errors);
+            } else {
+                setFieldErrors({ name: [err.message || 'Registration failed.'] });
+            }
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const renderFieldError = (fieldName: string) => {
+        const errors = fieldErrors[fieldName];
+        if (errors && errors.length > 0) {
+            return (
+                <div className="field-errors-container">
+                    {errors.map((msg, idx) => (
+                        <span key={idx} className="field-error-text">
+                            <AlertCircle size={16} /> {msg}
+                        </span>
+                    ))}
+                </div>
+            );
+        }
+        return null;
     };
 
     return (
@@ -51,7 +64,7 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
                     <p className={styles.subtitle}>Create an account to begin capturing your life's journey.</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className={styles.authForm}>
+                <form onSubmit={handleSubmit} className={styles.authForm} noValidate>
                     <div className={styles.formGroup}>
                         <label htmlFor="reg-name">Full Name</label>
                         <input
@@ -59,9 +72,10 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className={fieldErrors.name ? 'input-error' : ''}
                             placeholder="Enter your name"
-                            required
                         />
+                        {renderFieldError('name')}
                     </div>
                     <div className={styles.formGroup}>
                         <label htmlFor="reg-email">Email</label>
@@ -70,9 +84,10 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
                             type="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className={fieldErrors.email ? 'input-error' : ''}
                             placeholder="Enter your email"
-                            required
                         />
+                        {renderFieldError('email')}
                     </div>
                     <div className={styles.formGroup}>
                         <label htmlFor="reg-password">Password</label>
@@ -81,9 +96,10 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
                             type="password"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            className={fieldErrors.password ? 'input-error' : ''}
                             placeholder="••••••••"
-                            required
                         />
+                        {renderFieldError('password')}
                     </div>
                     <div className={styles.formGroup}>
                         <label htmlFor="reg-confirm">Confirm Password</label>
@@ -92,19 +108,13 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
                             type="password"
                             value={formData.password_confirmation}
                             onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
+                            className={fieldErrors.password_confirmation ? 'input-error' : ''}
                             placeholder="••••••••"
-                            required
                         />
+                        {renderFieldError('password_confirmation')}
                     </div>
 
-                    {error && (
-                        <div className={styles.errorMessage}>
-                            <AlertCircle size={18} />
-                            {error}
-                        </div>
-                    )}
-
-                    <button type="submit" className={styles.submitBtn} disabled={isLoading}>
+                    <button type="submit" className={styles.submitBtn} disabled={isLoading} style={{ marginTop: '16px' }}>
                         {isLoading ? (
                             <Loader2 className="loading-icon animate-spin" size={24} />
                         ) : (

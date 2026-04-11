@@ -8,6 +8,8 @@ import TimelinePage from './pages/Timeline';
 import LandingPage from './pages/Landing';
 import FriendlistPage from './pages/Friendlist';
 import NotesPage from './pages/Notes';
+import MapsPage from './pages/Maps';
+import ProfilePage from './pages/Profile';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import { EntryProvider } from './contexts/EntryContext';
@@ -107,6 +109,23 @@ function AppContent() {
                     <Route path="/notes" element={
                         <ProtectedRoute>
                             <NotesPage />
+                        </ProtectedRoute>
+                    } />
+                    
+                    <Route path="/maps" element={
+                        <ProtectedRoute>
+                            <MapsPage />
+                        </ProtectedRoute>
+                    } />
+
+                    <Route path="/profile" element={
+                        <ProtectedRoute>
+                            <div className="page-container">
+                                <Navbar />
+                                <main className="main-layout">
+                                    <ProfilePage />
+                                </main>
+                            </div>
                         </ProtectedRoute>
                     } />
 

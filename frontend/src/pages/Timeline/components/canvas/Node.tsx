@@ -21,7 +21,7 @@ const Node = ({ entry, side, index = 0 }: NodeProps) => {
     const dateStr = formatDate(entry.date || entry.created_at);
 
     return (
-        <div 
+        <div
             className={`${styles.nodeWrapper} ${side === 'right' ? styles.right : styles.left}`}
             style={{ animationDelay: `${0.3 + index * 0.15}s` }}
         >
@@ -39,19 +39,21 @@ const Node = ({ entry, side, index = 0 }: NodeProps) => {
                                 <span className={styles.date}>{dateStr}</span>
                                 {entry.participants && entry.participants.length > 0 && (
                                     <div className={styles.participantAvatars}>
-                                        {entry.participants.slice(0, 4).map((p, i) => (
-                                            <Avatar 
+                                        {entry.participants.slice(0, 4).map((p) => (
+                                            <Avatar
                                                 key={p.id}
                                                 user={p}
                                                 size={24}
                                                 className={styles.participantAvatar}
-                                                // style handled by pure CSS or internal layout 
                                             />
                                         ))}
                                         {entry.participants.length > 4 && (
-                                            <div className={`${styles.participantAvatar} ${styles.participantAvatarMore}`}>
-                                                +{entry.participants.length - 4}
-                                            </div>
+                                            <Avatar
+                                                text={`+${entry.participants.length - 4}`}
+                                                size={24}
+                                                className={styles.participantAvatar}
+                                                backgroundColor="var(--color-dark-beige)"
+                                            />
                                         )}
                                     </div>
                                 )}

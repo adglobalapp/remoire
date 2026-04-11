@@ -34,4 +34,10 @@ Route::middleware(['auth:sanctum', 'last_seen'])->group(function () {
     Route::post('/friends/{user}/accept', [FriendController::class, 'accept']);
     Route::delete('/friends/{user}', [FriendController::class, 'destroy']);
     Route::post('/friends/{user}/block', [FriendController::class, 'block']);
+
+    // Profile routes
+    Route::put('/user/profile', [\App\Http\Controllers\ProfileController::class, 'update']);
+    Route::put('/user/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword']);
+    Route::get('/user/blocked', [\App\Http\Controllers\ProfileController::class, 'blockedUsers']);
+    Route::delete('/user/blocked/{user}', [\App\Http\Controllers\ProfileController::class, 'unblock']);
 });

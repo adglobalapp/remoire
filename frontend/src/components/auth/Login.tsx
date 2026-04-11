@@ -8,24 +8,47 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister }) => {
     const { login } = useAuth();
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setError(null);
+        setFieldErrors({});
         try {
             const data = await login(formData);
             if (data) {
                 onClose();
-            } else {
-                setError('Invalid email or password.');
             }
         } catch (err: any) {
-            setError(err.message || 'An unexpected error occurred.');
+            if (err.status === 422 && err.errors) {
+                setFieldErrors(err.errors);
+            } else if (err.status === 401) {
+                setFieldErrors({ 
+                    email: ['Invalid email or password.'],
+                    password: [' ']
+                });
+            } else {
+                setFieldErrors({ email: [err.message || 'An unexpected error occurred.'] });
+            }
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const renderFieldError = (fieldName: string) => {
+        const errors = fieldErrors[fieldName];
+        if (errors && errors.length > 0 && errors[0] !== ' ') {
+            return (
+                <div className="field-errors-container">
+                    {errors.map((msg, idx) => (
+                        <span key={idx} className="field-error-text">
+                            <AlertCircle size={16} /> {msg}
+                        </span>
+                    ))}
+                </div>
+            );
+        }
+        return null;
     };
 
     return (
@@ -40,7 +63,7 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister }) => {
                     <p className={styles.subtitle}>Sign in to continue your journey.</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className={styles.authForm}>
+                <form onSubmit={handleSubmit} className={styles.authForm} noValidate>
                     <div className={styles.formGroup}>
                         <label htmlFor="email">Email</label>
                         <input
@@ -48,9 +71,10 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister }) => {
                             type="email"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className={fieldErrors.email ? 'input-error' : ''}
                             placeholder="Enter your email"
-                            required
                         />
+                        {renderFieldError('email')}
                     </div>
                     <div className={styles.formGroup}>
                         <label htmlFor="password">Password</label>
@@ -59,19 +83,13 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister }) => {
                             type="password"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            className={fieldErrors.password ? 'input-error' : ''}
                             placeholder="••••••••"
-                            required
                         />
+                        {renderFieldError('password')}
                     </div>
 
-                    {error && (
-                        <div className={styles.errorMessage}>
-                            <AlertCircle size={18} />
-                            {error}
-                        </div>
-                    )}
-
-                    <button type="submit" className={styles.submitBtn} disabled={isLoading}>
+                    <button type="submit" className={styles.submitBtn} disabled={isLoading} style={{ marginTop: '16px' }}>
                         {isLoading ? (
                             <Loader2 className="loading-icon animate-spin" size={24} />
                         ) : (

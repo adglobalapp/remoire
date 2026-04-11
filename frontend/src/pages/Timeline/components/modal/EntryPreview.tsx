@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useLayoutEffect } from 'react';
 import styles from './EntryPreview.module.css';
 import editorStyles from '../../../Entry/components/editor/Canvas.module.css';
-import type { PageSettings, EntryPreviewProps } from '../../../../types';
+import UserProfile from '../../../Friendlist/components/modal/UserProfile';
+import type { PageSettings, EntryPreviewProps, User } from '../../../../types';
 
-import { X, Edit3 } from 'lucide-react';
+import { X, Edit3, MapPin } from 'lucide-react';
+import Avatar from '../../../../components/common/Avatar';
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -21,6 +23,7 @@ import { DEFAULT_PAGE_SETTINGS } from '../../../../types';
 const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
     const { selectEntry } = useEntryContext();
     const navigate = useNavigate();
+    const [selectedParticipant, setSelectedParticipant] = useState<User | null>(null);
 
     const handleEdit = () => {
         selectEntry(entry);
@@ -125,19 +128,61 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
                 </div>
 
                 <div className={styles.modalFooter}>
-                    <button type="button" className={`btn btn-secondary`} onClick={onClose}>
-                        Close
-                    </button>
-                    <button
-                        type="button"
-                        className={`btn ${styles.editEntryBtn}`}
-                        onClick={handleEdit}
-                    >
-                        <Edit3 size={16} /> Edit Entry
-                    </button>
+                    <div className={styles.footerInfo}>
+                        {entry.location_name && (
+                            <div className={styles.locationTag}>
+                                <MapPin size={22} />
+                                <span>{entry.location_name}</span>
+                            </div>
+                        )}
 
+                        {entry.participants && entry.participants.length > 0 && (
+                            <div className={styles.participantStack} title={entry.participants.map(p => p.name).join(', ')}>
+                                {entry.participants.slice(0, 3).map((p, idx) => (
+                                    <div 
+                                        key={p.id} 
+                                        className={styles.avatarMiniWrapper}
+                                        style={{ zIndex: 10 - idx }}
+                                        onClick={() => setSelectedParticipant(p)}
+                                    >
+                                        <Avatar user={p} size={34} />
+                                    </div>
+                                ))}
+                                {entry.participants.length > 3 && (
+                                    <Avatar
+                                        text={`+${entry.participants.length - 3}`}
+                                        size={34}
+                                        backgroundColor="var(--color-dark-beige)"
+                                        color="var(--color-burgundy)"
+                                        className={styles.avatarMore}
+                                    />
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className={styles.footerActions}>
+                        <button type="button" className={`btn btn-secondary`} onClick={onClose}>
+                            Close
+                        </button>
+                        <button
+                            type="button"
+                            className={`btn ${styles.editEntryBtn}`}
+                            onClick={handleEdit}
+                        >
+                            <Edit3 size={16} /> Edit Entry
+                        </button>
+                    </div>
                 </div>
             </div>
+
+            {selectedParticipant && (
+                <UserProfile
+                    user={selectedParticipant}
+                    onClose={() => setSelectedParticipant(null)}
+                    onBlock={() => { }}
+                />
+            )}
         </div>,
         document.body
     );

@@ -42,6 +42,10 @@
     object-fit: cover;
 }
 
+.avatar span {
+    transform: none !important;
+}
+
 .userDetails {
     display: flex;
     flex-direction: column;

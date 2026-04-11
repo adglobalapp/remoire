@@ -10,6 +10,7 @@ export const login = async (credentials: LoginCredentials) => {
     const data = await response.json();
     if (!response.ok) {
         const error = new Error(data.message || 'Login failed') as any;
+        error.status = response.status;
         error.errors = data.errors;
         throw error;
     }
@@ -25,6 +26,7 @@ export const register = async (credentials: RegisterCredentials) => {
     const data = await response.json();
     if (!response.ok) {
         const error = new Error(data.message || 'Registration failed') as any;
+        error.status = response.status;
         error.errors = data.errors;
         throw error;
     }

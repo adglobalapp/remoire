@@ -88,7 +88,7 @@ class MockDataSeeder extends Seeder
         $timelines = [$travelTimeline, $cookingTimeline, $familyTimeline];
 
         // 5. Create Entries for Main User
-        $entries = Entry::factory(25)->create([
+        $entries = Entry::factory(50)->create([
             'user_id' => $mainUser->id
         ]);
 
@@ -129,13 +129,17 @@ class MockDataSeeder extends Seeder
             }
         }
 
-        // 6. Create some shared entries where Main User is a participant
-        foreach ($acceptedFriends->random(5) as $friend) {
-            $friendEntry = Entry::factory()->create([
-                'user_id' => $friend->id,
-                'title' => "Shared with " . $mainUser->name
+        // 6b. Create some concentrated entries in Budapest for clustering demo
+        $budapestEntries = Entry::factory(40)->create([
+            'user_id' => $mainUser->id,
+            'location_name' => 'Budapest, Hungary',
+        ]);
+        foreach ($budapestEntries as $entry) {
+            $entry->update([
+                'latitude' => 47.4979 + fake()->randomFloat(4, -0.05, 0.05),
+                'longitude' => 19.0402 + fake()->randomFloat(4, -0.05, 0.05)
             ]);
-            $friendEntry->participants()->attach($mainUser->id);
+            $entry->timelines()->syncWithoutDetaching([$defaultTimeline->id]);
         }
 
         // 7. Create Notes for Main User

@@ -1,12 +1,13 @@
 .avatarCircle {
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    place-items: center;
     overflow: hidden;
     position: relative;
     background-color: var(--color-light-beige);
     flex-shrink: 0;
+    border: 2px solid white;
+    box-sizing: border-box;
 }
 
 .avatarImage {
@@ -18,11 +19,10 @@
 .initials {
     font-family: var(--font-ui), sans-serif;
     font-weight: 500;
-    color: var(--color-dark-brown);
     user-select: none;
     line-height: 1;
-    display: block;
     text-align: center;
+    width: 100%;
 }
 
 .avatarWrapper {

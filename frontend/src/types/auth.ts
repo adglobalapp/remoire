@@ -19,5 +19,6 @@ export interface AuthContextType {
     login: (credentials: LoginCredentials) => Promise<any>;
     register: (credentials: RegisterCredentials) => Promise<any>;
     logout: () => void;
+    setUser: (user: User | null) => void;
     isAuthenticated: boolean;
 }

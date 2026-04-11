@@ -52,6 +52,9 @@ class EntryFactory extends Factory
             'content' => json_encode(['contentJSON' => $contentJSON]),
             'image_url' => null,
             'color' => fake()->hexColor(),
+            'location_name' => fake()->city() . ', ' . fake()->country(),
+            'latitude' => fake()->latitude(),
+            'longitude' => fake()->longitude(),
         ];
     }
 }

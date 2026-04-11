@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect } from 'rea
 import * as api from '../api/timelines';
 import { type Timeline, type TimelineContextValue, type TimelineProviderProps } from '../types';
 import { useAuth } from './AuthContext';
+import toast from 'react-hot-toast';
 
 const DEFAULT_TIMELINE: Timeline = {
     id: 0,
@@ -42,7 +43,7 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
                     setActiveTimeline(DEFAULT_TIMELINE);
                 }
             } catch (error) {
-                console.error('Failed to fetch timelines:', error);
+                toast.error('Failed to load timelines');
                 setTimelines([DEFAULT_TIMELINE]);
                 setActiveTimeline(DEFAULT_TIMELINE);
             } finally {

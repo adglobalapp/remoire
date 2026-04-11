@@ -77,6 +77,11 @@ class User extends Authenticatable
         return $this->hasMany(Entry::class);
     }
 
+    public function participatedEntries()
+    {
+        return $this->belongsToMany(Entry::class, 'entry_user');
+    }
+
     public function timelines()
     {
         return $this->hasMany(Timeline::class);

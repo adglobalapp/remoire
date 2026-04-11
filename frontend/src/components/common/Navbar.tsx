@@ -45,9 +45,12 @@ const Navbar = () => {
                 >
                     <StickyNote size={20} /> Notes
                 </NavLink>
-                <a href="#" className={styles.link}>
+                <NavLink
+                    to="/maps"
+                    className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
+                >
                     <Map size={20} /> Map
-                </a>
+                </NavLink>
             </div>
 
             <div className={styles.authSection}>
@@ -66,7 +69,7 @@ const Navbar = () => {
                                 <div className={styles.dropdownHeader}>
                                     <span className={styles.dropdownHeaderName}>{user.name}</span>
                                 </div>
-                                <div className={styles.dropdownItem} onClick={() => { /* Not implemented yet */ }}>
+                                <div className={styles.dropdownItem} onClick={() => { navigate('/profile'); setProfileMenuOpen(false); }}>
                                     <User size={15} />
                                     <span>My Profile</span>
                                 </div>
@@ -112,11 +115,18 @@ const Navbar = () => {
                         <StickyNote size={18} /> Notes
                     </NavLink>
 
-                    <a href="#" className={styles.mobileLink}>
+                    <NavLink 
+                        to="/maps" 
+                        className={({ isActive }) => `${styles.mobileLink} ${isActive ? styles.active : ''}`} 
+                        onClick={() => setMenuOpen(false)}
+                    >
                         <Map size={18} /> Map
-                    </a>
+                    </NavLink>
                     {user && (
                         <>
+                            <NavLink to="/profile" className={({ isActive }) => `${styles.mobileLink} ${isActive ? styles.active : ''}`} onClick={() => setMenuOpen(false)}>
+                                <User size={18} /> My Profile
+                            </NavLink>
                             <div className={styles.mobileUserBadge}>
                                 <Avatar user={user} size={28} />
                                 <span>{user.name}</span>

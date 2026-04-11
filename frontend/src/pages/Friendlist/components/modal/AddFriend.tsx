@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Search, UserPlus, Check, Clock } from 'lucide-react';
+import { X, Search, UserPlus, Check, Clock, AlertCircle } from 'lucide-react';
 import classNames from 'classnames';
 import styles from './AddFriend.module.css';
 import { type User as UserType } from '../../../../types';
@@ -12,6 +12,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<UserType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -19,6 +20,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
                 handleSearch();
             } else {
                 setResults([]);
+                setFieldErrors({});
             }
         }, 300);
 
@@ -27,11 +29,16 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
 
     const handleSearch = async () => {
         setIsLoading(true);
+        setFieldErrors({});
         try {
             const users = await searchUsers(query);
             setResults(users);
-        } catch (error) {
-            toast.error('Search failed');
+        } catch (error: any) {
+            if (error.status === 422 && error.errors) {
+                setFieldErrors(error.errors);
+            } else {
+                toast.error(error.message || 'Search failed');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -50,6 +57,22 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
         }
     };
 
+    const renderFieldError = (fieldName: string) => {
+        const errors = fieldErrors[fieldName];
+        if (errors && errors.length > 0) {
+            return (
+                <div className="field-errors-container" style={{ padding: '0 12px' }}>
+                    {errors.map((msg, idx) => (
+                        <span key={idx} className="field-error-text">
+                            <AlertCircle size={16} /> {msg}
+                        </span>
+                    ))}
+                </div>
+            );
+        }
+        return null;
+    };
+
     return (
         <div className="global-modal-overlay" onClick={onClose}>
             <div className="global-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -61,7 +84,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
                 </div>
 
                 <div className={styles.searchSection}>
-                    <div className={styles.searchBar}>
+                    <div className={`${styles.searchBar} ${fieldErrors.query || fieldErrors.search || fieldErrors.friend_code ? 'input-error' : ''}`}>
                         <Search size={20} className={styles.searchIcon} />
                         <input
                             type="text"
@@ -71,6 +94,7 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
                             autoFocus
                         />
                     </div>
+                    {renderFieldError('query') || renderFieldError('search') || renderFieldError('friend_code')}
                 </div>
 
                 <div className={styles.resultsList}>

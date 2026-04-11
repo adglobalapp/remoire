@@ -10,7 +10,19 @@ class EntryController extends Controller
 {
     public function index()
     {
-        return auth()->user()->entries()->with('participants')->orderBy('created_at', 'desc')->get();
+        $user = auth()->user();
+        
+        // Own entries
+        $ownedEntries = $user->entries()->with('participants')->get();
+        
+        // Shared entries
+        $participatedEntries = $user->participatedEntries()->with('participants')->get();
+        
+        // Combine and sort by date descending
+        return $ownedEntries->concat($participatedEntries)
+            ->unique('id')
+            ->sortByDesc('date')
+            ->values();
     }
 
     public function store(Request $request)
@@ -21,6 +33,9 @@ class EntryController extends Controller
             'content' => 'nullable|string',
             'color'   => 'nullable|string',
             'image_url' => 'nullable|string',
+            'location_name' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'participant_ids' => 'nullable|array',
             'participant_ids.*' => 'exists:users,id',
         ]);
@@ -38,9 +53,15 @@ class EntryController extends Controller
 
     public function show(Entry $entry)
     {
-        if ($entry->user_id !== Auth::id()) {
+        $user = Auth::user();
+        
+        $isOwner = $entry->user_id === $user->id;
+        $isParticipant = $entry->participants()->where('users.id', $user->id)->exists();
+
+        if (!$isOwner && !$isParticipant) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
+        
         return $entry->load('participants');
     }
 
@@ -55,6 +76,9 @@ class EntryController extends Controller
             'content' => 'nullable|string',
             'color'   => 'nullable|string',
             'image_url' => 'nullable|string',
+            'location_name' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'participant_ids' => 'nullable|array',
             'participant_ids.*' => 'exists:users,id',
         ]);

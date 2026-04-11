@@ -69,8 +69,11 @@ export interface AddParticipantProps {
 }
 
 export interface AvatarProps {
-    user: User | { name: string; avatar_url?: string | null; id?: number };
+    user?: User | { name: string; avatar_url?: string | null; id?: number };
+    text?: string;
     size?: number;
     className?: string;
     showName?: boolean;
+    backgroundColor?: string;
+    color?: string;
 }
