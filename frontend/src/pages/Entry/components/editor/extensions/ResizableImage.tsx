@@ -106,6 +106,24 @@ const ImageNodeView = (props: any) => {
                 zIndex: selected ? 100 : 1,
                 pointerEvents: selected ? 'auto' : 'none',
             }}
+            onPointerDown={(e: React.PointerEvent) => {
+                const target = e.target as HTMLElement;
+                // Don't interfere if clicking on moveable controls
+                if (target.closest('.moveable-control-box')) return;
+
+                if (window.innerWidth <= 800) {
+                    // Hide mobile keyboard
+                    props.editor.commands.blur();
+                    setTimeout(() => props.editor.commands.blur(), 10);
+                }
+                
+                if (!selected) {
+                    const pos = typeof props.getPos === 'function' ? props.getPos() : undefined;
+                    if (pos !== undefined) {
+                        props.editor.commands.setNodeSelection(pos);
+                    }
+                }
+            }}
         >
             <div
                 ref={targetRef}

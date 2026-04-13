@@ -33,8 +33,8 @@ export const TextFormatting = ({ editor, isDragMode }: FormattingProps) => (
     <div className={styles.toolbarGroup}>
         <button
             type="button"
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            disabled={isDragMode || !editor.can().chain().focus().toggleBold().run()}
+            onClick={() => editor.chain().toggleBold().run()}
+            disabled={isDragMode || !editor.can().chain().toggleBold().run()}
             className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive('bold') })}
             title="Bold"
         >
@@ -42,8 +42,8 @@ export const TextFormatting = ({ editor, isDragMode }: FormattingProps) => (
         </button>
         <button
             type="button"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            disabled={isDragMode || !editor.can().chain().focus().toggleItalic().run()}
+            onClick={() => editor.chain().toggleItalic().run()}
+            disabled={isDragMode || !editor.can().chain().toggleItalic().run()}
             className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive('italic') })}
             title="Italic"
         >
@@ -51,8 +51,8 @@ export const TextFormatting = ({ editor, isDragMode }: FormattingProps) => (
         </button>
         <button
             type="button"
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            disabled={isDragMode || !editor.can().chain().focus().toggleUnderline().run()}
+            onClick={() => editor.chain().toggleUnderline().run()}
+            disabled={isDragMode || !editor.can().chain().toggleUnderline().run()}
             className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive('underline') })}
             title="Underline"
         >
@@ -66,7 +66,7 @@ export const Alignment = ({ editor, isDragMode }: FormattingProps) => (
         <button
             type="button"
             disabled={isDragMode}
-            onClick={() => editor.chain().focus().setTextAlign('left').run()}
+            onClick={() => editor.chain().setTextAlign('left').run()}
             className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive({ textAlign: 'left' }) })}
             title="Align Left"
         >
@@ -75,7 +75,7 @@ export const Alignment = ({ editor, isDragMode }: FormattingProps) => (
         <button
             type="button"
             disabled={isDragMode}
-            onClick={() => editor.chain().focus().setTextAlign('center').run()}
+            onClick={() => editor.chain().setTextAlign('center').run()}
             className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive({ textAlign: 'center' }) })}
             title="Align Center"
         >
@@ -84,7 +84,7 @@ export const Alignment = ({ editor, isDragMode }: FormattingProps) => (
         <button
             type="button"
             disabled={isDragMode}
-            onClick={() => editor.chain().focus().setTextAlign('right').run()}
+            onClick={() => editor.chain().setTextAlign('right').run()}
             className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive({ textAlign: 'right' }) })}
             title="Align Right"
         >
@@ -93,7 +93,7 @@ export const Alignment = ({ editor, isDragMode }: FormattingProps) => (
         <button
             type="button"
             disabled={isDragMode}
-            onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+            onClick={() => editor.chain().setTextAlign('justify').run()}
             className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive({ textAlign: 'justify' }) })}
             title="Justify"
         >
@@ -108,7 +108,7 @@ export const Lists = ({ editor, isDragMode }: FormattingProps) => (
             type="button"
             disabled={isDragMode}
             onClick={() => {
-                editor.chain().focus().toggleBulletList().run();
+                editor.chain().toggleBulletList().run();
             }}
             className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive('bulletList') })}
             title="Bullet List"
@@ -119,7 +119,7 @@ export const Lists = ({ editor, isDragMode }: FormattingProps) => (
             type="button"
             disabled={isDragMode}
             onClick={() => {
-                editor.chain().focus().toggleOrderedList().run();
+                editor.chain().toggleOrderedList().run();
             }}
             className={classNames(styles.actionButton, { [styles.isActive]: editor.isActive('orderedList') })}
             title="Ordered List"

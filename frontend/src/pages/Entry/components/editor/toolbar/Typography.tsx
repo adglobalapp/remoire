@@ -123,7 +123,7 @@ const Typography = ({ editor, isDragMode }: TypographyProps) => {
                     setCurrentSize(newSize);
 
                     const { $from, $to } = editor.state.selection;
-                    let chain = editor.chain().focus();
+                    let chain = editor.chain();
 
                     if ($from.pos === $to.pos && $from.sameParent($to)) {
                         chain = chain
@@ -170,7 +170,7 @@ const Typography = ({ editor, isDragMode }: TypographyProps) => {
                 onChange={(e) => {
                     const val = e.target.value;
                     setCurrentSize(val);
-                    editor.chain().focus().setFontSize(val).setTextAlign(currentAlign).run();
+                    editor.chain().setFontSize(val).setTextAlign(currentAlign).run();
                 }}
             >
                 {!PRESET_SIZES.includes(currentSize) && (

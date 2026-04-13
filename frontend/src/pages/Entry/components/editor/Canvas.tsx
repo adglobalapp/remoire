@@ -62,7 +62,6 @@ const Canvas = () => {
         return '<h1>Untitled</h1><p>Dear Diary...</p>';
     };
 
-    // Config editor
     const editor = useEditor({
         extensions: [
             StarterKit,
@@ -107,7 +106,6 @@ const Canvas = () => {
         return findFirstText(json) || 'Untitled';
     };
 
-    // Save entry
     const { updateEntryTitle } = useEntryContext();
     useEffect(() => {
         if (!editor || initialEntryId === null) return;
@@ -117,7 +115,6 @@ const Canvas = () => {
             const contentJSON = editor.getJSON();
             const currentTitle = extractTitleFromJSON(contentJSON);
             
-            // Real-time sync with sidebar
             if (currentTitle !== activeEntry?.title) {
                 updateEntryTitle(initialEntryId, currentTitle);
             }
@@ -129,7 +126,6 @@ const Canvas = () => {
         return () => { editor.off('update', handleUpdate); };
     }, [editor, saveEntry, initialEntryId, activeEntry?.title, updateEntryTitle]);
 
-    // Load entry
     useEffect(() => {
         if (!editor || !activeEntry || (loadedEntryIdRef.current === activeEntry.id && lastContentRef.current === activeEntry.content)) return;
 
@@ -143,7 +139,6 @@ const Canvas = () => {
             settings = { ...DEFAULT_PAGE_SETTINGS, ...stored.pageSettings };
         }
 
-        // Case 1: Entry ID changed - Full reload
         if (loadedEntryIdRef.current !== activeEntry.id) {
             loadedEntryIdRef.current = activeEntry.id;
             lastContentRef.current = activeEntry.content;
@@ -152,7 +147,6 @@ const Canvas = () => {
             setPageSettings(settings);
             pageSettingsRef.current = settings;
 
-            // Delayed to avoid lifecycle issues
             setTimeout(() => {
                 if (editor) {
                     editor.commands.setContent(contentJSON, { emitUpdate: false });
@@ -160,7 +154,6 @@ const Canvas = () => {
                 }
             }, 10);
         }
-        // Case 2: Same entry, but content/settings updated (e.g. from server/sync)
         else {
             lastContentRef.current = activeEntry.content;
             if (JSON.stringify(settings) !== JSON.stringify(pageSettingsRef.current)) {
@@ -170,7 +163,6 @@ const Canvas = () => {
         }
     }, [editor, activeEntry]);
 
-    // Drag mode
     useEffect(() => {
         editor?.setEditable(!isDragMode);
         if (isDragMode) {
@@ -194,8 +186,15 @@ const Canvas = () => {
     const onTouchStart = (e: React.TouchEvent) => {
         const target = e.target as Element;
         const isBackdrop = target === containerRef.current || target?.classList?.contains(styles.canvas);
+        const isInteractive = target.tagName === 'IMG' || 
+                               !!target.closest('img') || 
+                               !!target.closest('.moveable-control-box') || 
+                               !!target.closest('[class*="imageBox"]') || 
+                               target.tagName === 'BUTTON' || 
+                               !!target.closest('button');
+        const isMobile = window.innerWidth <= 800;
 
-        if (isDragMode || isBackdrop || e.touches.length >= 2) {
+        if (isDragMode || isBackdrop || e.touches.length >= 2 || (isMobile && !isInteractive)) {
             handleTouchStart(e, true);
         }
     };
@@ -211,7 +210,6 @@ const Canvas = () => {
             setTransform({ x: initialX, y: 0, scale: initialScale });
         }
     }, [setTransform]);
-
 
     const handlePageSettingsChange = (newSettings: PageSettings) => {
         setPageSettings(newSettings);

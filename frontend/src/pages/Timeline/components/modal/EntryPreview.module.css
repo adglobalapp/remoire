@@ -178,6 +178,10 @@
 }
 
 @media (max-width: 500px) {
+    .modalContent {
+        max-height: 75vh;
+    }
+
     .modalFooter {
         flex-direction: column;
         align-items: stretch;

@@ -22,6 +22,7 @@
         opacity: 0;
         transform: translateY(24px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -139,7 +140,6 @@
 @media (max-width: 600px) {
     .noteCard {
         aspect-ratio: unset;
-        min-height: unset;
         padding: 1.25rem;
     }
 

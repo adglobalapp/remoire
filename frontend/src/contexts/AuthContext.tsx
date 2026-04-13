@@ -11,21 +11,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        let isMounted = true;
         const initAuth = async () => {
             if (token) {
                 try {
                     const userData = await api.getCurrentUser();
-                    setUser(userData);
+                    if (isMounted) {
+                        setUser(userData);
+                    }
                 } catch (error: any) {
-                    toast.error('Authentication failed');
-                    if (error.status === 401) {
-                        logout();
+                    if (isMounted) {
+                        toast.error('Authentication failed', { id: 'auth-fail' });
+                        if (error.status === 401) {
+                            logout();
+                        }
                     }
                 }
             }
-            setIsLoading(false);
+            if (isMounted) {
+                setIsLoading(false);
+            }
         };
         initAuth();
+
+        return () => {
+            isMounted = false;
+        };
     }, [token]);
 
     const login = async (credentials: LoginCredentials) => {
