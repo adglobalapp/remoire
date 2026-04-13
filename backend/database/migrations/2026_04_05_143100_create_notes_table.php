@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('title')->nullable();
-            $table->enum('type', ['text', 'todo'])->default('text');
             $table->text('content')->nullable();
             $table->string('color')->nullable();
             $table->boolean('is_pinned')->default(false);

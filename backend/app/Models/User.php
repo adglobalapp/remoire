@@ -81,11 +81,6 @@ class User extends Authenticatable
         });
     }
 
-    public function friendships()
-    {
-        return $this->hasMany(Friend::class , 'user_id')->orWhere('friend_id', $this->id);
-    }
-
     public function pendingFriendRequests()
     {
         return $this->belongsToMany(User::class , 'friends', 'friend_id', 'user_id')
@@ -98,19 +93,6 @@ class User extends Authenticatable
         return $this->belongsToMany(User::class , 'friends', 'user_id', 'friend_id')
             ->wherePivot('status', 'pending')
             ->withTimestamps();
-    }
-
-    public function getAvatarUrlAttribute($value)
-    {
-        if (!$value) {
-            return null;
-        }
-
-        if (str_starts_with($value, 'http')) {
-            return $value;
-        }
-
-        return asset(ltrim($value, '/'));
     }
 
     public function notes()

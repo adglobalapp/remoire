@@ -12,7 +12,6 @@ class Note extends Model
     protected $fillable = [
         'user_id',
         'title',
-        'type',
         'content',
         'color',
         'is_pinned'

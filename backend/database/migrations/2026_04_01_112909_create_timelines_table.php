@@ -20,9 +20,10 @@ return new class extends Migration
         });
 
         Schema::create('entry_timeline', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('entry_id')->constrained()->onDelete('cascade');
             $table->foreignId('timeline_id')->constrained()->onDelete('cascade');
-            $table->primary(['entry_id', 'timeline_id']);
+            $table->timestamps();
         });
     }
 

@@ -16,7 +16,6 @@ class NoteController extends Controller
     {
         $validated = $request->validate([
             'title' => 'nullable|string|max:255',
-            'type' => 'nullable|in:text,todo',
             'content' => 'nullable|string',
             'color' => 'nullable|string|max:20',
             'is_pinned' => 'nullable|boolean',
@@ -46,7 +45,6 @@ class NoteController extends Controller
 
         $validated = $request->validate([
             'title' => 'nullable|string|max:255',
-            'type' => 'nullable|in:text,todo',
             'content' => 'nullable|string',
             'color' => 'nullable|string|max:20',
             'is_pinned' => 'nullable|boolean',

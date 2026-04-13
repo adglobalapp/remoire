@@ -28,10 +28,12 @@ class Entry extends Model
     {
         $data = json_decode($content, true);
         $json = $data['contentJSON'] ?? null;
-        if (!$json) return null;
+        if (!$json)
+            return null;
 
         $title = static::findFirstText($json);
-        if (!$title) return null;
+        if (!$title)
+            return null;
 
         return mb_strlen($title) > 50 ? mb_substr($title, 0, 50) . '...' : $title;
     }
@@ -42,7 +44,8 @@ class Entry extends Model
             return $text;
         }
         foreach ($node['content'] ?? [] as $child) {
-            if ($found = static::findFirstText($child)) return $found;
+            if ($found = static::findFirstText($child))
+                return $found;
         }
         return null;
     }

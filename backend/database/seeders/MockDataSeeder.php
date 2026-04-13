@@ -144,12 +144,12 @@ class MockDataSeeder extends Seeder
 
         // 7. Create Notes for Main User
         $notesData = [
-            ['title' => 'Shopping List', 'type' => 'text', 'content' => "Milk\nEggs\nBread\nButter", 'color' => '#f9e2af', 'is_pinned' => true],
-            ['title' => 'Project Ideas', 'type' => 'text', 'content' => "Refactor the authentication flow.\nAdd drag and drop to notes.\nImprove the UI animations.", 'color' => '#89dceb', 'is_pinned' => false],
-            ['title' => 'Weekly Meeting', 'type' => 'text', 'content' => "Discuss the new features for the upcoming sprint. Review the bug reports from yesterday.", 'color' => '#cba6f7', 'is_pinned' => false],
-            ['title' => 'Movies to Watch', 'type' => 'text', 'content' => "Dune: Part Two\nOppenheimer\nPoor Things", 'color' => '#f8a5c2', 'is_pinned' => true],
-            ['title' => 'Workout Plan', 'type' => 'text', 'content' => "Monday: Chest & Triceps\nWednesday: Back & Biceps\nFriday: Legs & Core", 'color' => '#a6e3a1', 'is_pinned' => false],
-            ['title' => 'Quick Reminder', 'type' => 'text', 'content' => "Call mom at 5 PM.", 'color' => '#fab387', 'is_pinned' => false]
+            ['title' => 'Shopping List', 'content' => "Milk\nEggs\nBread\nButter", 'color' => '#f9e2af', 'is_pinned' => true],
+            ['title' => 'Project Ideas', 'content' => "Refactor the authentication flow.\nAdd drag and drop to notes.\nImprove the UI animations.", 'color' => '#89dceb', 'is_pinned' => false],
+            ['title' => 'Weekly Meeting', 'content' => "Discuss the new features for the upcoming sprint. Review the bug reports from yesterday.", 'color' => '#cba6f7', 'is_pinned' => false],
+            ['title' => 'Movies to Watch', 'content' => "Dune: Part Two\nOppenheimer\nPoor Things", 'color' => '#f8a5c2', 'is_pinned' => true],
+            ['title' => 'Workout Plan', 'content' => "Monday: Chest & Triceps\nWednesday: Back & Biceps\nFriday: Legs & Core", 'color' => '#a6e3a1', 'is_pinned' => false],
+            ['title' => 'Quick Reminder', 'content' => "Call mom at 5 PM.", 'color' => '#fab387', 'is_pinned' => false]
         ];
 
         foreach ($notesData as $note) {
