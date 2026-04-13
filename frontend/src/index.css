@@ -320,16 +320,6 @@ button {
   }
 }
 
-@media (min-width: 1401px) {
-  .sidebar-left .sidebar-container {
-    animation: slideInLeftSidebar 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  .sidebar-right .sidebar-container {
-    animation: slideInRightSidebar 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-}
-
 .content-area-full {
   position: absolute;
   top: 0;

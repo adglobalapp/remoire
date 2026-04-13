@@ -4,7 +4,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
-import { type NoteModalProps, type ChecklistItem } from '../../../../types';
+import { type NoteModalProps } from '../../../../types';
 import { PRESET_COLORS } from '../../../../utils/constants';
 import styles from './NoteModal.module.css';
 
@@ -40,31 +40,13 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
         if (!editor || !note) return;
 
         let content = (note?.content as string) || '<p></p>';
-
-        if (note?.type === 'todo' && note?.content) {
-            try {
-                const todos = JSON.parse(note.content);
-                if (Array.isArray(todos) && todos.length > 0) {
-                    content = '<ul data-type="taskList">' +
-                        todos.map((t: ChecklistItem) =>
-                            `<li data-checked="${t.completed}"><label><input type="checkbox" ${t.completed ? 'checked' : ''}><span></span></label><div><p>${t.text || ''}</p></div></li>`
-                        ).join('') +
-                        '</ul>';
-                } else {
-                    content = '<ul data-type="taskList"><li data-checked="false"><label><input type="checkbox"><span></span></label><div><p></p></div></li></ul>';
-                }
-            } catch (e) {
-                content = '<p></p>';
-            }
-        }
-
         editor.commands.setContent(content);
     }, [note, editor]);
 
     const handleSave = async () => {
         if (!editor) return;
         setIsSaving(true);
-        await onSave({ title, type: 'text', content: editor.getHTML(), color, is_pinned: isPinned });
+        await onSave({ title, content: editor.getHTML(), color, is_pinned: isPinned });
         setIsSaving(false);
     };
 

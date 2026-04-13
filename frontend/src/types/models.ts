@@ -47,7 +47,6 @@ export interface Note {
     id: number;
     user_id: number;
     title: string | null;
-    type: 'text' | 'todo';
     content: string | null;
     color: string | null;
     is_pinned: boolean;
