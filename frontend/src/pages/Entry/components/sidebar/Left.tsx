@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Trash2, Plus, Search, PanelLeft, X, Loader2 } from 'lucide-react';
-import Confirmation from '../../../../components/common/modal/Confirmation';
+import DeleteConfirmation from '../../../../components/common/DeleteConfirmation';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { formatDateTime } from '../../../../utils/dateUtils';
 import { useLocation } from 'react-router-dom';
@@ -165,9 +165,8 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                 </div>
 
                 {itemToDelete !== null && (
-                    <Confirmation
+                    <DeleteConfirmation
                         title="Delete Entry"
-                        variant="danger"
                         message={
                             <span>
                                 Are you sure you want to delete <strong>{entries.find(e => e.id === itemToDelete)?.title || 'Untitled'}</strong>? This action cannot be undone.

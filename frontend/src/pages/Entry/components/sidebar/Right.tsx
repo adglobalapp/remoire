@@ -9,7 +9,7 @@ import { type User, type LeftProps } from '../../../../types';
 import AddParticipant from '../modal/AddParticipant';
 import LocationPicker from '../modal/LocationPicker';
 import Avatar from '../../../../components/common/Avatar';
-import Confirmation from '../../../../components/common/modal/Confirmation';
+import DeleteConfirmation from '../../../../components/common/DeleteConfirmation';
 import { useUserProfile } from '../../../../contexts/UserProfileContext';
 import toast from 'react-hot-toast';
 import classNames from 'classnames';
@@ -260,12 +260,11 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
             )}
 
             {showLocationConfirm && (
-                <Confirmation
+                <DeleteConfirmation
                     title="Remove Location"
                     message="Are you sure you want to remove the location from this entry?"
                     confirmText="Remove"
                     cancelText="Cancel"
-                    variant="danger"
                     isLoading={isRemovingLocation}
                     loadingText="Removing..."
                     onConfirm={handleRemoveLocation}

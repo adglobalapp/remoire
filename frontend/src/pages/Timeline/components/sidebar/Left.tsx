@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Trash2, Plus, Search, PanelLeft, X, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import Confirmation from '../../../../components/common/modal/Confirmation';
+import DeleteConfirmation from '../../../../components/common/DeleteConfirmation';
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
 import { useLocation } from 'react-router-dom';
 import styles from './Left.module.css';
@@ -175,9 +175,8 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                 </div>
 
                 {itemToDelete !== null && (
-                    <Confirmation
+                    <DeleteConfirmation
                         title="Delete Timeline"
-                        variant="danger"
                         message={
                             <span>
                                 Are you sure you want to delete <strong>{timelines.find(t => t.id === itemToDelete)?.name}</strong>? This action cannot be undone.

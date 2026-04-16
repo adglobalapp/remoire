@@ -8,7 +8,7 @@ import { getRelationships, getRelationshipRequests, acceptRelationshipRequest, d
 import List from './components/list/List';
 import AddFriend from './components/modal/AddFriend';
 import { useUserProfile } from '../../contexts/UserProfileContext';
-import Confirmation from '../../components/common/modal/Confirmation';
+import DeleteConfirmation from '../../components/common/DeleteConfirmation';
 import toast from 'react-hot-toast';
 
 const FriendlistPage = () => {
@@ -130,9 +130,8 @@ const FriendlistPage = () => {
                 )}
 
                 {confirmAction && (
-                    <Confirmation
+                    <DeleteConfirmation
                         title={confirmAction.type === 'delete' ? 'Remove Friend?' : 'Block User?'}
-                        variant="danger"
                         message={
                             confirmAction.type === 'delete'
                                 ? <span>Are you sure you want to remove <strong>{confirmAction.userName}</strong> from your friends?</span>

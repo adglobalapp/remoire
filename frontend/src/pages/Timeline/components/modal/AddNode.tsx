@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { uploadImage } from '../../../../api';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
-import Confirmation from '../../../../components/common/modal/Confirmation';
+import DeleteConfirmation from '../../../../components/common/DeleteConfirmation';
 import { type AddNodeProps } from '../../../../types';
 import { PRESET_COLORS } from '../../../../utils/constants';
 import styles from './AddNode.module.css';
@@ -318,9 +318,8 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
             </div>
 
             {isConfirmOpen && (
-                <Confirmation
+                <DeleteConfirmation
                     title="Remove from Timeline"
-                    variant="danger"
                     message={
                         <span>
                             Are you sure you want to remove <strong>{entryToEdit?.title || 'this entry'}</strong> from the timeline? It will only be removed from this timeline and will not be permanently deleted.

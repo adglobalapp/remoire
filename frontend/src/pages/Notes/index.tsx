@@ -8,7 +8,7 @@ import { type Note as NoteType } from '../../types';
 import { getNotes, createNote, updateNote, deleteNote } from '../../api';
 import Note from './components/Note/Note';
 import NoteModal from './components/Modal/NoteModal';
-import Confirmation from '../../components/common/modal/Confirmation';
+import DeleteConfirmation from '../../components/common/DeleteConfirmation';
 
 const NotesPage = () => {
     const [notes, setNotes] = useState<NoteType[]>([]);
@@ -133,9 +133,8 @@ const NotesPage = () => {
                 )}
 
                 {noteToDelete && (
-                    <Confirmation
+                    <DeleteConfirmation
                         title="Delete Note?"
-                        variant="danger"
                         message={
                             <span>Are you sure you want to delete <strong>{notes.find(n => n.id === noteToDelete)?.title || 'Untitled'}</strong>? This action cannot be undone.</span>
                         }

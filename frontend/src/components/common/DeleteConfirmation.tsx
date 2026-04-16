@@ -1,28 +1,24 @@
 import { X, AlertTriangle, Loader2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import styles from './Confirmation.module.css';
-import { type ConfirmationProps } from '../../../types';
+import styles from './DeleteConfirmation.module.css';
+import { type DeleteConfirmationProps } from '../../types';
 
-const Confirmation: React.FC<ConfirmationProps> = ({
+const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
     title,
     message,
     confirmText = 'Confirm',
     cancelText = 'Cancel',
     onConfirm,
     onCancel,
-    variant = 'default',
     isLoading = false,
     loadingText
 }) => {
-    const isDanger = variant === 'danger';
-    const confirmBtnClass = isDanger ? 'btn-danger' : 'btn-primary';
-
     return createPortal(
         <div className="global-modal-overlay" onClick={isLoading ? undefined : onCancel}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
                     <div className={styles.headerTitleContainer}>
-                        {isDanger && <AlertTriangle className={styles.alertIcon} size={24} />}
+                        <AlertTriangle className={styles.alertIcon} size={24} />
                         <h3>{title}</h3>
                     </div>
                     <button className="global-modal-close-btn" onClick={onCancel} disabled={isLoading}>
@@ -40,7 +36,7 @@ const Confirmation: React.FC<ConfirmationProps> = ({
                     <button className="btn btn-secondary" onClick={onCancel} disabled={isLoading}>
                         {cancelText}
                     </button>
-                    <button className={`btn ${confirmBtnClass}`} onClick={onConfirm} disabled={isLoading}>
+                    <button className={`btn btn-danger`} onClick={onConfirm} disabled={isLoading}>
                         {isLoading
                             ? <><Loader2 size={16} className="animate-spin" /> {loadingText || 'Processing...'}</>
                             : confirmText
@@ -53,4 +49,4 @@ const Confirmation: React.FC<ConfirmationProps> = ({
     );
 };
 
-export default Confirmation;
+export default DeleteConfirmation;

@@ -22,12 +22,11 @@ export interface EntryPreviewProps {
     onClose: () => void;
 }
 
-export interface ConfirmationProps {
+export interface DeleteConfirmationProps {
     title: string | ReactNode;
     message: string | ReactNode;
     confirmText?: string;
     cancelText?: string;
-    variant?: 'default' | 'danger';
     isLoading?: boolean;
     loadingText?: string;
     onConfirm: () => void;

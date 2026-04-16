@@ -5,7 +5,7 @@ import { formatDate, formatRelativeDate } from '../../../../utils/dateUtils';
 import { type UserProfileProps } from '../../../../types';
 import Avatar from '../../../../components/common/Avatar';
 import { useAuth } from '../../../../contexts/AuthContext';
-import Confirmation from '../../../../components/common/modal/Confirmation';
+import DeleteConfirmation from '../../../../components/common/DeleteConfirmation';
 import { useUserProfile } from '../../../../contexts/UserProfileContext';
 
 const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
@@ -125,9 +125,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
             </div>
 
             {showBlockConfirm && (
-                <Confirmation
+                <DeleteConfirmation
                     title="Block User?"
-                    variant="danger"
                     message={<span>Are you sure you want to block <strong>{user.name}</strong>? They won't be able to search for you or send requests.</span>}
                     confirmText="Block User"
                     isLoading={isBlocking}
