@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Friend;
+use App\Models\Relationship;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -52,11 +52,11 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        $blocked = Friend::where('user_id', $user->id)
+        $blocked = Relationship::where('user_id', $user->id)
             ->where('status', 'blocked')
-            ->with('friend')
+            ->with('target')
             ->get()
-            ->pluck('friend');
+            ->pluck('target');
 
         return response()->json($blocked);
     }
@@ -65,8 +65,8 @@ class ProfileController extends Controller
     {
         $currentUser = Auth::user();
 
-        Friend::where('user_id', $currentUser->id)
-            ->where('friend_id', $user->id)
+        Relationship::where('user_id', $currentUser->id)
+            ->where('target_id', $user->id)
             ->where('status', 'blocked')
             ->delete();
 

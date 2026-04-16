@@ -1,9 +1,9 @@
-import type { FriendListProps } from '../../../../types';
+import type { RelationshipListProps } from '../../../../types';
 import Row from './Row';
 import classNames from 'classnames';
 import styles from '../../index.module.css';
 
-const FriendList = ({
+const RelationshipList = ({
     title,
     users,
     type,
@@ -14,7 +14,7 @@ const FriendList = ({
     showEmptyState = false,
     emptyMessage = "You haven't added any friends yet.",
     delay = 0
-}: FriendListProps) => {
+}: RelationshipListProps) => {
     if (users.length === 0 && !showEmptyState) return null;
 
     return (
@@ -40,4 +40,4 @@ const FriendList = ({
     );
 };
 
-export default FriendList;
+export default RelationshipList;

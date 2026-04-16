@@ -38,7 +38,7 @@ const Profile = () => {
         if (!silent) setBlockedLoading(true);
         try {
             const data = await getBlockedUsers();
-            setBlocked(data.map((u: any) => ({ ...u, friend_status: 'blocked' })));
+            setBlocked(data.map((u: any) => ({ ...u, relationship_status: 'blocked' })));
         } catch (err) {
             console.error(err);
         } finally {

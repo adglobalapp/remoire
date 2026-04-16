@@ -76,21 +76,21 @@ class User extends Authenticatable
     {
         $id = $this->id;
         return User::whereIn('id', function ($q) use ($id) {
-            $q->select('friend_id')->from('friends')->where(['user_id' => $id, 'status' => 'accepted'])
-                ->union($q->newQuery()->select('user_id')->from('friends')->where(['friend_id' => $id, 'status' => 'accepted']));
+            $q->select('target_id')->from('relationships')->where(['user_id' => $id, 'status' => 'accepted'])
+                ->union($q->newQuery()->select('user_id')->from('relationships')->where(['target_id' => $id, 'status' => 'accepted']));
         });
     }
 
     public function pendingFriendRequests()
     {
-        return $this->belongsToMany(User::class , 'friends', 'friend_id', 'user_id')
+        return $this->belongsToMany(User::class , 'relationships', 'target_id', 'user_id')
             ->wherePivot('status', 'pending')
             ->withTimestamps();
     }
 
     public function sentFriendRequests()
     {
-        return $this->belongsToMany(User::class , 'friends', 'user_id', 'friend_id')
+        return $this->belongsToMany(User::class , 'relationships', 'user_id', 'target_id')
             ->wherePivot('status', 'pending')
             ->withTimestamps();
     }

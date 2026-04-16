@@ -23,14 +23,14 @@ export interface User {
     bio?: string | null;
     last_seen_at?: string | null;
     created_at: string;
-    friend_status?: 'none' | 'pending' | 'accepted' | 'blocked';
+    relationship_status?: 'none' | 'pending' | 'accepted' | 'blocked';
     is_requester?: boolean;
 }
 
-export interface FriendRelation {
+export interface Relationship {
     id: number;
     user_id: number;
-    friend_id: number;
+    target_id: number;
     status: 'pending' | 'accepted' | 'blocked';
     created_at: string;
     updated_at: string;

@@ -70,12 +70,12 @@ export interface LocationPickerProps {
     initialLocation?: { lat: number; lng: number; name?: string };
 }
 
-export interface AddFriendProps {
+export interface AddConnectionProps {
     onClose: () => void;
     onRefresh: () => void;
 }
 
-export interface FriendListProps {
+export interface RelationshipListProps {
     title: string;
     users: User[];
     type: 'pending' | 'sent' | 'friend';
@@ -90,8 +90,8 @@ export interface FriendListProps {
 
 export interface AddParticipantProps {
     onClose: () => void;
-    onSelectFriend: (userId: number) => void;
-    friends: User[];
+    onSelectUser: (userId: number) => void;
+    users: User[];
 }
 
 export interface AvatarProps {

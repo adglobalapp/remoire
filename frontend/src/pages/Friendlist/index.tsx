@@ -4,7 +4,7 @@ import Loader from '../../components/common/Loader';
 import Navbar from '../../components/common/Navbar';
 import styles from './index.module.css';
 import { type User as UserType } from '../../types';
-import { getFriends, getFriendRequests, acceptFriendRequest, deleteFriendship } from '../../api';
+import { getRelationships, getRelationshipRequests, acceptRelationshipRequest, deleteRelationship } from '../../api';
 import List from './components/list/List';
 import AddFriend from './components/modal/AddFriend';
 import { useUserProfile } from '../../contexts/UserProfileContext';
@@ -30,8 +30,8 @@ const FriendlistPage = () => {
         setIsLoading(true);
         try {
             const [friendsData, requestsData] = await Promise.all([
-                getFriends(),
-                getFriendRequests()
+                getRelationships(),
+                getRelationshipRequests()
             ]);
             setFriends(friendsData);
             setPendingRequests(requestsData.pending);
@@ -51,7 +51,7 @@ const FriendlistPage = () => {
     const visibleFriends = friends.filter(u => !isBlocked(u.id));
 
     const handleAccept = async (id: number) => {
-        const success = await acceptFriendRequest(id);
+        const success = await acceptRelationshipRequest(id);
         if (success) {
             toast.success('Friend request accepted!');
             fetchData();
@@ -64,7 +64,7 @@ const FriendlistPage = () => {
         if (!confirmAction) return;
         setIsConfirming(true);
         if (confirmAction.type === 'delete') {
-            const success = await deleteFriendship(confirmAction.userId);
+            const success = await deleteRelationship(confirmAction.userId);
             if (success) { toast.success('Connection removed'); fetchData(); }
             else toast.error('Failed to remove connection');
         } else {

@@ -1,0 +1,24 @@
+- [x] **Backend: Database Schema**
+    - [x] Create rename migration
+    - [x] Execute migration (`php artisan migrate`)
+- [x] **Backend: Models & Logic**
+    - [x] Rename `Friend` model to `Relationship`
+    - [x] Update `User.php` relationship methods
+    - [x] Rename `FriendFactory` to `RelationshipFactory`
+    - [x] Update `MockDataSeeder`
+- [x] **Backend: Controllers & API**
+    - [x] Rename `FriendController` to `RelationshipController`
+    - [x] Update `ProfileController` logic
+    - [x] Update `api.php` routes
+- [x] **Frontend: Core API & Types**
+    - [x] Update `models.ts` interfaces
+    - [x] Rename `friends.ts` API to `relationships.ts` and update endpoints
+- [x] **Frontend: Components Update**
+    - [x] Update `Navbar.tsx`
+    - [x] Update `UserProfileContext.tsx`
+    - [x] Update `Friendlist` pages/components
+    - [x] Update `Entry` sidebar/modals
+    - [x] Update `Landing` page
+- [x] **Verification**
+    - [x] Verify code consistency (Grep)
+    - [ ] Manual test by user (recommended)

@@ -16,7 +16,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
     const [isBlocking, setIsBlocking] = useState(false);
 
     const isSelf = authUser?.id === user.id;
-    const friendStatus = user.friend_status || 'none';
+    const relationshipStatus = user.relationship_status || 'none';
 
     const handleBlockClick = () => {
         setShowBlockConfirm(true);
@@ -109,7 +109,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
 
                 {!isSelf && (
                     <div className={styles.modalFooter}>
-                        {friendStatus === 'blocked' ? (
+                        {relationshipStatus === 'blocked' ? (
                             <button className="btn btn-secondary" onClick={handleUnblockClick} disabled={isUnblocking}>
                                 <UserMinus size={18} /> {isUnblocking ? 'Unblocking...' : 'Unblock User'}
                             </button>

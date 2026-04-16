@@ -1,9 +1,9 @@
 import { type User } from '../types';
 import { API_BASE_URL, getHeaders } from './client';
 
-export const getFriends = async (): Promise<User[]> => {
+export const getRelationships = async (): Promise<User[]> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/friends`, {
+        const response = await fetch(`${API_BASE_URL}/relationships`, {
             headers: getHeaders(),
         });
         if (!response.ok) throw new Error(`Error: ${response.status}`);
@@ -13,9 +13,9 @@ export const getFriends = async (): Promise<User[]> => {
     }
 };
 
-export const getFriendRequests = async (): Promise<{ pending: User[], sent: User[] }> => {
+export const getRelationshipRequests = async (): Promise<{ pending: User[], sent: User[] }> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/friends/requests`, {
+        const response = await fetch(`${API_BASE_URL}/relationships/requests`, {
             headers: getHeaders(),
         });
         if (!response.ok) throw new Error(`Error: ${response.status}`);
@@ -27,7 +27,7 @@ export const getFriendRequests = async (): Promise<{ pending: User[], sent: User
 
 export const searchUsers = async (query: string): Promise<User[]> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/friends/search?q=${encodeURIComponent(query)}`, {
+        const response = await fetch(`${API_BASE_URL}/relationships/search?q=${encodeURIComponent(query)}`, {
             headers: getHeaders(),
         });
         if (!response.ok) throw new Error(`Error: ${response.status}`);
@@ -37,12 +37,12 @@ export const searchUsers = async (query: string): Promise<User[]> => {
     }
 };
 
-export const sendFriendRequest = async (friendId: number): Promise<boolean> => {
+export const sendRelationshipRequest = async (targetId: number): Promise<boolean> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/friends`, {
+        const response = await fetch(`${API_BASE_URL}/relationships`, {
             method: 'POST',
             headers: getHeaders(),
-            body: JSON.stringify({ friend_id: friendId }),
+            body: JSON.stringify({ target_id: targetId }),
         });
         return response.ok;
     } catch (error) {
@@ -50,9 +50,9 @@ export const sendFriendRequest = async (friendId: number): Promise<boolean> => {
     }
 };
 
-export const acceptFriendRequest = async (userId: number): Promise<boolean> => {
+export const acceptRelationshipRequest = async (userId: number): Promise<boolean> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/friends/${userId}/accept`, {
+        const response = await fetch(`${API_BASE_URL}/relationships/${userId}/accept`, {
             method: 'POST',
             headers: getHeaders(),
         });
@@ -62,9 +62,9 @@ export const acceptFriendRequest = async (userId: number): Promise<boolean> => {
     }
 };
 
-export const deleteFriendship = async (userId: number): Promise<boolean> => {
+export const deleteRelationship = async (userId: number): Promise<boolean> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/friends/${userId}`, {
+        const response = await fetch(`${API_BASE_URL}/relationships/${userId}`, {
             method: 'DELETE',
             headers: getHeaders(),
         });
@@ -76,7 +76,7 @@ export const deleteFriendship = async (userId: number): Promise<boolean> => {
 
 export const blockUser = async (userId: number): Promise<boolean> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/friends/${userId}/block`, {
+        const response = await fetch(`${API_BASE_URL}/relationships/${userId}/block`, {
             method: 'POST',
             headers: getHeaders(),
         });

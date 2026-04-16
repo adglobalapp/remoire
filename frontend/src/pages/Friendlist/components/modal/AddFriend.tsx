@@ -3,13 +3,13 @@ import { X, Search, UserPlus, Check, Clock, AlertCircle, Loader2 } from 'lucide-
 import classNames from 'classnames';
 import styles from './AddFriend.module.css';
 import { type User as UserType } from '../../../../types';
-import { searchUsers, sendFriendRequest } from '../../../../api';
+import { searchUsers, sendRelationshipRequest } from '../../../../api';
 import toast from 'react-hot-toast';
-import { type AddFriendProps } from '../../../../types';
+import { type AddConnectionProps } from '../../../../types';
 import Avatar from '../../../../components/common/Avatar';
 import { useUserProfile } from '../../../../contexts/UserProfileContext';
 
-const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
+const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<UserType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -49,12 +49,12 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
 
     const handleSendRequest = async (userId: number) => {
         setIsAdding(userId);
-        const success = await sendFriendRequest(userId);
+        const success = await sendRelationshipRequest(userId);
         setIsAdding(null);
         if (success) {
             toast.success('Friend request sent!');
             setResults(prev => prev.map(u =>
-                u.id === userId ? { ...u, friend_status: 'pending', is_requester: true } : u
+                u.id === userId ? { ...u, relationship_status: 'pending', is_requester: true } : u
             ));
             onRefresh();
             onClose();
@@ -122,9 +122,9 @@ const AddFriend: React.FC<AddFriendProps> = ({ onClose, onRefresh }) => {
                                 </div>
 
                                 <div className={styles.action}>
-                                    {user.friend_status === 'accepted' ? (
+                                    {user.relationship_status === 'accepted' ? (
                                         <span className={styles.statusBadge}><Check size={14} /> Friends</span>
-                                    ) : user.friend_status === 'pending' ? (
+                                    ) : user.relationship_status === 'pending' ? (
                                         <span className={classNames(styles.statusBadge, styles.statusBadgePending)}><Clock size={14} /> Pending</span>
                                     ) : (
                                         <button

@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Entry;
 use App\Models\Timeline;
-use App\Models\Friend;
+use App\Models\Relationship;
 use App\Models\Note;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -33,9 +33,9 @@ class MockDataSeeder extends Seeder
         // Accepted Friends (10)
         $acceptedFriends = $users->random(10);
         foreach ($acceptedFriends as $friend) {
-            Friend::create([
+            Relationship::create([
                 'user_id' => $mainUser->id,
-                'friend_id' => $friend->id,
+                'target_id' => $friend->id,
                 'status' => 'accepted'
             ]);
         }
@@ -43,9 +43,9 @@ class MockDataSeeder extends Seeder
         // Pending Incoming Requests (5) - Others wanting to be friends with Main User
         $incomingRequests = $users->diff($acceptedFriends)->random(5);
         foreach ($incomingRequests as $requestor) {
-            Friend::create([
+            Relationship::create([
                 'user_id' => $requestor->id,
-                'friend_id' => $mainUser->id,
+                'target_id' => $mainUser->id,
                 'status' => 'pending'
             ]);
         }
@@ -53,9 +53,9 @@ class MockDataSeeder extends Seeder
         // Pending Outgoing Requests (3) - Main User wanting to be friends with others
         $outgoingRequests = $users->diff($acceptedFriends)->diff($incomingRequests)->random(3);
         foreach ($outgoingRequests as $recipient) {
-            Friend::create([
+            Relationship::create([
                 'user_id' => $mainUser->id,
-                'friend_id' => $recipient->id,
+                'target_id' => $recipient->id,
                 'status' => 'pending'
             ]);
         }

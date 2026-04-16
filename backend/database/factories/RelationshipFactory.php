@@ -2,16 +2,16 @@
 
 namespace Database\Factories;
 
-use App\Models\Friend;
+use App\Models\Relationship;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Friend>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Relationship>
  */
-class FriendFactory extends Factory
+class RelationshipFactory extends Factory
 {
-    protected $model = Friend::class;
+    protected $model = Relationship::class;
 
     /**
      * Define the model's default state.
@@ -22,7 +22,7 @@ class FriendFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'friend_id' => User::factory(),
+            'target_id' => User::factory(),
             'status' => 'pending',
         ];
     }

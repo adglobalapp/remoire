@@ -6,7 +6,7 @@ import Avatar from '../../../../components/common/Avatar';
 import { useUserProfile } from '../../../../contexts/UserProfileContext';
 import classNames from 'classnames';
 
-const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectFriend, friends }) => {
+const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectUser, users }) => {
     const { showProfile, isBlocked } = useUserProfile();
     const [isAdding, setIsAdding] = useState<number | null>(null);
 
@@ -14,7 +14,7 @@ const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectFriend
         e.stopPropagation();
         setIsAdding(id);
         try {
-            await onSelectFriend(id);
+            await onSelectUser(id);
             onClose();
         } finally {
             setIsAdding(null);
@@ -32,12 +32,12 @@ const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectFriend
                 </div>
 
                 <div className={styles.resultsList}>
-                    {friends.filter(f => !isBlocked(f.id)).length > 0 ? (
-                        friends.filter(f => !isBlocked(f.id)).map(friend => (
+                    {users.filter(f => !isBlocked(f.id)).length > 0 ? (
+                        users.filter(f => !isBlocked(f.id)).map(friend => (
                             <div
                                 key={friend.id}
                                 className={classNames(styles.resultItem, { 'user-blocked': isBlocked(friend.id) })}
-                                onClick={() => { onSelectFriend(friend.id); onClose(); }}
+                                onClick={() => { onSelectUser(friend.id); onClose(); }}
                             >
                                 <div 
                                     className={styles.userInfo} 

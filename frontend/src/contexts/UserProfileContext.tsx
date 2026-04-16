@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, type ReactNode }
 import { type User, type UserProfileContextType } from '../types';
 import UserProfile from '../pages/Friendlist/components/modal/UserProfile';
 import { getBlockedUsers, unblockUser as apiUnblockUser } from '../api/profile';
-import { blockUser as apiBlockUser } from '../api/friends';
+import { blockUser as apiBlockUser } from '../api/relationships';
 import { useAuth } from './AuthContext';
 import toast from 'react-hot-toast';
 
@@ -62,9 +62,9 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
         const userWithStatus = { ...user };
 
         if (isBlocked(user.id)) {
-            userWithStatus.friend_status = 'blocked';
-        } else if (!userWithStatus.friend_status) {
-            userWithStatus.friend_status = 'none';
+            userWithStatus.relationship_status = 'blocked';
+        } else if (!userWithStatus.relationship_status) {
+            userWithStatus.relationship_status = 'none';
         }
 
         setSelectedUser(userWithStatus);

@@ -47,8 +47,8 @@ const Canvas = () => {
             filtered = entries.filter(e => activeTimeline.entryIds.includes(e.id));
         }
 
-        // Sort by entry.date (YYYY-MM-DD), falling back to created_at
-        return filtered.sort((a, b) => compareDates(a.date || a.created_at, b.date || b.created_at));
+        // Sort by entry.date (YYYY-MM-DD), falling back to created_at (descending: newest first)
+        return filtered.sort((a, b) => compareDates(a.date || a.created_at, b.date || b.created_at, false));
     }, [activeTimeline, entries]);
 
     const onMouseDown = (e: React.MouseEvent) => {

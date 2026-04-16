@@ -4,7 +4,7 @@ import { MapPin, Calendar, Plus, Users, PanelRight, X, Trash2, Pencil, Loader2 }
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { useLocation } from 'react-router-dom';
 import styles from './Right.module.css';
-import { getFriends } from '../../../../api';
+import { getRelationships } from '../../../../api';
 import { type User, type LeftProps } from '../../../../types';
 import AddParticipant from '../modal/AddParticipant';
 import LocationPicker from '../modal/LocationPicker';
@@ -29,7 +29,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const toggle = onToggle || (() => { });
 
     useEffect(() => {
-        getFriends().then(setFriends);
+        getRelationships().then(setFriends);
     }, []);
 
     useEffect(() => {
@@ -110,7 +110,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         ? activeEntry.date.substring(0, 10)
         : '';
 
-    const availableFriends = friends.filter(f =>
+    const availableUsers = friends.filter(f =>
         !activeEntry?.participants?.some(p => p.id === f.id)
     );
 
@@ -239,9 +239,9 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
 
             {isModalOpen && createPortal(
                 <AddParticipant
-                    friends={availableFriends}
+                    users={availableUsers}
                     onClose={() => setIsModalOpen(false)}
-                    onSelectFriend={addParticipant}
+                    onSelectUser={addParticipant}
                 />,
                 document.body
             )}
