@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Plus } from 'lucide-react';
-import AddNode from '../modal/AddNode';
-import Node from './Node';
+import AddEntryCard from '../modal/AddEntryCard';
+import EntryCard from './EntryCard';
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
 import Loader from '../../../../components/common/Loader';
 import { useEntryContext } from '../../../../contexts/EntryContext';
@@ -101,7 +101,7 @@ const Canvas = () => {
                         {visibleEntries.map((entry, index) => {
                             const side: 'left' | 'right' = index % 2 === 0 ? 'left' : 'right';
                             return (
-                                <Node
+                                <EntryCard
                                     key={`${activeTimeline?.id || 'default'}-${entry.id}`}
                                     entry={entry}
                                     side={side}
@@ -126,7 +126,7 @@ const Canvas = () => {
             )}
 
             {isAddModalOpen && (
-                <AddNode onClose={() => setIsAddModalOpen(false)} />
+                <AddEntryCard onClose={() => setIsAddModalOpen(false)} />
             )}
         </div>
     );

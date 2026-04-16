@@ -6,13 +6,13 @@ export interface LeftProps {
     onToggle?: () => void;
 }
 
-export interface NodeProps {
+export interface EntryCardProps {
     entry: Entry;
     side: 'left' | 'right';
     index?: number;
 }
 
-export interface AddNodeProps {
+export interface AddEntryCardProps {
     onClose: () => void;
     entryToEdit?: Entry;
 }

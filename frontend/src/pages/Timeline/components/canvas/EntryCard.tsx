@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { type NodeProps } from '../../../../types';
-import styles from './Node.module.css';
+import { type EntryCardProps } from '../../../../types';
+import styles from './EntryCard.module.css';
 import { Settings } from 'lucide-react';
 import EntryPreview from '../modal/EntryPreview';
-import AddNode from '../modal/AddNode';
+import AddEntryCard from '../modal/AddEntryCard';
 import { formatDate } from '../../../../utils/dateUtils';
 import { getExcerpt, getImageUrl } from '../../../../utils/contentUtils';
 import Avatar from '../../../../components/common/Avatar';
 
-const Node = ({ entry, side, index = 0 }: NodeProps) => {
+const EntryCard = ({ entry, side, index = 0 }: EntryCardProps) => {
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -82,10 +82,10 @@ const Node = ({ entry, side, index = 0 }: NodeProps) => {
             )}
 
             {isEditOpen && (
-                <AddNode entryToEdit={entry} onClose={() => setIsEditOpen(false)} />
+                <AddEntryCard entryToEdit={entry} onClose={() => setIsEditOpen(false)} />
             )}
         </div>
     );
 };
 
-export default Node;
+export default EntryCard;

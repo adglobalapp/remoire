@@ -6,11 +6,11 @@ import { uploadImage } from '../../../../api';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
 import DeleteConfirmation from '../../../../components/common/DeleteConfirmation';
-import { type AddNodeProps } from '../../../../types';
+import { type AddEntryCardProps } from '../../../../types';
 import { PRESET_COLORS } from '../../../../utils/constants';
-import styles from './AddNode.module.css';
+import styles from './AddEntryCard.module.css';
 
-const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
+const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
     const { entries, updateEntryMetadata } = useEntryContext();
     const { activeTimeline, addEntryToTimeline, removeEntryFromTimeline } = useTimelineContext();
 
@@ -150,7 +150,7 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
             >
                 <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
                     <div className={styles.modalHeader}>
-                        <h2>{entryToEdit ? 'Edit Entry Appearance' : 'Add Entry to Timeline'}</h2>
+                        <h2>{entryToEdit ? 'Edit Entry Card' : 'Add Entry to Timeline'}</h2>
                         <button className="modal-close-btn" onClick={onClose} aria-label="Close">
                             <X size={20} />
                         </button>
@@ -178,7 +178,7 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
                             {isDropdownOpen && (
                                 <div className={styles.dropdownMenu}>
                                     {availableEntries.length === 0 ? (
-                                        <p className="empty-state-placeholder">No more entries available.</p>
+                                        <p className={styles.emptyState}>No more entries available.</p>
                                     ) : (
                                         availableEntries.map(e => (
                                             <div
@@ -337,4 +337,4 @@ const AddNode = ({ onClose, entryToEdit }: AddNodeProps) => {
     );
 };
 
-export default AddNode;
+export default AddEntryCard;
