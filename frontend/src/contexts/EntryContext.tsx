@@ -79,27 +79,15 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
         await apiUpdateEntry(id, { title });
     }, []);
 
-    const syncEntryUpdate = useCallback(async (id: number, data: any) => {
+    const updateEntry = useCallback(async (id: number, data: any) => {
         const updated = await apiUpdateEntry(id, data);
         if (!updated) return;
         setEntries(prev => prev.map(e => e.id === id ? updated : e));
         setActiveEntry(prev => prev?.id === id ? updated : prev);
     }, []);
 
-    const updateEntryDate = useCallback(async (id: number, date: string) => {
-        await syncEntryUpdate(id, { date });
-    }, [syncEntryUpdate]);
-
-    const updateEntryMetadata = useCallback(async (id: number, data: Partial<Entry>) => {
-        await syncEntryUpdate(id, data);
-    }, [syncEntryUpdate]);
-
-    const updateEntryParticipants = useCallback(async (id: number, participantIds: number[]) => {
-        await syncEntryUpdate(id, { participant_ids: participantIds } as any);
-    }, [syncEntryUpdate]);
-
     return (
-        <EntryContext.Provider value={{ entries, activeEntry, isLoading, selectEntry, createEntry, deleteEntry, saveEntry, updateEntryTitle, updateEntryDate, updateEntryMetadata, updateEntryParticipants }}>
+        <EntryContext.Provider value={{ entries, activeEntry, isLoading, selectEntry, createEntry, deleteEntry, saveEntry, updateEntryTitle, updateEntry }}>
             {children}
         </EntryContext.Provider>
     );

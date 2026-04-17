@@ -11,7 +11,7 @@ import { PRESET_COLORS } from '../../../../utils/constants';
 import styles from './AddEntryCard.module.css';
 
 const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
-    const { entries, updateEntryMetadata } = useEntryContext();
+    const { entries, updateEntry } = useEntryContext();
     const { activeTimeline, addEntryToTimeline, removeEntryFromTimeline } = useTimelineContext();
 
     const [selectedEntryId, setSelectedEntryId] = useState<number | ''>(entryToEdit?.id || '');
@@ -84,7 +84,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
         setIsLoading(true);
         setFieldErrors({});
         try {
-            await updateEntryMetadata(Number(selectedEntryId), {
+            await updateEntry(Number(selectedEntryId), {
                 color: handleColorSave(),
                 image_url: imageUrl || undefined,
             });

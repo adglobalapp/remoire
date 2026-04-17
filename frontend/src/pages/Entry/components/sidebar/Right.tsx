@@ -15,7 +15,7 @@ import toast from 'react-hot-toast';
 import classNames from 'classnames';
 
 const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
-    const { activeEntry, updateEntryDate, updateEntryParticipants, updateEntryMetadata } = useEntryContext();
+    const { activeEntry, updateEntry } = useEntryContext();
     const { pathname } = useLocation();
     const lastPage = useRef(pathname);
     const [friends, setFriends] = useState<User[]>([]);
@@ -46,7 +46,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
 
     const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (activeEntry) {
-            updateEntryDate(activeEntry.id, e.target.value);
+            updateEntry(activeEntry.id, { date: e.target.value });
             toast.success('Date updated');
         }
     };
@@ -56,7 +56,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
             setIsRemovingParticipant(userId);
             try {
                 const currentIds = activeEntry.participants?.map(p => p.id) || [];
-                await updateEntryParticipants(activeEntry.id, currentIds.filter(id => id !== userId));
+                await updateEntry(activeEntry.id, { participant_ids: currentIds.filter(id => id !== userId) });
                 toast.success('Participant removed');
             } catch {
                 toast.error('Failed to remove participant');
@@ -70,7 +70,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         if (activeEntry) {
             const currentIds = activeEntry.participants?.map(p => p.id) || [];
             if (!currentIds.includes(userId)) {
-                await updateEntryParticipants(activeEntry.id, [...currentIds, userId]);
+                await updateEntry(activeEntry.id, { participant_ids: [...currentIds, userId] });
                 toast.success('Participant added');
             }
         }
@@ -78,7 +78,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
 
     const handleLocationSelect = async (location: { name: string, lat: number, lng: number }) => {
         if (activeEntry) {
-            await updateEntryMetadata(activeEntry.id, {
+            await updateEntry(activeEntry.id, {
                 location_name: location.name,
                 latitude: location.lat,
                 longitude: location.lng
@@ -91,7 +91,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         if (activeEntry) {
             setIsRemovingLocation(true);
             try {
-                await updateEntryMetadata(activeEntry.id, {
+                await updateEntry(activeEntry.id, {
                     location_name: null as any,
                     latitude: null as any,
                     longitude: null as any

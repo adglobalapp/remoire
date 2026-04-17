@@ -15,7 +15,6 @@ const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectUser, 
         setIsAdding(id);
         try {
             await onSelectUser(id);
-            onClose();
         } finally {
             setIsAdding(null);
         }
@@ -37,7 +36,7 @@ const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectUser, 
                             <div
                                 key={friend.id}
                                 className={classNames(styles.resultItem, { 'user-blocked': isBlocked(friend.id) })}
-                                onClick={() => { onSelectUser(friend.id); onClose(); }}
+                                onClick={() => { onSelectUser(friend.id); }}
                             >
                                 <div 
                                     className={styles.userInfo} 

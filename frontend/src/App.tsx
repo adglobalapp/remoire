@@ -17,35 +17,28 @@ import { TimelineProvider } from './contexts/TimelineContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { UserProfileProvider } from './contexts/UserProfileContext';
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function AuthGuard({ children, type }: { children: React.ReactNode; type: 'private' | 'guest' }) {
     const { isAuthenticated, isLoading } = useAuth();
 
     if (isLoading) {
-        return (
-            <div className="page-container">
-                <Navbar />
-                <main className="main-layout">
-                    <Loader centered />
-                </main>
-            </div>
-        );
-    }
-
-    if (!isAuthenticated) {
-        return <Navigate to="/" replace />;
-    }
-
-    return <>{children}</>;
-}
-
-function LandingRoute({ children }: { children: React.ReactNode }) {
-    const { isAuthenticated, isLoading } = useAuth();
-
-    if (isLoading) {
+        if (type === 'private') {
+            return (
+                <div className="page-container">
+                    <Navbar />
+                    <main className="main-layout">
+                        <Loader centered />
+                    </main>
+                </div>
+            );
+        }
         return <Loader centered />;
     }
 
-    if (isAuthenticated) {
+    if (type === 'private' && !isAuthenticated) {
+        return <Navigate to="/" replace />;
+    }
+
+    if (type === 'guest' && isAuthenticated) {
         return <Navigate to="/entries" replace />;
     }
 
@@ -61,7 +54,7 @@ function AppContent() {
             <TimelineProvider>
                 <Routes>
                     <Route path="/" element={
-                        <LandingRoute>
+                        <AuthGuard type="guest">
                             <>
                                 <LandingPage
                                     onLogin={() => setShowLogin(true)}
@@ -86,48 +79,48 @@ function AppContent() {
                                     />
                                 )}
                             </>
-                        </LandingRoute>
+                        </AuthGuard>
                     } />
 
                     <Route path="/entries" element={
-                        <ProtectedRoute>
+                        <AuthGuard type="private">
                             <EntryPage />
-                        </ProtectedRoute>
+                        </AuthGuard>
                     } />
 
                     <Route path="/timelines" element={
-                        <ProtectedRoute>
+                        <AuthGuard type="private">
                             <TimelinePage />
-                        </ProtectedRoute>
+                        </AuthGuard>
                     } />
 
                     <Route path="/friends" element={
-                        <ProtectedRoute>
+                        <AuthGuard type="private">
                             <FriendlistPage />
-                        </ProtectedRoute>
+                        </AuthGuard>
                     } />
 
                     <Route path="/notes" element={
-                        <ProtectedRoute>
+                        <AuthGuard type="private">
                             <NotesPage />
-                        </ProtectedRoute>
+                        </AuthGuard>
                     } />
 
                     <Route path="/maps" element={
-                        <ProtectedRoute>
+                        <AuthGuard type="private">
                             <MapsPage />
-                        </ProtectedRoute>
+                        </AuthGuard>
                     } />
 
                     <Route path="/profile" element={
-                        <ProtectedRoute>
+                        <AuthGuard type="private">
                             <div className="page-container">
                                 <Navbar />
                                 <main className="main-layout">
                                     <ProfilePage />
                                 </main>
                             </div>
-                        </ProtectedRoute>
+                        </AuthGuard>
                     } />
 
                     <Route path="*" element={<Navigate to="/" replace />} />

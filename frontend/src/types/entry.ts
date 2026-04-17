@@ -10,9 +10,7 @@ export interface EntryContextValue {
     deleteEntry: (id: number) => Promise<void>;
     saveEntry: (id: number, title: string, content: string) => void;
     updateEntryTitle: (id: number, title: string) => void;
-    updateEntryDate: (id: number, date: string) => Promise<void>;
-    updateEntryMetadata: (id: number, data: Partial<Entry>) => Promise<void>;
-    updateEntryParticipants: (id: number, participantIds: number[]) => Promise<void>;
+    updateEntry: (id: number, data: Partial<Entry> & { participant_ids?: number[] }) => Promise<void>;
 }
 
 export interface EntryProviderProps {
