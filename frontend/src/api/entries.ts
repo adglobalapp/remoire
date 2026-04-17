@@ -13,18 +13,6 @@ export const getEntries = async (): Promise<Entry[]> => {
     }
 };
 
-export const getEntry = async (id: number): Promise<Entry | null> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
-            headers: getHeaders(),
-        });
-        if (!response.ok) throw new Error(`Error: ${response.status}`);
-        return await response.json();
-    } catch (error) {
-        return null;
-    }
-};
-
 export const createEntry = async (title: string): Promise<Entry | null> => {
     try {
         const response = await fetch(`${API_BASE_URL}/entries`, {
