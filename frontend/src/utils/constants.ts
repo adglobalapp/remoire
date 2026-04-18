@@ -1,9 +1,9 @@
 export const PRESET_COLORS = [
-    '#f8a5c2', // Soft Coral
-    '#f9e2af', // Sunny Yellow
-    '#a6e3a1', // Minty Green
-    '#89dceb', // Sky Blue
-    '#cba6f7', // Soft Lavender
-    '#fab387', // Peach
-    '#f5e0dc'  // Warm Sand
+    '#f8a5c2', 
+    '#f9e2af', 
+    '#a6e3a1', 
+    '#89dceb', 
+    '#cba6f7', 
+    '#fab387', 
+    '#f5e0dc'  
 ];

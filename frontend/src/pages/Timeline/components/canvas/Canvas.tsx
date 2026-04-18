@@ -25,7 +25,6 @@ const Canvas = () => {
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-    // Initial centering (override the default hook transform)
     useEffect(() => {
         if (containerRef.current) {
             const width = containerRef.current.offsetWidth;
@@ -36,7 +35,6 @@ const Canvas = () => {
         }
     }, [setTransform]);
 
-    // Filter and sort entries for the active timeline, ordered by entry.date
     const visibleEntries: Entry[] = useMemo(() => {
         if (!activeTimeline) return [];
 
@@ -47,7 +45,6 @@ const Canvas = () => {
             filtered = entries.filter(e => activeTimeline.entryIds.includes(e.id));
         }
 
-        // Sort by entry.date (YYYY-MM-DD), falling back to created_at (descending: newest first)
         return filtered.sort((a, b) => compareDates(a.date || a.created_at, b.date || b.created_at, false));
     }, [activeTimeline, entries]);
 
@@ -94,10 +91,10 @@ const Canvas = () => {
             >
                 {visibleEntries.length > 0 && (
                     <div className={styles.timelineWrapper}>
-                        {/* Vertical center line */}
+                        {}
                         <div className={styles.centerLine} />
 
-                        {/* Year labels */}
+                        {}
                         {visibleEntries.map((entry, index) => {
                             const side: 'left' | 'right' = index % 2 === 0 ? 'left' : 'right';
                             return (
@@ -113,7 +110,7 @@ const Canvas = () => {
                 )}
             </div>
 
-            {/* Add Node Button in Top Right */}
+            {}
             {activeTimeline && (
                 <button
                     onClick={() => setIsAddModalOpen(true)}

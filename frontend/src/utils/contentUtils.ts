@@ -18,7 +18,7 @@ export const getExcerpt = (content: string | null): string => {
             return full.length > 180 ? full.substring(0, 180) + '...' : full;
         }
     } catch {
-        // plain string
+        
     }
     const plain = typeof content === 'string' ? content.replace(/<[^>]+>/g, ' ').trim() : '';
     return plain.length > 180 ? plain.substring(0, 180) + '...' : plain;
@@ -44,7 +44,7 @@ export const getImageUrl = (content: string | null): string | null => {
             return findImage(contentJSON.content);
         }
     } catch {
-        // ignore
+        
     }
     return null;
 };

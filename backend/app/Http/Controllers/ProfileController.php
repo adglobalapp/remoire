@@ -13,7 +13,6 @@ class ProfileController extends Controller
 {
     public function update(Request $request)
     {
-        /** @var User $user */
         $user = Auth::user();
 
         $request->validate([
@@ -37,7 +36,6 @@ class ProfileController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        /** @var User $user */
         $user = $request->user();
         $user->update([
             'password' => Hash::make($request->password),

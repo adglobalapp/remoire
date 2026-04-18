@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Entry>
  */
@@ -18,8 +19,7 @@ class EntryFactory extends Factory
     {
         $titleText = fake()->sentence(3);
         $bodyText = fake()->paragraph(fake()->numberBetween(2, 4));
-        
-        // Structure expected by EntryController::extractTitle and the frontend editor
+
         $contentJSON = [
             'type' => 'doc',
             'content' => [
@@ -47,7 +47,7 @@ class EntryFactory extends Factory
 
         return [
             'user_id' => \App\Models\User::factory(),
-            'title' => 'Untitled', // Will be overwritten by the 'saving' event in the Entry model
+            'title' => 'Untitled',
             'date' => fake()->dateTimeBetween('-2 years', 'now')->format('Y-m-d'),
             'content' => json_encode(['contentJSON' => $contentJSON]),
             'image_url' => null,

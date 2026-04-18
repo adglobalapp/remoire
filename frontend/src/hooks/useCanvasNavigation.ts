@@ -35,10 +35,8 @@ export const useCanvasNavigation = (options: Options = {}) => {
         }
     }, [isDragging]);
 
-
     const handleMouseUp = useCallback(() => setIsDragging(false), []);
 
-    // Touch Handling
     const handleTouchStart = useCallback((e: React.TouchEvent, canDrag: boolean) => {
         if (!canDrag) return;
 
@@ -58,14 +56,14 @@ export const useCanvasNavigation = (options: Options = {}) => {
         if (!isDragging) return;
 
         if (e.touches.length === 1 && lastTouchDistanceRef.current === null) {
-            // Panning
+            
             const dx = e.touches[0].clientX - lastTouchPosRef.current.x;
             const dy = e.touches[0].clientY - lastTouchPosRef.current.y;
             setTransform(prev => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
             lastTouchPosRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
         } else if (e.touches.length === 2) {
-            // Pinch to Zoom
-            e.preventDefault(); // Prevent browser zoom
+            
+            e.preventDefault(); 
             const dx = e.touches[0].clientX - e.touches[1].clientX;
             const dy = e.touches[0].clientY - e.touches[1].clientY;
             const distance = Math.sqrt(dx * dx + dy * dy);
@@ -150,8 +148,6 @@ export const useCanvasNavigation = (options: Options = {}) => {
         isDragging,
         containerRef,
         handleMouseDown,
-        handleMouseUp,
         handleTouchStart,
-        handleTouchEnd,
     };
 };

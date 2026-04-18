@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -83,14 +82,14 @@ class User extends Authenticatable
 
     public function pendingFriendRequests()
     {
-        return $this->belongsToMany(User::class , 'relationships', 'target_id', 'user_id')
+        return $this->belongsToMany(User::class, 'relationships', 'target_id', 'user_id')
             ->wherePivot('status', 'pending')
             ->withTimestamps();
     }
 
     public function sentFriendRequests()
     {
-        return $this->belongsToMany(User::class , 'relationships', 'user_id', 'target_id')
+        return $this->belongsToMany(User::class, 'relationships', 'user_id', 'target_id')
             ->wherePivot('status', 'pending')
             ->withTimestamps();
     }

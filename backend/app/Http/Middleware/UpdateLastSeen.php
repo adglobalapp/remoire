@@ -17,9 +17,7 @@ class UpdateLastSeen
     {
         if (auth()->check()) {
             $user = auth()->user();
-            
-            // Only update if last_seen_at is null or not from today
-            // This meets the "day-accurate" requirement while being efficient
+
             if (!$user->last_seen_at || !$user->last_seen_at->isToday()) {
                 $user->update(['last_seen_at' => now()]);
             }

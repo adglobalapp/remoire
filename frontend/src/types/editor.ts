@@ -60,4 +60,3 @@ export interface PageSettingsProps {
     pageSettings?: PageSettings;
     onPageSettingsChange?: (settings: PageSettings) => void;
 }
-

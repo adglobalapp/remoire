@@ -15,7 +15,6 @@ const ImageNodeView = (props: any) => {
     const moveableRef = useRef<any>(null);
     const canvasScale = useCanvasScale();
 
-    // Image actions
     const handleDrag = useCallback(({ target, beforeTranslate }: any) => {
         target.style.transform = `translate(${beforeTranslate[0]}px, ${beforeTranslate[1]}px) rotate(${rotation ?? 0}deg)`;
     }, [rotation]);
@@ -60,14 +59,12 @@ const ImageNodeView = (props: any) => {
         }
     }, [updateAttributes]);
 
-    // Update Moveable rect when attributes or scale change
     useEffect(() => {
         if (selected && moveableRef.current) {
             moveableRef.current.updateRect();
         }
     }, [selected, src, width, height, x, y, rotation, canvasScale]);
 
-    // Image selection
     useEffect(() => {
         if (!selected) return;
 
@@ -95,7 +92,6 @@ const ImageNodeView = (props: any) => {
     const w = width ?? 300;
     const h = height > 0 ? height : 'auto';
 
-    // cap the delete button and padding size
     const deleteScale = Math.min(1 / canvasScale, 1.5);
     const deleteBottom = -(8 + 12 * (1 + deleteScale));
 
@@ -108,11 +104,11 @@ const ImageNodeView = (props: any) => {
             }}
             onPointerDown={(e: React.PointerEvent) => {
                 const target = e.target as HTMLElement;
-                // Don't interfere if clicking on moveable controls
+                
                 if (target.closest('.moveable-control-box')) return;
 
                 if (window.innerWidth <= 800) {
-                    // Hide mobile keyboard
+                    
                     props.editor.commands.blur();
                     setTimeout(() => props.editor.commands.blur(), 10);
                 }

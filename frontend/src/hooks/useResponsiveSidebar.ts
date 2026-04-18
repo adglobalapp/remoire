@@ -1,30 +1,16 @@
 import { useState, useEffect } from 'react';
 
-/**
- * Custom hook to manage sidebar visibility based on screen width.
- * Standardizes the 1400px breakpoint for mode where sidebars are open by default.
- */
 export const useResponsiveSidebar = (breakpoint = 1400) => {
-    // Initial state based on current window width
-    const getInitialState = () => {
-        if (typeof window === 'undefined') return false;
-        return window.innerWidth > breakpoint;
-    };
+    const isLargeScreen = typeof window !== 'undefined' && window.innerWidth > breakpoint;
 
-    const [leftOpen, setLeftOpen] = useState(getInitialState);
-    const [rightOpen, setRightOpen] = useState(getInitialState);
+    const [leftOpen, setLeftOpen] = useState(isLargeScreen);
+    const [rightOpen, setRightOpen] = useState(isLargeScreen);
 
     useEffect(() => {
         const handleResize = () => {
             const isDesktop = window.innerWidth > breakpoint;
-            // When crossing the breakpoint, force the state to match the new mode
-            if (isDesktop) {
-                setLeftOpen(true);
-                setRightOpen(true);
-            } else {
-                setLeftOpen(false);
-                setRightOpen(false);
-            }
+            setLeftOpen(isDesktop);
+            setRightOpen(isDesktop);
         };
 
         window.addEventListener('resize', handleResize);
@@ -32,11 +18,11 @@ export const useResponsiveSidebar = (breakpoint = 1400) => {
     }, [breakpoint]);
 
     const toggleLeft = () => {
-        const isMobile = typeof window !== 'undefined' && window.innerWidth <= breakpoint;
+        const isMobile = window.innerWidth <= breakpoint;
         if (isMobile) {
             if (!leftOpen) {
                 setLeftOpen(true);
-                setRightOpen(false); // Force close other sidebar on mobile
+                setRightOpen(false);
             } else {
                 setLeftOpen(false);
             }
@@ -46,11 +32,11 @@ export const useResponsiveSidebar = (breakpoint = 1400) => {
     };
 
     const toggleRight = () => {
-        const isMobile = typeof window !== 'undefined' && window.innerWidth <= breakpoint;
+        const isMobile = window.innerWidth <= breakpoint;
         if (isMobile) {
             if (!rightOpen) {
                 setRightOpen(true);
-                setLeftOpen(false); // Force close other sidebar on mobile
+                setLeftOpen(false);
             } else {
                 setRightOpen(false);
             }
@@ -61,9 +47,7 @@ export const useResponsiveSidebar = (breakpoint = 1400) => {
 
     return {
         leftOpen,
-        setLeftOpen,
         rightOpen,
-        setRightOpen,
         toggleLeft,
         toggleRight
     };

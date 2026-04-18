@@ -184,5 +184,4 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     );
 };
 
-
 export default Left;

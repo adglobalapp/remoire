@@ -17,7 +17,7 @@ class MockDataSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Create Main User
+
         $mainUser = User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
@@ -26,11 +26,8 @@ class MockDataSeeder extends Seeder
             'avatar_url' => 'https://i.pravatar.cc/300?u=test@example.com',
         ]);
 
-        // 2. Create 20 Mock Users (potential friends)
         $users = User::factory(20)->create();
 
-        // Friendships for Main User
-        // Accepted Friends (10)
         $acceptedFriends = $users->random(10);
         foreach ($acceptedFriends as $friend) {
             Relationship::create([
@@ -40,7 +37,6 @@ class MockDataSeeder extends Seeder
             ]);
         }
 
-        // Pending Incoming Requests (5) - Others wanting to be friends with Main User
         $incomingRequests = $users->diff($acceptedFriends)->random(5);
         foreach ($incomingRequests as $requestor) {
             Relationship::create([
@@ -50,7 +46,6 @@ class MockDataSeeder extends Seeder
             ]);
         }
 
-        // Pending Outgoing Requests (3) - Main User wanting to be friends with others
         $outgoingRequests = $users->diff($acceptedFriends)->diff($incomingRequests)->random(3);
         foreach ($outgoingRequests as $recipient) {
             Relationship::create([
@@ -60,7 +55,6 @@ class MockDataSeeder extends Seeder
             ]);
         }
 
-        // 4. Create Timelines for Main User
         $defaultTimeline = Timeline::create([
             'user_id' => $mainUser->id,
             'name' => 'All Entries',
@@ -87,12 +81,10 @@ class MockDataSeeder extends Seeder
 
         $timelines = [$travelTimeline, $cookingTimeline, $familyTimeline];
 
-        // 5. Create Entries for Main User
         $entries = Entry::factory(50)->create([
             'user_id' => $mainUser->id
         ]);
 
-        // Titles for some entries
         $specialEntries = [
             ['title' => 'Sunset in Santorini', 'color' => '#f8a5c2'],
             ['title' => 'First Homemade Lasagna', 'color' => '#fab387'],
@@ -102,34 +94,29 @@ class MockDataSeeder extends Seeder
         ];
 
         foreach ($entries as $index => $entry) {
-            // Apply special titles to some
+
             if ($index < count($specialEntries)) {
                 $entry->update($specialEntries[$index]);
             }
 
-            // Randomly assign to 1-2 custom timelines
             if (fake()->boolean(70)) {
                 $randomTimeline = $timelines[array_rand($timelines)];
                 $entry->timelines()->attach($randomTimeline->id);
             }
 
-            // Always add to default timeline (logic usually handled by app, but good for seeding)
             $entry->timelines()->syncWithoutDetaching([$defaultTimeline->id]);
 
-            // Randomly assign 1-3 participants from accepted friends
             if (fake()->boolean(60)) {
                 $participants = $acceptedFriends->random(fake()->numberBetween(1, 3));
                 $entry->participants()->attach($participants->pluck('id'));
             }
 
-            // Add some "placeholder" images to some entries for visualization
             if (fake()->boolean(40)) {
                 $imgId = fake()->numberBetween(1, 1000);
                 $entry->update(['image_url' => "https://picsum.photos/seed/{$imgId}/800/600"]);
             }
         }
 
-        // 6b. Create some concentrated entries in Budapest for clustering demo
         $budapestEntries = Entry::factory(40)->create([
             'user_id' => $mainUser->id,
             'location_name' => 'Budapest, Hungary',
@@ -142,7 +129,6 @@ class MockDataSeeder extends Seeder
             $entry->timelines()->syncWithoutDetaching([$defaultTimeline->id]);
         }
 
-        // 7. Create Notes for Main User
         $notesData = [
             ['title' => 'Shopping List', 'content' => "Milk\nEggs\nBread\nButter", 'color' => '#f9e2af', 'is_pinned' => true],
             ['title' => 'Project Ideas', 'content' => "Refactor the authentication flow.\nAdd drag and drop to notes.\nImprove the UI animations.", 'color' => '#89dceb', 'is_pinned' => false],
