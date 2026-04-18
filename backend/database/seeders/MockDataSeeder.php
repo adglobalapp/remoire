@@ -18,13 +18,15 @@ class MockDataSeeder extends Seeder
     public function run(): void
     {
 
-        $mainUser = User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => Hash::make('password'),
-            'bio' => 'Journaling my experiences and memories. Interested in travel and photography.',
-            'avatar_url' => 'https://i.pravatar.cc/300?u=test@example.com',
-        ]);
+        $mainUser = User::updateOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => Hash::needsRehash('password') ? Hash::make('password') : 'password',
+                'bio' => 'Journaling my experiences and memories. Interested in travel and photography.',
+                'avatar_url' => 'https://i.pravatar.cc/300?u=test@example.com',
+            ]
+        );
 
         $users = User::factory(20)->create();
 
