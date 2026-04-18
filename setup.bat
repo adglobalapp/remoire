@@ -5,6 +5,7 @@ call composer install
 call php artisan key:generate
 copy /y nul database\database.sqlite
 call php artisan migrate --force
+call php artisan storage:link
 cd ../frontend
 copy .env.example .env
 call npm install
