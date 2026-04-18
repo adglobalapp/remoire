@@ -1,6 +1,3 @@
-/* sidebarContainer styles removed to avoid overriding global .sidebar-container */
-
-
 .mobileHidden,
 .mobileVisible {
     height: 100%;

@@ -6,11 +6,11 @@
     background-color: var(--color-dark-beige);
     background-color: var(--color-dark-beige);
     background-image:
-        radial-gradient(at 10% 10%, rgba(248, 165, 194, 0.18) 0px, transparent 50%),
-        radial-gradient(at 90% 10%, rgba(137, 220, 235, 0.18) 0px, transparent 50%),
-        radial-gradient(at 50% 50%, rgba(249, 226, 175, 0.15) 0px, transparent 50%),
-        radial-gradient(at 10% 90%, rgba(166, 227, 161, 0.18) 0px, transparent 50%),
-        radial-gradient(at 90% 90%, rgba(203, 166, 247, 0.18) 0px, transparent 50%);
+        radial-gradient(at 10% 10%, rgba(var(--color-pink-rgb), 0.18) 0px, transparent 50%),
+        radial-gradient(at 90% 10%, rgba(var(--color-sky-rgb), 0.18) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(var(--color-yellow-rgb), 0.15) 0px, transparent 50%),
+        radial-gradient(at 10% 90%, rgba(var(--color-green-rgb), 0.18) 0px, transparent 50%),
+        radial-gradient(at 90% 90%, rgba(var(--color-mauve-rgb), 0.18) 0px, transparent 50%);
     color: var(--color-dark-brown);
     display: flex;
     flex-direction: column;
@@ -18,7 +18,6 @@
     justify-content: center;
     font-family: var(--font-ui), sans-serif;
 }
-
 
 .landingContainer::before {
     content: '';
@@ -37,7 +36,7 @@
     position: relative;
     z-index: 2;
     text-align: center;
-    margin-bottom: 60px;
+    margin-bottom: 80px;
     margin-top: -60px;
     animation: fadeInDown 1s ease-out;
 }
@@ -57,24 +56,23 @@
 }
 
 .sparkle {
-    color: #f8a5c2;
-    width: clamp(32px, 6vw, 48px);
-    height: clamp(32px, 6vw, 48px);
-    filter: drop-shadow(0 0 10px rgba(248, 165, 194, 0.4));
-    animation: pulse 2.5s ease-in-out infinite;
+    stroke: url(#sparkle-gradient);
+    width: clamp(40px, 8vw, 56px);
+    height: clamp(40px, 8vw, 56px);
+    animation: sparkle-float 3s ease-in-out infinite;
 }
 
-@keyframes pulse {
+@keyframes sparkle-float {
 
     0%,
     100% {
-        transform: scale(1);
-        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0deg);
+        filter: drop-shadow(0 0 15px rgba(248, 165, 194, 0.7));
     }
 
     50% {
-        transform: scale(1.1);
-        opacity: 0.8;
+        transform: translateY(-8px) scale(1.15) rotate(5deg);
+        filter: drop-shadow(0 0 25px rgba(248, 165, 194, 0.9));
     }
 }
 
@@ -140,86 +138,29 @@
     animation: fadeInUp 1s ease-out 0.4s both;
 }
 
-.showcaseCard {
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 1);
-    border-radius: 24px;
-    padding: 24px;
-    height: 300px;
-    display: flex;
-    flex-direction: column;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-    cursor: pointer;
-}
-
 .clickable {
     cursor: pointer;
 }
 
 .mockNode1 {
-    background: #89dceb;
+    background: var(--color-sky);
 }
 
 .mockNode2 {
-    background: #fab387;
+    background: var(--color-peach);
 }
 
 .mockNode3 {
-    background: #cba6f7;
+    background: var(--color-mauve);
 }
 
 .mockNode4 {
-    background: #f8a5c2;
+    background: var(--color-pink);
 }
-
-.showcaseCard:hover {
-    transform: translateY(-10px);
-    background: rgba(255, 255, 255, 0.85);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-}
-
-.showcaseCard:nth-child(2) {
-    border-top: 4px solid #89dceb;
-}
-
-.showcaseCard:nth-child(3) {
-    border-top: 4px solid #a6e3a1;
-}
-
-.showcaseCard:nth-child(4) {
-    border-top: 4px solid #cba6f7;
-}
-
-.cardIcon {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 16px;
-    color: var(--color-burgundy);
-}
-
-.cardTitle {
-    font-size: 1.5rem;
-    font-weight: 500;
-    margin-bottom: 10px;
-    color: var(--color-dark-brown);
-}
-
-.cardContent {
-    font-family: var(--font-body);
-    font-size: 0.95rem;
-    line-height: 1.5;
-    opacity: 0.65;
-    color: var(--color-dark-brown);
-}
-
 
 .mockNote {
-    background: #FFFEF2;
-    color: #493627;
+    background: var(--color-white);
+    color: var(--color-light-brown);
     padding: 14px;
     border-radius: 4px;
     font-family: var(--font-body);
@@ -229,7 +170,7 @@
     margin-top: auto;
     width: 100%;
     position: relative;
-    border-left: 3px solid #f9e2af;
+    border-left: 3px solid var(--color-yellow);
 }
 
 .mockNotePin {
@@ -239,7 +180,7 @@
     transform: translateX(-50%);
     width: 8px;
     height: 8px;
-    background: #f38ba8;
+    background: var(--color-red);
     border-radius: 50%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -288,7 +229,7 @@
 }
 
 .mockStickyNote {
-    background: #f9e2af;
+    background: var(--color-yellow);
     padding: 16px;
     margin-top: auto;
     position: relative;
@@ -332,8 +273,8 @@
     align-items: center;
     gap: 6px;
     padding: 4px 12px;
-    background: #cba6f7;
-    color: #4a3366;
+    background: var(--color-mauve);
+    color: var(--color-light-brown);
     border-radius: 50px;
     font-size: 1.2rem;
     font-weight: 400;
@@ -364,7 +305,6 @@
     font-family: var(--font-body);
 }
 
-
 @keyframes fadeInDown {
     from {
         opacity: 0;
@@ -386,27 +326,6 @@
     to {
         opacity: 1;
         transform: translateY(0);
-    }
-}
-
-
-.showcaseCard:nth-child(even) {
-    animation: float 7s ease-in-out infinite;
-}
-
-.showcaseCard:nth-child(odd) {
-    animation: float 7s ease-in-out infinite reverse;
-}
-
-@keyframes float {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-10px);
     }
 }
 

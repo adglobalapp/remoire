@@ -1,0 +1,69 @@
+.card {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 1);
+    border-radius: 24px;
+    padding: 24px;
+    height: 340px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    cursor: pointer;
+    border-top: 4px solid var(--accent-color, var(--color-pink));
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+}
+
+.icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 16px;
+    color: var(--color-burgundy);
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: var(--color-dark-brown);
+}
+
+.content {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    opacity: 0.65;
+    color: var(--color-dark-brown);
+}
+
+.mockContainer {
+    margin-top: auto;
+    width: 100%;
+}
+
+.even {
+    animation: float 7s ease-in-out infinite;
+}
+
+.odd {
+    animation: float 7s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
