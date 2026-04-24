@@ -6,7 +6,7 @@ import { blockUser as apiBlockUser } from '../api/relationships';
 import { useAuth } from './AuthContext';
 import toast from 'react-hot-toast';
 
-const UserProfileContext = createContext<UserProfileContextType | undefined>(undefined);
+export const UserProfileContext = createContext<UserProfileContextType | undefined>(undefined);
 
 export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -20,7 +20,7 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
         }
         try {
             const blocked = await getBlockedUsers();
-            setBlockedUserIds(new Set(blocked.map(u => u.id)));
+            setBlockedUserIds(new Set(blocked.map((u) => u.id)));
         } catch (error) {
             console.error('Failed to fetch blocked users:', error);
         }
@@ -71,21 +71,18 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
     };
 
     return (
-        <UserProfileContext.Provider value={{
-            showProfile: handleShowProfile,
-            blockedUserIds,
-            isBlocked,
-            refreshBlockedUsers,
-            blockUser,
-            unblockUser
-        }}>
+        <UserProfileContext.Provider
+            value={{
+                showProfile: handleShowProfile,
+                blockedUserIds,
+                isBlocked,
+                refreshBlockedUsers,
+                blockUser,
+                unblockUser,
+            }}
+        >
             {children}
-            {selectedUser && (
-                <UserProfile
-                    user={selectedUser}
-                    onClose={() => setSelectedUser(null)}
-                />
-            )}
+            {selectedUser && <UserProfile user={selectedUser} onClose={() => setSelectedUser(null)} />}
         </UserProfileContext.Provider>
     );
 };

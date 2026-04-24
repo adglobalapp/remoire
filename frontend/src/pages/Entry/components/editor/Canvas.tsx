@@ -20,14 +20,10 @@ import styles from './Canvas.module.css';
 const Canvas = () => {
     const { activeEntry, saveEntry } = useEntryContext();
 
-    const {
-        transform,
-        setTransform,
-        isDragging,
-        containerRef,
-        handleMouseDown,
-        handleTouchStart,
-    } = useCanvasNavigation({ minScale: 0.4, initialTransform: { x: 0, y: 0, scale: 1.15 } });
+    const { transform, setTransform, isDragging, containerRef, handleMouseDown, handleTouchStart } = useCanvasNavigation({
+        minScale: 0.4,
+        initialTransform: { x: 0, y: 0, scale: 1.15 },
+    });
 
     const [isDragMode, setIsDragMode] = useState(false);
     const [isColorPicking, setIsColorPicking] = useState(false);
@@ -36,7 +32,7 @@ const Canvas = () => {
     const [pageSettings, setPageSettings] = useState<PageSettings>(DEFAULT_PAGE_SETTINGS);
     const pageSettingsRef = useRef<PageSettings>(DEFAULT_PAGE_SETTINGS);
 
-    const initialEntryId = useRef<number | null>(activeEntry?.id ?? null).current;
+    const [initialEntryId] = useState<number | null>(activeEntry?.id ?? null);
     const loadedEntryIdRef = useRef<number | null>(null);
     const lastContentRef = useRef<string | null>(null);
 
@@ -53,8 +49,8 @@ const Canvas = () => {
     const getInitialContent = () => {
         if (!activeEntry) return '<h1>Untitled</h1><p>Dear Diary...</p>';
         const stored = parseStoredContent(activeEntry.content);
-        if (stored && typeof stored === 'object' && stored.contentJSON) {
-            return stored.contentJSON;
+        if (stored && typeof stored === 'object' && !Array.isArray(stored) && stored.contentJSON) {
+            return (stored as any).contentJSON;
         }
 
         if (typeof stored === 'string' && stored) return stored;
@@ -69,7 +65,9 @@ const Canvas = () => {
             ResizableImage,
             Placeholder.configure({ placeholder: 'Start writing...' }),
             TextStyle,
-            FontFamily.configure({ types: ['textStyle', 'heading', 'paragraph', 'listItem'] }),
+            FontFamily.configure({
+                types: ['textStyle', 'heading', 'paragraph', 'listItem'],
+            }),
             Color,
             FontSize,
         ],
@@ -79,7 +77,7 @@ const Canvas = () => {
         editorProps: {
             transformPastedHTML(html) {
                 const doc = new DOMParser().parseFromString(html, 'text/html');
-                doc.body.querySelectorAll('*').forEach(el => {
+                doc.body.querySelectorAll('*').forEach((el) => {
                     if (el instanceof HTMLElement) {
                         el.style.fontFamily = '';
                     }
@@ -89,9 +87,9 @@ const Canvas = () => {
         },
     });
 
-    const extractTitleFromJSON = (json: any): string => {
+    const extractTitleFromJSON = (json: Record<string, any> | null): string => {
         if (!json || !json.content) return 'Untitled';
-        
+
         const findFirstText = (node: any): string | null => {
             if (node.text) return node.text.trim();
             if (node.content && Array.isArray(node.content)) {
@@ -113,26 +111,35 @@ const Canvas = () => {
             if (transaction.getMeta('isColorPreview')) return;
 
             const contentJSON = editor.getJSON();
-            const currentTitle = extractTitleFromJSON(contentJSON);
-            
+            const currentTitle = extractTitleFromJSON(contentJSON as Record<string, any>);
+
             if (currentTitle !== activeEntry?.title) {
                 updateEntryTitle(initialEntryId, currentTitle);
             }
 
-            const serialized = JSON.stringify({ contentJSON, pageSettings: pageSettingsRef.current });
+            const serialized = JSON.stringify({
+                contentJSON,
+                pageSettings: pageSettingsRef.current,
+            });
             saveEntry(initialEntryId, currentTitle, serialized);
         };
         editor.on('update', handleUpdate);
-        return () => { editor.off('update', handleUpdate); };
+        return () => {
+            editor.off('update', handleUpdate);
+        };
     }, [editor, saveEntry, initialEntryId, activeEntry?.title, updateEntryTitle]);
 
     useEffect(() => {
-        if (!editor || !activeEntry || (loadedEntryIdRef.current === activeEntry.id && lastContentRef.current === activeEntry.content)) return;
+        if (!editor || !activeEntry || (loadedEntryIdRef.current === activeEntry.id && lastContentRef.current === activeEntry.content))
+            return;
 
         const stored = parseStoredContent(activeEntry.content);
-        const contentJSON = (stored && typeof stored === 'object' && stored.contentJSON)
-            ? stored.contentJSON
-            : (typeof stored === 'string' ? stored : '<h1>Untitled</h1><p>Dear Diary...</p>');
+        const contentJSON =
+            stored && typeof stored === 'object' && stored.contentJSON
+                ? stored.contentJSON
+                : typeof stored === 'string'
+                  ? stored
+                  : '<h1>Untitled</h1><p>Dear Diary...</p>';
 
         let settings = DEFAULT_PAGE_SETTINGS;
         if (stored && typeof stored === 'object' && stored.pageSettings) {
@@ -143,18 +150,17 @@ const Canvas = () => {
             loadedEntryIdRef.current = activeEntry.id;
             lastContentRef.current = activeEntry.content;
 
-            setIsLoading(true);
             setPageSettings(settings);
             pageSettingsRef.current = settings;
 
             setTimeout(() => {
+                setIsLoading(true);
                 if (editor) {
                     editor.commands.setContent(contentJSON, { emitUpdate: false });
                     setIsLoading(false);
                 }
             }, 10);
-        }
-        else {
+        } else {
             lastContentRef.current = activeEntry.content;
             if (JSON.stringify(settings) !== JSON.stringify(pageSettingsRef.current)) {
                 setPageSettings(settings);
@@ -186,12 +192,13 @@ const Canvas = () => {
     const onTouchStart = (e: React.TouchEvent) => {
         const target = e.target as Element;
         const isBackdrop = target === containerRef.current || target?.classList?.contains(styles.canvas);
-        const isInteractive = target.tagName === 'IMG' || 
-                               !!target.closest('img') || 
-                               !!target.closest('.moveable-control-box') || 
-                               !!target.closest('[class*="imageBox"]') || 
-                               target.tagName === 'BUTTON' || 
-                               !!target.closest('button');
+        const isInteractive =
+            target.tagName === 'IMG' ||
+            !!target.closest('img') ||
+            !!target.closest('.moveable-control-box') ||
+            !!target.closest('[class*="imageBox"]') ||
+            target.tagName === 'BUTTON' ||
+            !!target.closest('button');
         const isMobile = window.innerWidth <= 800;
 
         if (isDragMode || isBackdrop || e.touches.length >= 2 || (isMobile && !isInteractive)) {
@@ -217,7 +224,10 @@ const Canvas = () => {
         if (initialEntryId !== null && editor) {
             const contentJSON = editor.getJSON();
             const currentTitle = extractTitleFromJSON(contentJSON);
-            const serialized = JSON.stringify({ contentJSON, pageSettings: newSettings });
+            const serialized = JSON.stringify({
+                contentJSON,
+                pageSettings: newSettings,
+            });
             saveEntry(initialEntryId, currentTitle, serialized);
         }
     };
@@ -229,11 +239,10 @@ const Canvas = () => {
                 className={classNames(styles.editorContainer, {
                     [styles.isDragging]: isDragging,
                     [styles.dragMode]: isDragMode,
-                    [styles.hideSelection]: isColorPicking
+                    [styles.hideSelection]: isColorPicking,
                 })}
                 onMouseDown={onMouseDown}
                 onTouchStart={onTouchStart}
-
                 onClick={(e) => {
                     const target = e.target as Element;
                     const startTarget = mouseDownTargetRef.current as Element;
@@ -256,7 +265,9 @@ const Canvas = () => {
                 <CanvasScaleContext.Provider value={transform.scale}>
                     <div
                         className={styles.canvas}
-                        style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})` }}
+                        style={{
+                            transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`,
+                        }}
                     >
                         {activeEntry && (
                             <div
@@ -264,7 +275,7 @@ const Canvas = () => {
                                 style={{
                                     backgroundImage: pageSettings.backgroundUrl ? `url(${pageSettings.backgroundUrl})` : undefined,
                                     backgroundSize: pageSettings.backgroundUrl ? 'cover' : undefined,
-                                    padding: `${pageSettings.paddingTop}px ${pageSettings.paddingRight}px ${pageSettings.paddingBottom}px ${pageSettings.paddingLeft}px`
+                                    padding: `${pageSettings.paddingTop}px ${pageSettings.paddingRight}px ${pageSettings.paddingBottom}px ${pageSettings.paddingLeft}px`,
                                 }}
                                 onClick={(e) => {
                                     if (e.target === e.currentTarget) {

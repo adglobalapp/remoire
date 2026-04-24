@@ -1,11 +1,13 @@
+import { type TiptapNode } from '../types';
+
 export const getExcerpt = (content: string | null): string => {
     if (!content) return '';
     try {
         const parsed = JSON.parse(content);
-        const contentJSON = parsed?.contentJSON;
+        const contentJSON = parsed?.contentJSON as { content?: TiptapNode[] };
         if (contentJSON?.content) {
             const texts: string[] = [];
-            const traverse = (nodes: any[]) => {
+            const traverse = (nodes: TiptapNode[]) => {
                 for (const node of nodes) {
                     if (node.type === 'heading') continue;
                     if (node.type === 'text' && node.text) texts.push(node.text);
@@ -18,7 +20,7 @@ export const getExcerpt = (content: string | null): string => {
             return full.length > 180 ? full.substring(0, 180) + '...' : full;
         }
     } catch {
-        
+        void 0;
     }
     const plain = typeof content === 'string' ? content.replace(/<[^>]+>/g, ' ').trim() : '';
     return plain.length > 180 ? plain.substring(0, 180) + '...' : plain;
@@ -28,9 +30,9 @@ export const getImageUrl = (content: string | null): string | null => {
     if (!content) return null;
     try {
         const parsed = JSON.parse(content);
-        const contentJSON = parsed?.contentJSON;
+        const contentJSON = parsed?.contentJSON as { content?: TiptapNode[] };
         if (contentJSON?.content) {
-            const findImage = (nodes: any[]): string | null => {
+            const findImage = (nodes: TiptapNode[]): string | null => {
                 for (const node of nodes) {
                     if (node.type === 'resizableImage' && node.attrs?.src) return node.attrs.src;
                     if (node.type === 'image' && node.attrs?.src) return node.attrs.src;
@@ -44,7 +46,7 @@ export const getImageUrl = (content: string | null): string | null => {
             return findImage(contentJSON.content);
         }
     } catch {
-        
+        void 0;
     }
     return null;
 };

@@ -29,10 +29,7 @@ const FriendlistPage = () => {
     const fetchData = async () => {
         setIsLoading(true);
         try {
-            const [friendsData, requestsData] = await Promise.all([
-                getRelationships(),
-                getRelationshipRequests()
-            ]);
+            const [friendsData, requestsData] = await Promise.all([getRelationships(), getRelationshipRequests()]);
             setFriends(friendsData);
             setPendingRequests(requestsData.pending);
             setSentRequests(requestsData.sent);
@@ -43,12 +40,14 @@ const FriendlistPage = () => {
         }
     };
 
-    useEffect(() => { fetchData(); }, []);
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const isBlocked = (id: number) => blockedUserIds.has(id);
-    const visiblePending = pendingRequests.filter(u => !isBlocked(u.id));
-    const visibleSent = sentRequests.filter(u => !isBlocked(u.id));
-    const visibleFriends = friends.filter(u => !isBlocked(u.id));
+    const visiblePending = pendingRequests.filter((u) => !isBlocked(u.id));
+    const visibleSent = sentRequests.filter((u) => !isBlocked(u.id));
+    const visibleFriends = friends.filter((u) => !isBlocked(u.id));
 
     const handleAccept = async (id: number) => {
         const success = await acceptRelationshipRequest(id);
@@ -65,8 +64,10 @@ const FriendlistPage = () => {
         setIsConfirming(true);
         if (confirmAction.type === 'delete') {
             const success = await deleteRelationship(confirmAction.userId);
-            if (success) { toast.success('Connection removed'); fetchData(); }
-            else toast.error('Failed to remove connection');
+            if (success) {
+                toast.success('Connection removed');
+                fetchData();
+            } else toast.error('Failed to remove connection');
         } else {
             await blockUser(confirmAction.userId);
             fetchData();
@@ -98,7 +99,13 @@ const FriendlistPage = () => {
                             type="pending"
                             delay={0}
                             onAccept={handleAccept}
-                            onDelete={(user) => setConfirmAction({ type: 'delete', userId: user.id, userName: user.name })}
+                            onDelete={(user) =>
+                                setConfirmAction({
+                                    type: 'delete',
+                                    userId: user.id,
+                                    userName: user.name,
+                                })
+                            }
                             onViewProfile={showProfile}
                             titleClassName={styles.bgDarkBlue}
                         />
@@ -108,7 +115,13 @@ const FriendlistPage = () => {
                             users={visibleSent}
                             type="sent"
                             delay={1}
-                            onDelete={(user) => setConfirmAction({ type: 'delete', userId: user.id, userName: user.name })}
+                            onDelete={(user) =>
+                                setConfirmAction({
+                                    type: 'delete',
+                                    userId: user.id,
+                                    userName: user.name,
+                                })
+                            }
                             onViewProfile={showProfile}
                             titleClassName={styles.bgDarkBlue}
                         />
@@ -118,24 +131,35 @@ const FriendlistPage = () => {
                             users={visibleFriends}
                             type="friend"
                             delay={2}
-                            onDelete={(user) => setConfirmAction({ type: 'delete', userId: user.id, userName: user.name })}
+                            onDelete={(user) =>
+                                setConfirmAction({
+                                    type: 'delete',
+                                    userId: user.id,
+                                    userName: user.name,
+                                })
+                            }
                             onViewProfile={showProfile}
                             showEmptyState
                         />
                     </div>
                 )}
 
-                {showAddModal && (
-                    <AddFriend onClose={() => setShowAddModal(false)} onRefresh={fetchData} />
-                )}
+                {showAddModal && <AddFriend onClose={() => setShowAddModal(false)} onRefresh={fetchData} />}
 
                 {confirmAction && (
                     <DeleteConfirmation
                         title={confirmAction.type === 'delete' ? 'Remove Friend?' : 'Block User?'}
                         message={
-                            confirmAction.type === 'delete'
-                                ? <span>Are you sure you want to remove <strong>{confirmAction.userName}</strong> from your friends?</span>
-                                : <span>Are you sure you want to block <strong>{confirmAction.userName}</strong>? They won't be able to search for you or send requests.</span>
+                            confirmAction.type === 'delete' ? (
+                                <span>
+                                    Are you sure you want to remove <strong>{confirmAction.userName}</strong> from your friends?
+                                </span>
+                            ) : (
+                                <span>
+                                    Are you sure you want to block <strong>{confirmAction.userName}</strong>? They won't be able to search
+                                    for you or send requests.
+                                </span>
+                            )
                         }
                         confirmText={confirmAction.type === 'delete' ? 'Remove' : 'Block User'}
                         isLoading={isConfirming}

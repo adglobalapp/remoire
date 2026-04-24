@@ -56,7 +56,9 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
             ResizableImage,
             TextStyle,
-            FontFamily.configure({ types: ['textStyle', 'heading', 'paragraph', 'listItem'] }),
+            FontFamily.configure({
+                types: ['textStyle', 'heading', 'paragraph', 'listItem'],
+            }),
             Color,
             FontSize,
         ],
@@ -91,7 +93,7 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
             onWheel={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
         >
-            <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
                     <h2>Preview Entry</h2>
                     <button className="modal-close-btn" onClick={onClose}>
@@ -112,7 +114,7 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
                             style={{
                                 backgroundImage: pageSettings.backgroundUrl ? `url(${pageSettings.backgroundUrl})` : undefined,
                                 backgroundSize: pageSettings.backgroundUrl ? 'cover' : undefined,
-                                padding: `${pageSettings.paddingTop}px ${pageSettings.paddingRight}px ${pageSettings.paddingBottom}px ${pageSettings.paddingLeft}px`
+                                padding: `${pageSettings.paddingTop}px ${pageSettings.paddingRight}px ${pageSettings.paddingBottom}px ${pageSettings.paddingLeft}px`,
                             }}
                         >
                             <div className={editorStyles.editorContent}>
@@ -134,11 +136,7 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
                         {entry.participants && entry.participants.length > 0 && (
                             <div className={styles.participantStack}>
                                 {entry.participants.slice(0, 3).map((p, idx) => (
-                                    <div
-                                        key={p.id}
-                                        className={styles.avatarMiniWrapper}
-                                        style={{ zIndex: 10 - idx }}
-                                    >
+                                    <div key={p.id} className={styles.avatarMiniWrapper} style={{ zIndex: 10 - idx }}>
                                         <Avatar user={p} size={34} />
                                     </div>
                                 ))}
@@ -159,19 +157,14 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
                         <button type="button" className={`btn btn-secondary`} onClick={onClose}>
                             Close
                         </button>
-                        <button
-                            type="button"
-                            className={`btn ${styles.editEntryBtn}`}
-                            onClick={handleEdit}
-                        >
+                        <button type="button" className={`btn ${styles.editEntryBtn}`} onClick={handleEdit}>
                             <Edit3 size={16} /> Edit Entry
                         </button>
                     </div>
                 </div>
             </div>
-
         </div>,
-        document.body
+        document.body,
     );
 };
 

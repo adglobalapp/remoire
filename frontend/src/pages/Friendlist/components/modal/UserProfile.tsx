@@ -58,11 +58,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
                             </h2>
                         </div>
 
-                        {user.bio && (
-                            <div className={styles.miniBio}>
-                                {user.bio}
-                            </div>
-                        )}
+                        {user.bio && <div className={styles.miniBio}>{user.bio}</div>}
                     </div>
                 </div>
 
@@ -127,7 +123,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
             {showBlockConfirm && (
                 <DeleteConfirmation
                     title="Block User?"
-                    message={<span>Are you sure you want to block <strong>{user.name}</strong>? They won't be able to search for you or send requests.</span>}
+                    message={
+                        <span>
+                            Are you sure you want to block <strong>{user.name}</strong>? They won't be able to search for you or send
+                            requests.
+                        </span>
+                    }
                     confirmText="Block User"
                     isLoading={isBlocking}
                     loadingText="Blocking..."

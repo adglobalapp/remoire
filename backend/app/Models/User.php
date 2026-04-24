@@ -41,7 +41,7 @@ class User extends Authenticatable
         parent::boot();
 
         static::creating(function ($user) {
-            if (!$user->friend_code) {
+            if (! $user->friend_code) {
                 $user->friend_code = static::generateUniqueFriendCode();
             }
         });
@@ -74,6 +74,7 @@ class User extends Authenticatable
     public function friends()
     {
         $id = $this->id;
+
         return User::whereIn('id', function ($q) use ($id) {
             $q->select('target_id')->from('relationships')->where(['user_id' => $id, 'status' => 'accepted'])
                 ->union($q->newQuery()->select('user_id')->from('relationships')->where(['target_id' => $id, 'status' => 'accepted']));

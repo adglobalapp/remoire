@@ -14,14 +14,7 @@ const Canvas = () => {
     const { activeTimeline, isLoading } = useTimelineContext();
     const { entries } = useEntryContext();
 
-    const {
-        transform,
-        setTransform,
-        isDragging,
-        containerRef,
-        handleMouseDown,
-        handleTouchStart,
-    } = useCanvasNavigation({ minScale: 0.3 });
+    const { transform, setTransform, isDragging, containerRef, handleMouseDown, handleTouchStart } = useCanvasNavigation({ minScale: 0.3 });
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -31,7 +24,11 @@ const Canvas = () => {
             const sidebarSpace = width > 1400 ? 660 : 32;
             const idealScale = (width - sidebarSpace) / 920;
             const initialScale = Math.min(1, idealScale);
-            setTransform({ x: (width / 2) - (500 * initialScale), y: 60, scale: initialScale });
+            setTransform({
+                x: width / 2 - 500 * initialScale,
+                y: 60,
+                scale: initialScale,
+            });
         }
     }, [setTransform]);
 
@@ -42,7 +39,7 @@ const Canvas = () => {
         if (activeTimeline.isDefault) {
             filtered = [...entries];
         } else {
-            filtered = entries.filter(e => activeTimeline.entryIds.includes(e.id));
+            filtered = entries.filter((e) => activeTimeline.entryIds.includes(e.id));
         }
 
         return filtered.sort((a, b) => compareDates(a.date || a.created_at, b.date || b.created_at, false));
@@ -78,16 +75,16 @@ const Canvas = () => {
             {!isLoading && visibleEntries.length === 0 && (
                 <div className={styles.emptyStateOverlay}>
                     <div className="empty-state-placeholder">
-                        {activeTimeline?.isDefault 
-                            ? 'No entries yet. Create your first one!' 
-                            : 'No entries found in this timeline.'}
+                        {activeTimeline?.isDefault ? 'No entries yet. Create your first one!' : 'No entries found in this timeline.'}
                     </div>
                 </div>
             )}
 
             <div
                 className={styles.canvas}
-                style={{ transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})` }}
+                style={{
+                    transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`,
+                }}
             >
                 {visibleEntries.length > 0 && (
                     <div className={styles.timelineWrapper}>
@@ -98,12 +95,7 @@ const Canvas = () => {
                         {visibleEntries.map((entry, index) => {
                             const side: 'left' | 'right' = index % 2 === 0 ? 'left' : 'right';
                             return (
-                                <EntryCard
-                                    key={`${activeTimeline?.id || 'default'}-${entry.id}`}
-                                    entry={entry}
-                                    side={side}
-                                    index={index}
-                                />
+                                <EntryCard key={`${activeTimeline?.id || 'default'}-${entry.id}`} entry={entry} side={side} index={index} />
                             );
                         })}
                     </div>
@@ -116,15 +108,13 @@ const Canvas = () => {
                     onClick={() => setIsAddModalOpen(true)}
                     className={`btn ${styles.addButton}`}
                     disabled={activeTimeline.isDefault}
-                    title={activeTimeline.isDefault ? "Default timeline is not modifiable" : ""}
+                    title={activeTimeline.isDefault ? 'Default timeline is not modifiable' : ''}
                 >
                     <Plus size={18} /> Add Entry
                 </button>
             )}
 
-            {isAddModalOpen && (
-                <AddEntryCard onClose={() => setIsAddModalOpen(false)} />
-            )}
+            {isAddModalOpen && <AddEntryCard onClose={() => setIsAddModalOpen(false)} />}
         </div>
     );
 };

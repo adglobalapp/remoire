@@ -19,7 +19,7 @@ const createCustomIcon = (color: string) => {
         html: `<div class="${styles.markerPin}" style="background-color: ${color};"></div>`,
         iconSize: [24, 24],
         iconAnchor: [12, 24],
-        popupAnchor: [0, -32]
+        popupAnchor: [0, -32],
     });
 };
 
@@ -33,7 +33,7 @@ const createClusterIcon = (cluster: any) => {
                </div>`,
         className: styles.customCluster,
         iconSize: [44, 44],
-        iconAnchor: [22, 22]
+        iconAnchor: [22, 22],
     });
 };
 
@@ -44,7 +44,7 @@ const MapsPage = () => {
     const [mapCenter] = useState<[number, number]>([20, 0]);
 
     const entriesWithLocation = useMemo(() => {
-        return entries.filter(e => e.latitude && e.longitude);
+        return entries.filter((e) => e.latitude && e.longitude);
     }, [entries]);
 
     const handleViewEntry = (entry: any) => {
@@ -57,12 +57,7 @@ const MapsPage = () => {
             <Navbar />
             <main className="main-layout">
                 <div className={styles.mapWrapper}>
-                    <MapContainer
-                        center={mapCenter}
-                        zoom={3}
-                        className={styles.mapContainer}
-                        minZoom={2}
-                    >
+                    <MapContainer center={mapCenter} zoom={3} className={styles.mapContainer} minZoom={2}>
                         <TileLayer
                             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -79,23 +74,17 @@ const MapsPage = () => {
                                 fillOpacity: 0.2,
                             }}
                         >
-                            {entriesWithLocation.map(entry => {
+                            {entriesWithLocation.map((entry) => {
                                 const isOwn = user?.id === entry.user_id;
                                 const pinColor = entry.color || PRESET_COLORS[entry.id % PRESET_COLORS.length];
 
                                 return (
-                                    <Marker
-                                        key={entry.id}
-                                        position={[entry.latitude!, entry.longitude!]}
-                                        icon={createCustomIcon(pinColor)}
-                                    >
+                                    <Marker key={entry.id} position={[entry.latitude!, entry.longitude!]} icon={createCustomIcon(pinColor)}>
                                         <Popup className={styles.popup}>
                                             <div className={styles.popupContent}>
                                                 <div className={styles.popupHeader}>
                                                     <h4 className={styles.popupTitle}>{entry.title || 'Untitled'}</h4>
-                                                    {!isOwn && (
-                                                        <span className={styles.sharedBadge}>Shared</span>
-                                                    )}
+                                                    {!isOwn && <span className={styles.sharedBadge}>Shared</span>}
                                                 </div>
 
                                                 <div className={styles.popupMeta}>

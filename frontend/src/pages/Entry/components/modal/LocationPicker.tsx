@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import { X, Search, MapPin, Check, AlertCircle, Loader2 } from 'lucide-react';
-import type { LocationPickerProps } from '../../../../types';
+import type { LocationPickerProps, NominatimResult } from '../../../../types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import styles from './LocationPicker.module.css';
@@ -12,7 +12,7 @@ const createCustomIcon = () => {
         html: `<div class="${styles.markerPin}"></div>`,
         iconSize: [24, 24],
         iconAnchor: [12, 24],
-        popupAnchor: [0, -28]
+        popupAnchor: [0, -28],
     });
 };
 
@@ -37,10 +37,10 @@ function ChangeView({ center }: { center: [number, number] }) {
 
 const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, initialLocation }) => {
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [searchResults, setSearchResults] = useState<NominatimResult[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [markerPos, setMarkerPos] = useState<[number, number]>(
-        initialLocation ? [initialLocation.lat, initialLocation.lng] : [47.4979, 19.0402]
+        initialLocation ? [initialLocation.lat, initialLocation.lng] : [47.4979, 19.0402],
     );
     const [locationName, setLocationName] = useState(initialLocation?.name || '');
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
@@ -53,22 +53,21 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
 
         setIsSearching(true);
         try {
-            const response = await fetch(
-                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`
-            );
-            const data = await response.json();
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
+            const data = (await response.json()) as NominatimResult[];
             if (data.length === 0) {
                 setFieldErrors({ search: ['No results found for this location.'] });
             }
             setSearchResults(data);
-        } catch (error: any) {
-            setFieldErrors({ search: [error.message || 'Location search failed'] });
+        } catch (error) {
+            const err = error as Error;
+            setFieldErrors({ search: [err.message || 'Location search failed'] });
         } finally {
             setIsSearching(false);
         }
     };
 
-    const selectResult = (result: any) => {
+    const selectResult = (result: NominatimResult) => {
         const lat = parseFloat(result.lat);
         const lon = parseFloat(result.lon);
         setMarkerPos([lat, lon]);
@@ -83,12 +82,10 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
         setFieldErrors({});
 
         try {
-            const response = await fetch(
-                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`
-            );
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`);
             const data = await response.json();
             setLocationName(data.display_name || `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`);
-        } catch (error) {
+        } catch {
             setLocationName(`${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`);
         }
     };
@@ -100,7 +97,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
             await onSelect({
                 name: locationName,
                 lat: markerPos[0],
-                lng: markerPos[1]
+                lng: markerPos[1],
             });
             onClose();
         } finally {
@@ -155,11 +152,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
                         {searchResults.length > 0 && (
                             <div className={styles.searchResults}>
                                 {searchResults.map((result) => (
-                                    <div
-                                        key={result.place_id}
-                                        className={styles.resultItem}
-                                        onClick={() => selectResult(result)}
-                                    >
+                                    <div key={result.place_id} className={styles.resultItem} onClick={() => selectResult(result)}>
                                         <MapPin size={16} />
                                         <span>{result.display_name}</span>
                                     </div>
@@ -169,11 +162,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
                     </div>
 
                     <div className={styles.mapContainer}>
-                        <MapContainer
-                            center={markerPos}
-                            zoom={13}
-                            className={styles.mapWrapper}
-                        >
+                        <MapContainer center={markerPos} zoom={13} className={styles.mapWrapper}>
                             <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -188,9 +177,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
                         <div className={styles.currentLocation}>
                             <MapPin size={16} className={styles.pinIcon} />
                             <div className={styles.currentLocationFlex}>
-                                <span className={styles.locationLabel}>
-                                    {locationName || 'Click on map to pick a location'}
-                                </span>
+                                <span className={styles.locationLabel}>{locationName || 'Click on map to pick a location'}</span>
                             </div>
                         </div>
                         <button
@@ -198,7 +185,15 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
                             onClick={handleConfirm}
                             disabled={!locationName || isSaving}
                         >
-                            {isSaving ? <><Loader2 size={18} className="animate-spin" /> Saving...</> : <><Check size={18} /> Save Location</>}
+                            {isSaving ? (
+                                <>
+                                    <Loader2 size={18} className="animate-spin" /> Saving...
+                                </>
+                            ) : (
+                                <>
+                                    <Check size={18} /> Save Location
+                                </>
+                            )}
                         </button>
                     </div>
                 </div>

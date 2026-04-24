@@ -13,7 +13,10 @@ export const getRelationships = async (): Promise<User[]> => {
     }
 };
 
-export const getRelationshipRequests = async (): Promise<{ pending: User[], sent: User[] }> => {
+export const getRelationshipRequests = async (): Promise<{
+    pending: User[];
+    sent: User[];
+}> => {
     try {
         const response = await fetch(`${API_BASE_URL}/relationships/requests`, {
             headers: getHeaders(),

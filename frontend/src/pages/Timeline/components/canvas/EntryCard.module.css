@@ -44,7 +44,9 @@
     height: 190px;
     max-width: 450px;
     border: 1px solid rgba(0, 0, 0, 0.06);
-    transition: box-shadow 0.2s, transform 0.2s;
+    transition:
+        box-shadow 0.2s,
+        transform 0.2s;
     cursor: pointer;
     display: flex;
     flex-direction: column;

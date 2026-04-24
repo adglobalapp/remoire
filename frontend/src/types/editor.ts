@@ -1,8 +1,16 @@
 import { type Editor } from '@tiptap/react';
 import { type PageSettings } from './pages';
+import '@tiptap/core';
+
+declare module '@tiptap/core' {
+    interface Commands<ReturnType> {
+        setFontSize: (size: string) => ReturnType;
+        unsetFontSize: () => ReturnType;
+    }
+}
 
 export type FontSizeOptions = {
-    types: string[],
+    types: string[];
 };
 
 export interface ResizableImageAttributes {
@@ -59,4 +67,16 @@ export interface PageSettingsProps {
     isDragMode: boolean;
     pageSettings?: PageSettings;
     onPageSettingsChange?: (settings: PageSettings) => void;
+}
+
+export interface ColorOption {
+    accentColor?: string;
+    index: number;
+}
+
+export interface TiptapNode {
+    type: string;
+    text?: string;
+    content?: TiptapNode[];
+    attrs?: Record<string, any>;
 }

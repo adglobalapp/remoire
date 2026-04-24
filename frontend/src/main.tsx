@@ -1,7 +1,7 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import './index.css';
+import App from './App.tsx';
 import '@fontsource/odor-mean-chey/400.css';
 import '@fontsource/gurajada/400.css';
 import '@fontsource/gudea/400.css';
@@ -9,7 +9,7 @@ import '@fontsource/gudea/700.css';
 import '@fontsource/kaushan-script/400.css';
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+    <StrictMode>
+        <App />
+    </StrictMode>,
+);

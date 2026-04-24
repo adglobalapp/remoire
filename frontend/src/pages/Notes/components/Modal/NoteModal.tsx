@@ -19,7 +19,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
-                heading: { levels: [1, 2] }
+                heading: { levels: [1, 2] },
             }),
             TaskList,
             TaskItem.configure({
@@ -32,21 +32,26 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
                 class: 'prose-editor focus:outline-none',
             },
         },
-        onUpdate: () => setSelectionCount(s => s + 1),
-        onSelectionUpdate: () => setSelectionCount(s => s + 1),
+        onUpdate: () => setSelectionCount((s) => s + 1),
+        onSelectionUpdate: () => setSelectionCount((s) => s + 1),
     });
 
     useEffect(() => {
         if (!editor || !note) return;
 
-        let content = (note?.content as string) || '<p></p>';
+        const content = (note?.content as string) || '<p></p>';
         editor.commands.setContent(content);
     }, [note, editor]);
 
     const handleSave = async () => {
         if (!editor) return;
         setIsSaving(true);
-        await onSave({ title, content: editor.getHTML(), color, is_pinned: isPinned });
+        await onSave({
+            title,
+            content: editor.getHTML(),
+            color,
+            is_pinned: isPinned,
+        });
         setIsSaving(false);
     };
 
@@ -57,9 +62,11 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
             <div
                 className={`${styles.modalContent} global-modal-content`}
                 onClick={(e) => e.stopPropagation()}
-                style={{
-                    '--note-bg': color
-                } as React.CSSProperties}
+                style={
+                    {
+                        '--note-bg': color,
+                    } as React.CSSProperties
+                }
             >
                 <div className={styles.modalHeader}>
                     <input
@@ -73,9 +80,9 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
                         <button
                             className={`${styles.headerBtn} ${isPinned ? styles.pinnedActive : ''}`}
                             onClick={() => setIsPinned(!isPinned)}
-                            title={isPinned ? "Unpin Note" : "Pin Note"}
+                            title={isPinned ? 'Unpin Note' : 'Pin Note'}
                         >
-                            <Pin size={18} fill={isPinned ? "currentColor" : "none"} />
+                            <Pin size={18} fill={isPinned ? 'currentColor' : 'none'} />
                         </button>
                         <button className={`${styles.closeBtnOverride} global-modal-close-btn`} onClick={onClose}>
                             <X size={20} />
@@ -168,7 +175,13 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
                             </button>
                         )}
                         <button className="btn btn-dark" onClick={handleSave} disabled={isSaving}>
-                            {isSaving ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : 'Save Changes'}
+                            {isSaving ? (
+                                <>
+                                    <Loader2 size={16} className="animate-spin" /> Saving...
+                                </>
+                            ) : (
+                                'Save Changes'
+                            )}
                         </button>
                     </div>
                 </div>

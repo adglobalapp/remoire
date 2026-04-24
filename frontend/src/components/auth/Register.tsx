@@ -19,7 +19,7 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
         e.preventDefault();
         setFieldErrors({});
         setIsLoading(true);
-        
+
         try {
             const data = await register(formData);
             if (data) {
@@ -107,7 +107,12 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
                             id="reg-confirm"
                             type="password"
                             value={formData.password_confirmation}
-                            onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    password_confirmation: e.target.value,
+                                })
+                            }
                             className={fieldErrors.password_confirmation ? 'input-error' : ''}
                             placeholder="••••••••"
                         />
@@ -128,7 +133,7 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
 
                 <div className={styles.modalFooter}>
                     <p className={styles.footerText}>
-                        Already have an account? 
+                        Already have an account?
                         <button onClick={onSwitchToLogin} className={styles.switchBtn}>
                             Sign In
                         </button>

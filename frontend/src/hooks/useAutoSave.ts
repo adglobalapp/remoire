@@ -5,10 +5,10 @@ import { type Entry } from '../types';
 
 export const useAutoSave = (
     setEntries: React.Dispatch<React.SetStateAction<Entry[]>>,
-    setActiveEntry: React.Dispatch<React.SetStateAction<Entry | null>>
+    setActiveEntry: React.Dispatch<React.SetStateAction<Entry | null>>,
 ) => {
     const savingRef = useRef(false);
-    const pendingSavesRef = useRef<Map<number, { title: string, content: string }>>(new Map());
+    const pendingSavesRef = useRef<Map<number, { title: string; content: string }>>(new Map());
 
     const processQueue = useCallback(async () => {
         if (savingRef.current || pendingSavesRef.current.size === 0) return;
@@ -23,14 +23,14 @@ export const useAutoSave = (
         const [id, data] = entry;
         pendingSavesRef.current.delete(id);
 
-        setEntries(prev => prev.map(e => e.id === id ? { ...e, ...data } : e));
-        setActiveEntry(prev => prev?.id === id ? { ...prev, ...data } : prev);
+        setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, ...data } : e)));
+        setActiveEntry((prev) => (prev?.id === id ? { ...prev, ...data } : prev));
 
         try {
             const updated = await apiUpdateEntry(id, data);
             if (updated) {
-                setEntries(prev => prev.map(e => e.id === id ? updated : e));
-                setActiveEntry(prev => prev?.id === id ? updated : prev);
+                setEntries((prev) => prev.map((e) => (e.id === id ? updated : e)));
+                setActiveEntry((prev) => (prev?.id === id ? updated : prev));
             }
         } catch (error) {
             toast.error('Failed to save changes.', { id: 'save-error' });
@@ -40,10 +40,13 @@ export const useAutoSave = (
         }
     }, [setEntries, setActiveEntry]);
 
-    const saveEntry = useCallback((id: number, title: string, content: string) => {
-        pendingSavesRef.current.set(id, { title, content });
-        processQueue();
-    }, [processQueue]);
+    const saveEntry = useCallback(
+        (id: number, title: string, content: string) => {
+            pendingSavesRef.current.set(id, { title, content });
+            processQueue();
+        },
+        [processQueue],
+    );
 
     return { saveEntry };
 };

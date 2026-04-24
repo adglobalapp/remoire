@@ -91,7 +91,9 @@
     cursor: pointer;
     padding: 5px;
     opacity: 0.6;
-    transition: opacity 0.2s, background 0.2s;
+    transition:
+        opacity 0.2s,
+        background 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -231,7 +233,9 @@
     background-color: var(--color-burgundy);
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+    transition:
+        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.3s;
 }
 
 .mobileHidden :global(.sidebar-container) {

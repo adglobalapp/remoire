@@ -9,9 +9,9 @@ const Note: React.FC<NoteProps> = ({ note, onClick, index = 0 }) => {
         if (content.includes('data-type="taskList"') || content.includes('data-checked=')) {
             const checklistItems: ChecklistItem[] = Array.from(content.matchAll(/<li[^>]+data-checked="([^"]+)"[^>]*>.*?<p>(.*?)<\/p>/g))
                 .slice(0, 6)
-                .map(match => ({
+                .map((match) => ({
                     completed: match[1] === 'true',
-                    text: match[2].replace(/<[^>]*>/g, '')
+                    text: match[2].replace(/<[^>]*>/g, ''),
                 }));
             if (checklistItems.length > 0) {
                 return (
@@ -34,13 +34,15 @@ const Note: React.FC<NoteProps> = ({ note, onClick, index = 0 }) => {
         return <p className={styles.preview}>{stripped || 'No content'}</p>;
     };
     return (
-        <div 
-            className={styles.noteCard} 
+        <div
+            className={styles.noteCard}
             onClick={onClick}
-            style={{ 
-                '--note-bg': note.color || '#fff',
-                '--delay': index,
-            } as React.CSSProperties}
+            style={
+                {
+                    '--note-bg': note.color || '#fff',
+                    '--delay': index,
+                } as React.CSSProperties
+            }
         >
             {note.is_pinned && (
                 <div className={styles.pinIcon} title="Pinned Note">
@@ -50,12 +52,8 @@ const Note: React.FC<NoteProps> = ({ note, onClick, index = 0 }) => {
 
             <div className={styles.donkeyEar} />
 
-            <h3 className={styles.title}>
-                {note.title || 'Untitled'}
-            </h3>
-            <div className={styles.body}>
-                {renderContent()}
-            </div>
+            <h3 className={styles.title}>{note.title || 'Untitled'}</h3>
+            <div className={styles.body}>{renderContent()}</div>
         </div>
     );
 };

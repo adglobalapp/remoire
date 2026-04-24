@@ -6,13 +6,13 @@ use App\Models\Relationship;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class RelationshipController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
+
         return response()->json($user->friends()->get());
     }
 
@@ -52,17 +52,24 @@ class RelationshipController extends Controller
             ->whereNotIn('id', $blockedUserIds)
             ->get();
 
-        $users->map(function ($user) use ($currentUser) {
-            $relationship = Relationship::where(function ($q) use ($currentUser, $user) {
-                $q->where('user_id', $currentUser->id)->where('target_id', $user->id);
-            })->orWhere(function ($q) use ($currentUser, $user) {
-                $q->where('user_id', $user->id)->where('target_id', $currentUser->id);
-            })->first();
+        $userIds = $users->pluck('id');
+        $relationships = Relationship::where(function ($q) use ($currentUser, $userIds) {
+            $q->where('user_id', $currentUser->id)->whereIn('target_id', $userIds);
+        })->orWhere(function ($q) use ($currentUser, $userIds) {
+            $q->whereIn('user_id', $userIds)->where('target_id', $currentUser->id);
+        })->get();
+
+        $users->map(function ($user) use ($currentUser, $relationships) {
+            $relationship = $relationships->first(function ($r) use ($currentUser, $user) {
+                return ($r->user_id === $currentUser->id && $r->target_id === $user->id) ||
+                    ($r->user_id === $user->id && $r->target_id === $currentUser->id);
+            });
 
             $user->relationship_status = $relationship ? $relationship->status : 'none';
             if ($user->relationship_status === 'pending') {
                 $user->is_requester = $relationship->user_id === $currentUser->id;
             }
+
             return $user;
         });
 
@@ -144,13 +151,13 @@ class RelationshipController extends Controller
             $relationship->update([
                 'user_id' => $currentUser->id,
                 'target_id' => $user->id,
-                'status' => 'blocked'
+                'status' => 'blocked',
             ]);
         } else {
             Relationship::create([
                 'user_id' => $currentUser->id,
                 'target_id' => $user->id,
-                'status' => 'blocked'
+                'status' => 'blocked',
             ]);
         }
 

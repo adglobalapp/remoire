@@ -63,7 +63,6 @@
 }
 
 @keyframes sparkle-float {
-
     0%,
     100% {
         transform: translateY(0) scale(1) rotate(0deg);

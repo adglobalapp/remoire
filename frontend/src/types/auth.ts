@@ -13,12 +13,17 @@ export interface RegisterCredentials {
     password_confirmation: string;
 }
 
+export interface AuthResponse {
+    user: User;
+    access_token: string;
+}
+
 export interface AuthContextType {
     user: User | null;
     token: string | null;
     isLoading: boolean;
-    login: (credentials: LoginCredentials) => Promise<any>;
-    register: (credentials: RegisterCredentials) => Promise<any>;
+    login: (credentials: LoginCredentials) => Promise<AuthResponse>;
+    register: (credentials: RegisterCredentials) => Promise<AuthResponse>;
     logout: () => Promise<void>;
     setUser: (user: User | null) => void;
     isAuthenticated: boolean;

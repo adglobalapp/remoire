@@ -14,7 +14,7 @@ const Toolbar = ({
     onToggleDragMode,
     onColorPickerToggle,
     pageSettings,
-    onPageSettingsChange
+    onPageSettingsChange,
 }: EditorToolbarProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -64,7 +64,7 @@ const Toolbar = ({
             const scrollAmount = 200;
             container.scrollBy({
                 left: direction === 'left' ? -scrollAmount : scrollAmount,
-                behavior: 'smooth'
+                behavior: 'smooth',
             });
         }
     };
@@ -85,26 +85,26 @@ const Toolbar = ({
     };
 
     return (
-        <div 
+        <div
             className={styles.toolbarWrapper}
             onPointerDown={(e) => {
                 const target = e.target as HTMLElement;
-                
+
                 if (target.tagName === 'INPUT' || target.tagName === 'SELECT' || target.closest('select') || target.closest('input')) {
                     if (window.innerWidth <= 800) {
                         editor.commands.blur();
                     }
                     return;
                 }
-                
+
                 const isButton = target.closest('button');
-                const isPopupTrigger = isButton && (
-                    isButton.closest('[title="Color Palette"]') || 
-                    isButton.closest('[title="Page Settings"]') || 
-                    isButton.closest('[title="Drag Tool"]') ||
-                    isButton.closest('[title="Upload Image"]')
-                );
-                                       
+                const isPopupTrigger =
+                    isButton &&
+                    (isButton.closest('[title="Color Palette"]') ||
+                        isButton.closest('[title="Page Settings"]') ||
+                        isButton.closest('[title="Drag Tool"]') ||
+                        isButton.closest('[title="Upload Image"]'));
+
                 if (window.innerWidth <= 800) {
                     if (isButton) {
                         editor.commands.blur();
@@ -113,25 +113,17 @@ const Toolbar = ({
                         return;
                     }
                 }
-                
+
                 e.preventDefault();
             }}
         >
             {showLeftArrow && (
-                <button 
-                    type="button" 
-                    className={styles.scrollArrow} 
-                    onClick={() => scroll('left')}
-                >
+                <button type="button" className={styles.scrollArrow} onClick={() => scroll('left')}>
                     <ChevronLeft size={16} />
                 </button>
             )}
 
-            <div
-                ref={scrollContainerRef}
-                className={styles.scrollContainer}
-                onScroll={checkScroll}
-            >
+            <div ref={scrollContainerRef} className={styles.scrollContainer} onScroll={checkScroll}>
                 <History editor={editor} isDragMode={isDragMode} />
 
                 <div className={styles.divider} />
@@ -166,13 +158,7 @@ const Toolbar = ({
                     >
                         <ImageIcon size={18} />
                     </button>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        ref={fileInputRef}
-                        onChange={handleImageUpload}
-                        className={styles.hiddenInput}
-                    />
+                    <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageUpload} className={styles.hiddenInput} />
                 </div>
 
                 <div className={styles.divider} />
@@ -180,7 +166,7 @@ const Toolbar = ({
                 <PageSettings
                     isDragMode={isDragMode}
                     pageSettings={pageSettings}
-                    onPageSettingsChange={onPageSettingsChange || (() => { })}
+                    onPageSettingsChange={onPageSettingsChange || (() => {})}
                 />
 
                 <div className={styles.divider} />
@@ -189,7 +175,9 @@ const Toolbar = ({
                     <button
                         type="button"
                         onClick={onToggleDragMode}
-                        className={classNames(styles.actionButton, { [styles.isActive]: isDragMode })}
+                        className={classNames(styles.actionButton, {
+                            [styles.isActive]: isDragMode,
+                        })}
                         title="Drag Tool"
                     >
                         <Hand size={18} />

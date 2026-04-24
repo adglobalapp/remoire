@@ -18,7 +18,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const lastPage = useRef(pathname);
     const lastId = useRef(activeEntry?.id);
     const mobileOpen = propOpen || false;
-    const toggle = onToggle || (() => { });
+    const toggle = onToggle || (() => {});
 
     useEffect(() => {
         const isLargeScreen = window.innerWidth > 1400;
@@ -39,7 +39,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         lastId.current = activeEntry?.id;
     }, [pathname, activeEntry?.id]);
 
-    const filteredEntries = entries.filter(entry => {
+    const filteredEntries = entries.filter((entry) => {
         const matchesSearch = (entry.title || '').toLowerCase().includes(searchQuery.toLowerCase());
         if (activeFilter === 'all') return matchesSearch;
 
@@ -50,9 +50,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
             return matchesSearch && entryDate.toDateString() === now.toDateString();
         }
         if (activeFilter === 'this-month') {
-            return matchesSearch &&
-                entryDate.getMonth() === now.getMonth() &&
-                entryDate.getFullYear() === now.getFullYear();
+            return matchesSearch && entryDate.getMonth() === now.getMonth() && entryDate.getFullYear() === now.getFullYear();
         }
         if (activeFilter === 'this-year') {
             return matchesSearch && entryDate.getFullYear() === now.getFullYear();
@@ -118,47 +116,45 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                                 <span className="sidebar-item-title">{entry.title || 'Untitled'}</span>
                                 <span className="sidebar-item-meta">{formatDateTime(entry.created_at)}</span>
                             </div>
-                            <button
-                                className="sidebar-delete-btn"
-                                onClick={(e) => handleDelete(e, entry.id)}
-                            >
+                            <button className="sidebar-delete-btn" onClick={(e) => handleDelete(e, entry.id)}>
                                 <Trash2 size={16} />
                             </button>
                         </div>
                     ))}
 
-                    {filteredEntries.length === 0 && (
-                        <div className="empty-state-placeholder">
-                            No entries yet. Create one!
-                        </div>
-                    )}
+                    {filteredEntries.length === 0 && <div className="empty-state-placeholder">No entries yet. Create one!</div>}
                 </div>
 
                 <div className="sidebar-footer">
-                    <button
-                        className="btn btn-primary w-full sidebar-btn-add"
-                        onClick={handleCreate}
-                        disabled={isCreating}
-                    >
-                        {isCreating ? <><Loader2 size={16} className="animate-spin" /> Adding...</> : <><Plus size={16} /> Add Entry</>}
+                    <button className="btn btn-primary w-full sidebar-btn-add" onClick={handleCreate} disabled={isCreating}>
+                        {isCreating ? (
+                            <>
+                                <Loader2 size={16} className="animate-spin" /> Adding...
+                            </>
+                        ) : (
+                            <>
+                                <Plus size={16} /> Add Entry
+                            </>
+                        )}
                     </button>
                     <div className="sidebar-search-box">
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
+                        <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                         <Search size={16} className="sidebar-search-icon" />
                     </div>
                     <div className={styles.filterRow}>
-                        {(['all', 'today', 'this-month', 'this-year'] as const).map(filter => (
+                        {(['all', 'today', 'this-month', 'this-year'] as const).map((filter) => (
                             <span
                                 key={filter}
                                 className={`${styles.filterItem} ${activeFilter === filter ? styles.active : ''}`}
                                 onClick={() => setActiveFilter(filter)}
                             >
-                                {filter === 'all' ? 'All' : filter === 'today' ? 'Today' : filter === 'this-month' ? 'This month' : 'This year'}
+                                {filter === 'all'
+                                    ? 'All'
+                                    : filter === 'today'
+                                      ? 'Today'
+                                      : filter === 'this-month'
+                                        ? 'This month'
+                                        : 'This year'}
                             </span>
                         ))}
                     </div>
@@ -169,7 +165,9 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                         title="Delete Entry"
                         message={
                             <span>
-                                Are you sure you want to delete <strong>{entries.find(e => e.id === itemToDelete)?.title || 'Untitled'}</strong>? This action cannot be undone.
+                                Are you sure you want to delete{' '}
+                                <strong>{entries.find((e) => e.id === itemToDelete)?.title || 'Untitled'}</strong>? This action cannot be
+                                undone.
                             </span>
                         }
                         confirmText="Delete"

@@ -16,7 +16,7 @@ export const formatDateTime = (dateString: string | null): string => {
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
     });
 };
 
@@ -36,6 +36,6 @@ export const formatRelativeDate = (dateString: string | null | undefined): strin
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays} days ago`;
-    
+
     return formatDate(dateString);
 };

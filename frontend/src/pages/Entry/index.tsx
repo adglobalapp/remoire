@@ -8,12 +8,7 @@ import { useResponsiveSidebar } from '../../hooks/useResponsiveSidebar';
 
 const EntryPage = () => {
     const { activeEntry, isLoading } = useEntryContext();
-    const {
-        leftOpen,
-        rightOpen,
-        toggleLeft,
-        toggleRight
-    } = useResponsiveSidebar();
+    const { leftOpen, rightOpen, toggleLeft, toggleRight } = useResponsiveSidebar();
 
     return (
         <div className="page-container">
@@ -25,10 +20,7 @@ const EntryPage = () => {
                 ) : (
                     <>
                         <div className="sidebar-left">
-                            <LeftSidebar
-                                isOpen={leftOpen}
-                                onToggle={toggleLeft}
-                            />
+                            <LeftSidebar isOpen={leftOpen} onToggle={toggleLeft} />
                         </div>
 
                         <section className="content-area-full">
@@ -36,10 +28,7 @@ const EntryPage = () => {
                         </section>
 
                         <div className="sidebar-right">
-                            <RightSidebar
-                                isOpen={rightOpen}
-                                onToggle={toggleRight}
-                            />
+                            <RightSidebar isOpen={rightOpen} onToggle={toggleRight} />
                         </div>
                     </>
                 )}

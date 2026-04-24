@@ -1,4 +1,4 @@
-import { type Entry } from '../types';
+import { type Entry, type ApiError } from '../types';
 import { API_BASE_URL, getHeaders } from './client';
 
 export const getEntries = async (): Promise<Entry[]> => {
@@ -32,7 +32,9 @@ export const createEntry = async (title: string): Promise<Entry | null> => {
 
 export const updateEntry = async (
     id: number,
-    data: Partial<Pick<Entry, 'title' | 'date' | 'content' | 'color' | 'image_url' | 'location_name' | 'latitude' | 'longitude'>> & { participant_ids?: number[] }
+    data: Partial<Pick<Entry, 'title' | 'date' | 'content' | 'color' | 'image_url' | 'location_name' | 'latitude' | 'longitude'>> & {
+        participant_ids?: number[];
+    },
 ): Promise<Entry | null> => {
     try {
         const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
@@ -40,16 +42,16 @@ export const updateEntry = async (
             headers: getHeaders(),
             body: JSON.stringify(data),
         });
-        
+
         const resData = await response.json();
-        
+
         if (!response.ok) {
-            const error = new Error(resData.message || 'Failed to update entry') as any;
+            const error = new Error(resData.message || 'Failed to update entry') as ApiError;
             error.status = response.status;
             error.errors = resData.errors;
             throw error;
         }
-        
+
         return resData;
     } catch (error) {
         return null;
@@ -86,7 +88,8 @@ export const uploadImage = async (file: File): Promise<{ url?: string; error?: s
         }
 
         return { url: data.url };
-    } catch (error: any) {
-        return { error: error.message || 'Unknown upload error' };
+    } catch (error) {
+        const err = error as Error;
+        return { error: err.message || 'Unknown upload error' };
     }
 };

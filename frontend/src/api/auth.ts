@@ -1,7 +1,7 @@
-import { type LoginCredentials, type RegisterCredentials, type User } from '../types';
+import { type LoginCredentials, type RegisterCredentials, type User, type AuthResponse, type ApiError } from '../types';
 import { API_BASE_URL, getHeaders } from './client';
 
-export const login = async (credentials: LoginCredentials) => {
+export const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: getHeaders(),
@@ -9,7 +9,7 @@ export const login = async (credentials: LoginCredentials) => {
     });
     const data = await response.json();
     if (!response.ok) {
-        const error = new Error(data.message || 'Login failed') as any;
+        const error = new Error(data.message || 'Login failed') as ApiError;
         error.status = response.status;
         error.errors = data.errors;
         throw error;
@@ -17,7 +17,7 @@ export const login = async (credentials: LoginCredentials) => {
     return data;
 };
 
-export const register = async (credentials: RegisterCredentials) => {
+export const register = async (credentials: RegisterCredentials): Promise<AuthResponse> => {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: getHeaders(),
@@ -25,7 +25,7 @@ export const register = async (credentials: RegisterCredentials) => {
     });
     const data = await response.json();
     if (!response.ok) {
-        const error = new Error(data.message || 'Registration failed') as any;
+        const error = new Error(data.message || 'Registration failed') as ApiError;
         error.status = response.status;
         error.errors = data.errors;
         throw error;
@@ -38,7 +38,7 @@ export const getCurrentUser = async (): Promise<User> => {
         headers: getHeaders(),
     });
     if (!response.ok) {
-        const error = new Error('Unauthorized') as any;
+        const error = new Error('Unauthorized') as ApiError;
         error.status = response.status;
         throw error;
     }

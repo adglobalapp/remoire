@@ -1,18 +1,10 @@
 import { Loader2 } from 'lucide-react';
 import styles from './Loader.module.css';
 
-interface LoaderProps {
-    className?: string;
-    size?: number;
-    contextual?: boolean;
-    centered?: boolean;
-}
+import { type LoaderProps } from '../../types';
 
-const Loader = ({ className = '', size = 40, contextual = false, centered = false }: LoaderProps) => {
-    const classNames = [
-        contextual ? styles.contextual : centered ? styles.centered : styles.loader,
-        className
-    ].filter(Boolean).join(' ');
+const Loader: React.FC<LoaderProps> = ({ className = '', size = 40, contextual = false, centered = false }) => {
+    const classNames = [contextual ? styles.contextual : centered ? styles.centered : styles.loader, className].filter(Boolean).join(' ');
 
     return (
         <div className={classNames}>

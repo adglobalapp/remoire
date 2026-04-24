@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Relationship;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -25,7 +25,7 @@ class ProfileController extends Controller
 
         return response()->json([
             'message' => 'Profile updated',
-            'user' => $user
+            'user' => $user,
         ]);
     }
 
@@ -42,7 +42,7 @@ class ProfileController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Password updated'
+            'message' => 'Password updated',
         ]);
     }
 
@@ -69,7 +69,7 @@ class ProfileController extends Controller
             ->delete();
 
         return response()->json([
-            'message' => 'User unblocked'
+            'message' => 'User unblocked',
         ]);
     }
 }

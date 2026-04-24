@@ -28,20 +28,20 @@ class EntryFactory extends Factory
                     'content' => [
                         [
                             'type' => 'text',
-                            'text' => $titleText
-                        ]
-                    ]
+                            'text' => $titleText,
+                        ],
+                    ],
                 ],
                 [
                     'type' => 'paragraph',
                     'content' => [
                         [
                             'type' => 'text',
-                            'text' => $bodyText
-                        ]
-                    ]
-                ]
-            ]
+                            'text' => $bodyText,
+                        ],
+                    ],
+                ],
+            ],
         ];
 
         return [
@@ -51,7 +51,7 @@ class EntryFactory extends Factory
             'content' => json_encode(['contentJSON' => $contentJSON]),
             'image_url' => null,
             'color' => fake()->hexColor(),
-            'location_name' => fake()->city() . ', ' . fake()->country(),
+            'location_name' => fake()->city().', '.fake()->country(),
             'latitude' => fake()->latitude(),
             'longitude' => fake()->longitude(),
         ];

@@ -9,23 +9,21 @@ import classNames from 'classnames';
 
 const Row: React.FC<RowProps> = ({ user, type, onAccept, onDelete, onViewProfile, index = 0 }) => {
     const { isBlocked } = useUserProfile();
-    const lastSeenText = user.last_seen_at
-        ? `Last seen: ${formatDate(user.last_seen_at)}`
-        : `Joined: ${formatDate(user.created_at)}`;
+    const lastSeenText = user.last_seen_at ? `Last seen: ${formatDate(user.last_seen_at)}` : `Joined: ${formatDate(user.created_at)}`;
 
     const isUserBlocked = isBlocked(user.id);
 
     return (
-        <div 
-            className={classNames(styles.friendRow, { 'user-blocked': isUserBlocked })} 
+        <div
+            className={classNames(styles.friendRow, {
+                'user-blocked': isUserBlocked,
+            })}
             style={{ '--delay': index } as React.CSSProperties}
         >
             <div className={styles.friendMain} onClick={() => onViewProfile(user)}>
                 <Avatar user={user} size={42} className={styles.avatar} />
                 <div className={styles.info}>
-                    <span className={styles.name}>
-                        {user.name}
-                    </span>
+                    <span className={styles.name}>{user.name}</span>
                     <span className={styles.subText}>{type === 'friend' ? lastSeenText : user.email}</span>
                 </div>
             </div>
@@ -57,22 +55,14 @@ const Row: React.FC<RowProps> = ({ user, type, onAccept, onDelete, onViewProfile
                         <span title="Request Sent" className={styles.statusWrapper}>
                             <Clock size={18} color="var(--color-light-brown)" className={styles.statusIcon} />
                         </span>
-                        <button
-                            onClick={() => onDelete(user.id)}
-                            className={styles.iconButton}
-                            title="Cancel Request"
-                        >
+                        <button onClick={() => onDelete(user.id)} className={styles.iconButton} title="Cancel Request">
                             <Trash2 size={18} color="var(--color-error)" />
                         </button>
                     </>
                 )}
 
                 {type === 'friend' && (
-                    <button
-                        onClick={() => onDelete(user.id)}
-                        className={styles.iconButton}
-                        title="Remove Friend"
-                    >
+                    <button onClick={() => onDelete(user.id)} className={styles.iconButton} title="Remove Friend">
                         <Trash2 size={18} color="var(--color-error)" />
                     </button>
                 )}

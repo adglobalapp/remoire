@@ -14,12 +14,12 @@ class Note extends Model
         'title',
         'content',
         'color',
-        'is_pinned'
+        'is_pinned',
     ];
 
     protected $casts = [
         'is_pinned' => 'boolean',
-        'content' => 'string'
+        'content' => 'string',
     ];
 
     public function user()

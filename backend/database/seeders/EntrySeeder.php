@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\User;
 use App\Models\Entry;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class EntrySeeder extends Seeder
 {
@@ -21,7 +20,7 @@ class EntrySeeder extends Seeder
         ]);
 
         Entry::factory()->count(20)->create([
-            'user_id' => $user->id
+            'user_id' => $user->id,
         ]);
     }
 }

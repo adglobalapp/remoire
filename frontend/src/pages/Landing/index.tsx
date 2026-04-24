@@ -22,10 +22,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onRegister }) => {
                     <Sparkles className={styles.sparkle} />
                     Remoire
                 </h1>
-                <p className={styles.subtitle}>Capture the rhythm of your life. A personal space for your stories, memories, and milestones.</p>
+                <p className={styles.subtitle}>
+                    Capture the rhythm of your life. A personal space for your stories, memories, and milestones.
+                </p>
                 <div className={styles.ctaButtons}>
-                    <button onClick={onRegister} className={styles.primaryBtn}>Get Started</button>
-                    <button onClick={onLogin} className={styles.secondaryBtn}>Sign In</button>
+                    <button onClick={onRegister} className={styles.primaryBtn}>
+                        Get Started
+                    </button>
+                    <button onClick={onLogin} className={styles.secondaryBtn}>
+                        Sign In
+                    </button>
                 </div>
             </header>
 
@@ -40,7 +46,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onRegister }) => {
                     <div className={styles.mockNote}>
                         <div className={styles.mockNotePin} />
                         <div className={styles.mockTitle}>Coffee by the Danube ☕️</div>
-                        <div className={styles.mockBody}>The city felt so quiet this morning. Just me, a warm latte, and the sound of the water. Best way to start the day...</div>
+                        <div className={styles.mockBody}>
+                            The city felt so quiet this morning. Just me, a warm latte, and the sound of the water. Best way to start the
+                            day...
+                        </div>
                     </div>
                 </FeatureCard>
 
@@ -97,11 +106,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onRegister }) => {
             </section>
 
             <footer className={styles.footer}>
-                <p>&copy; 2026 Remoire. Created by <strong>Nagy Laura Blanka</strong></p>
+                <p>
+                    &copy; 2026 Remoire. Created by <strong>Nagy Laura Blanka</strong>
+                </p>
             </footer>
         </div>
     );
 };
-
 
 export default LandingPage;

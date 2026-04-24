@@ -27,7 +27,7 @@ export const useResponsiveSidebar = (breakpoint = 1400) => {
                 setLeftOpen(false);
             }
         } else {
-            setLeftOpen(prev => !prev);
+            setLeftOpen((prev) => !prev);
         }
     };
 
@@ -41,7 +41,7 @@ export const useResponsiveSidebar = (breakpoint = 1400) => {
                 setRightOpen(false);
             }
         } else {
-            setRightOpen(prev => !prev);
+            setRightOpen((prev) => !prev);
         }
     };
 
@@ -49,6 +49,6 @@ export const useResponsiveSidebar = (breakpoint = 1400) => {
         leftOpen,
         rightOpen,
         toggleLeft,
-        toggleRight
+        toggleRight,
     };
 };

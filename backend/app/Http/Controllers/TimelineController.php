@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Timeline;
 use App\Models\Entry;
-use App\Models\User;
+use App\Models\Timeline;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,7 +13,7 @@ class TimelineController extends Controller
     {
         $user = Auth::user();
         $timelines = $user->timelines()->with('entries:id')->get();
-        
+
         if ($timelines->isEmpty()) {
             $default = $user->timelines()->create([
                 'name' => 'All Entries',
@@ -59,6 +58,7 @@ class TimelineController extends Controller
         if ($timeline->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
+
         return $timeline->load('entries');
     }
 
@@ -80,34 +80,44 @@ class TimelineController extends Controller
     public function destroy(Request $request, Timeline $timeline)
     {
         if ($timeline->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         if ($timeline->is_default) {
-            return response()->json(['error' => 'Cannot delete default timeline'], 400);
+            return response()->json(['message' => 'Cannot delete default timeline'], 400);
         }
 
         $timeline->delete();
+
         return response()->json(null, 204);
     }
 
     public function addEntry(Timeline $timeline, Entry $entry)
     {
         if ($timeline->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $isOwner = $entry->user_id === Auth::id();
+        $isParticipant = $entry->participants()->where('users.id', Auth::id())->exists();
+
+        if (! $isOwner && ! $isParticipant) {
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         $timeline->entries()->syncWithoutDetaching([$entry->id]);
+
         return response()->json(['message' => 'Entry added to timeline']);
     }
 
     public function removeEntry(Timeline $timeline, Entry $entry)
     {
         if ($timeline->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         $timeline->entries()->detach($entry->id);
+
         return response()->json(['message' => 'Entry removed from timeline']);
     }
 }

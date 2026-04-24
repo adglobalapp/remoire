@@ -19,7 +19,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const lastPage = useRef(pathname);
     const lastId = useRef(activeTimeline?.id);
     const mobileOpen = propOpen || false;
-    const toggle = onToggle || (() => { });
+    const toggle = onToggle || (() => {});
 
     useEffect(() => {
         const isLargeScreen = window.innerWidth > 1400;
@@ -40,9 +40,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         lastId.current = activeTimeline?.id;
     }, [pathname, activeTimeline?.id]);
 
-    const filtered = timelines.filter(t =>
-        t.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filtered = timelines.filter((t) => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const handleCreate = async () => {
         const name = newName.trim();
@@ -115,24 +113,17 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                                 >
                                     <div className="sidebar-item-info">
                                         <span className="sidebar-item-title">{timeline.name}</span>
-                                        {timeline.isDefault && (
-                                            <span className="sidebar-item-meta">default</span>
-                                        )}
+                                        {timeline.isDefault && <span className="sidebar-item-meta">default</span>}
                                     </div>
                                     {!timeline.isDefault && (
-                                        <button
-                                            className="sidebar-delete-btn"
-                                            onClick={(e) => handleDelete(e, timeline.id)}
-                                        >
+                                        <button className="sidebar-delete-btn" onClick={(e) => handleDelete(e, timeline.id)}>
                                             <Trash2 size={16} />
                                         </button>
                                     )}
                                 </div>
                             ))}
 
-                            {filtered.length === 0 && (
-                                <div className="empty-state-placeholder">No timelines found.</div>
-                            )}
+                            {filtered.length === 0 && <div className="empty-state-placeholder">No timelines found.</div>}
                         </>
                     )}
                 </div>
@@ -148,7 +139,10 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                                 onChange={(e) => setNewName(e.target.value)}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter') handleCreate();
-                                    if (e.key === 'Escape') { setIsCreating(false); setNewName(''); }
+                                    if (e.key === 'Escape') {
+                                        setIsCreating(false);
+                                        setNewName('');
+                                    }
                                 }}
                             />
                             <button className={styles.confirmBtn} onClick={handleCreate} disabled={isSaving}>
@@ -156,20 +150,12 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                             </button>
                         </div>
                     ) : (
-                        <button
-                            className="btn btn-primary w-full sidebar-btn-add"
-                            onClick={() => setIsCreating(true)}
-                        >
+                        <button className="btn btn-primary w-full sidebar-btn-add" onClick={() => setIsCreating(true)}>
                             <Plus size={16} /> Add Timeline
                         </button>
                     )}
                     <div className="sidebar-search-box">
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
+                        <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                         <Search size={16} className="sidebar-search-icon" />
                     </div>
                 </div>
@@ -179,7 +165,8 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                         title="Delete Timeline"
                         message={
                             <span>
-                                Are you sure you want to delete <strong>{timelines.find(t => t.id === itemToDelete)?.name}</strong>? This action cannot be undone.
+                                Are you sure you want to delete <strong>{timelines.find((t) => t.id === itemToDelete)?.name}</strong>? This
+                                action cannot be undone.
                             </span>
                         }
                         confirmText="Delete"

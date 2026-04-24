@@ -267,7 +267,9 @@
     text-decoration: none;
     color: var(--color-dark-brown);
     font-size: 1.4rem;
-    transition: background 0.2s, color 0.2s;
+    transition:
+        background 0.2s,
+        color 0.2s;
     border-bottom: none;
     width: 100%;
     background: none;

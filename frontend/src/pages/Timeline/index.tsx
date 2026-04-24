@@ -19,10 +19,7 @@ const TimelinePage = () => {
                 ) : (
                     <div className="display-contents" data-reloading={isLoading ? '' : undefined}>
                         <div className="sidebar-left">
-                            <Sidebar
-                                isOpen={isLeftOpen}
-                                onToggle={toggleLeft}
-                            />
+                            <Sidebar isOpen={isLeftOpen} onToggle={toggleLeft} />
                         </div>
 
                         <section className="content-area-full">

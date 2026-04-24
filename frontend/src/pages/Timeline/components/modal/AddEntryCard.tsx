@@ -25,7 +25,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
     const [customColor, setCustomColor] = useState<string>(
-        PRESET_COLORS.includes(entryToEdit?.color || '') ? '' : (entryToEdit?.color || '')
+        PRESET_COLORS.includes(entryToEdit?.color || '') ? '' : entryToEdit?.color || '',
     );
     const dropdownRef = useRef<HTMLDivElement>(null);
     const colorPickerRef = useRef<HTMLInputElement>(null);
@@ -40,17 +40,17 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const availableEntries = entries.filter(e => {
+    const availableEntries = entries.filter((e) => {
         if (!activeTimeline) return false;
         if (activeTimeline.isDefault) return true;
         return !activeTimeline.entryIds.includes(e.id);
     });
 
-    const selectedEntry = entries.find(e => e.id === selectedEntryId);
+    const selectedEntry = entries.find((e) => e.id === selectedEntryId);
 
     const handleEntrySelect = (id: number) => {
         setSelectedEntryId(id);
-        const entry = entries.find(ent => ent.id === id);
+        const entry = entries.find((ent) => ent.id === id);
         if (entry) {
             const entryColor = entry.color || '';
             const isPreset = PRESET_COLORS.includes(entryColor);
@@ -67,7 +67,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
         setCustomColor(val);
         setColor('');
         if (fieldErrors.color) {
-            setFieldErrors(prev => {
+            setFieldErrors((prev) => {
                 const newErrors = { ...prev };
                 delete newErrors.color;
                 return newErrors;
@@ -148,7 +148,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                 onWheel={(e) => e.stopPropagation()}
                 onMouseDown={(e) => e.stopPropagation()}
             >
-                <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+                <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                     <div className={styles.modalHeader}>
                         <h2>{entryToEdit ? 'Edit Entry Card' : 'Add Entry to Timeline'}</h2>
                         <button className="modal-close-btn" onClick={onClose} aria-label="Close">
@@ -166,7 +166,9 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                                 {selectedEntry ? (
                                     <div className={styles.selectedEntryRow}>
                                         <span className={styles.selectedTitle}>{selectedEntry.title || 'Untitled'}</span>
-                                        <span className={styles.selectedDate}>{new Date(selectedEntry.date || selectedEntry.created_at).toLocaleDateString('hu-HU')}</span>
+                                        <span className={styles.selectedDate}>
+                                            {new Date(selectedEntry.date || selectedEntry.created_at).toLocaleDateString('hu-HU')}
+                                        </span>
                                     </div>
                                 ) : (
                                     <span className={styles.placeholder}>-- Choose an entry --</span>
@@ -180,7 +182,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                                     {availableEntries.length === 0 ? (
                                         <p className={styles.emptyState}>No more entries available.</p>
                                     ) : (
-                                        availableEntries.map(e => (
+                                        availableEntries.map((e) => (
                                             <div
                                                 key={e.id}
                                                 className={`${styles.entryListItem} ${selectedEntryId === e.id ? styles.entryListItemActive : ''}`}
@@ -203,9 +205,11 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                     )}
 
                     <div className={styles.formGroup}>
-                        <label><Palette size={16} className={styles.iconInfo} /> Entry Accent Color</label>
+                        <label>
+                            <Palette size={16} className={styles.iconInfo} /> Entry Accent Color
+                        </label>
                         <div className={`${styles.colorPalette} ${fieldErrors.color ? 'input-error' : ''}`}>
-                            {PRESET_COLORS.map(c => (
+                            {PRESET_COLORS.map((c) => (
                                 <button
                                     key={c}
                                     type="button"
@@ -214,7 +218,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                                     onClick={() => {
                                         setColor(c === color ? '' : c);
                                         setCustomColor('');
-                                        setFieldErrors(prev => {
+                                        setFieldErrors((prev) => {
                                             const newErrors = { ...prev };
                                             delete newErrors.color;
                                             return newErrors;
@@ -244,12 +248,16 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                     </div>
 
                     <div className={styles.formGroup}>
-                        <label><Upload size={16} className={styles.iconInfo} /> Cover Image</label>
+                        <label>
+                            <Upload size={16} className={styles.iconInfo} /> Cover Image
+                        </label>
 
                         {imageUrl ? (
                             <div className={styles.imagePreviewContainer}>
                                 <img src={imageUrl} alt="Cover" className={styles.previewThumbnail} />
-                                <button type="button" className="btn btn-secondary" onClick={() => setImageUrl('')}>Remove</button>
+                                <button type="button" className="btn btn-secondary" onClick={() => setImageUrl('')}>
+                                    Remove
+                                </button>
                             </div>
                         ) : (
                             <label className={`btn btn-secondary ${styles.uploadLabel} ${fieldErrors.image_url ? 'input-error' : ''}`}>
@@ -262,7 +270,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                                         if (file) {
                                             setIsUploading(true);
                                             setUploadError(null);
-                                            setFieldErrors(prev => {
+                                            setFieldErrors((prev) => {
                                                 const newErrors = { ...prev };
                                                 delete newErrors.image_url;
                                                 return newErrors;
@@ -296,7 +304,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                                 className={`btn ${styles.deleteBtn}`}
                                 onClick={() => setIsConfirmOpen(true)}
                                 disabled={isLoading || isDeleting || isUploading || activeTimeline.isDefault}
-                                title={activeTimeline.isDefault ? "Cannot remove from default timeline" : undefined}
+                                title={activeTimeline.isDefault ? 'Cannot remove from default timeline' : undefined}
                             >
                                 <Trash2 size={16} />
                                 <span>Remove</span>
@@ -311,7 +319,13 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                             disabled={!selectedEntryId || isLoading || isDeleting || isUploading}
                             onClick={handleSave}
                         >
-                            {isLoading ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : 'Save'}
+                            {isLoading ? (
+                                <>
+                                    <Loader2 size={16} className="animate-spin" /> Saving...
+                                </>
+                            ) : (
+                                'Save'
+                            )}
                         </button>
                     </div>
                 </div>
@@ -322,7 +336,8 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                     title="Remove from Timeline"
                     message={
                         <span>
-                            Are you sure you want to remove <strong>{entryToEdit?.title || 'this entry'}</strong> from the timeline? It will only be removed from this timeline and will not be permanently deleted.
+                            Are you sure you want to remove <strong>{entryToEdit?.title || 'this entry'}</strong> from the timeline? It will
+                            only be removed from this timeline and will not be permanently deleted.
                         </span>
                     }
                     confirmText="Remove"
@@ -333,7 +348,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                 />
             )}
         </>,
-        document.body
+        document.body,
     );
 };
 

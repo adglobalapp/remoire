@@ -1,13 +1,12 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EntryController;
-use App\Http\Controllers\UploadController;
-use App\Http\Controllers\TimelineController;
-use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\NoteController;
+use App\Http\Controllers\RelationshipController;
+use App\Http\Controllers\TimelineController;
+use App\Http\Controllers\UploadController;
+use Illuminate\Support\Facades\Route;
 
 // Auth routes
 Route::post('/auth/register', [AuthController::class, 'register']);

@@ -1,9 +1,32 @@
 import { type ReactNode } from 'react';
 import { type Entry, type User } from './models';
+import { type PageSettings } from './pages';
 
 export interface LeftProps {
     isOpen?: boolean;
     onToggle?: () => void;
+}
+
+export interface EditorProps {
+    isDragMode: boolean;
+    pageSettings?: PageSettings;
+    onPageSettingsChange?: (settings: PageSettings) => void;
+}
+
+export interface LoaderProps {
+    className?: string;
+    size?: number;
+    contextual?: boolean;
+    centered?: boolean;
+}
+
+export interface FeatureCardProps {
+    icon: any;
+    title: string;
+    content: string;
+    children?: ReactNode;
+    accentColor?: string;
+    index: number;
 }
 
 export interface EntryCardProps {

@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, Search, UserPlus, Check, Clock, AlertCircle, Loader2 } from 'lucide-react';
 import classNames from 'classnames';
 import styles from './AddFriend.module.css';
-import { type User as UserType } from '../../../../types';
+import { type User as UserType, type ApiError } from '../../../../types';
 import { searchUsers, sendRelationshipRequest } from '../../../../api';
 import toast from 'react-hot-toast';
 import { type AddConnectionProps } from '../../../../types';
@@ -17,6 +17,24 @@ const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
     const { showProfile, isBlocked } = useUserProfile();
 
+    const handleSearch = useCallback(async () => {
+        setIsLoading(true);
+        setFieldErrors({});
+        try {
+            const users = await searchUsers(query);
+            setResults(users);
+        } catch (error) {
+            const err = error as ApiError;
+            if (err.status === 422 && err.errors) {
+                setFieldErrors(err.errors);
+            } else {
+                toast.error(err.message || 'Search failed');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    }, [query]);
+
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
             if (query.length >= 2) {
@@ -28,24 +46,7 @@ const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
         }, 300);
 
         return () => clearTimeout(delayDebounceFn);
-    }, [query]);
-
-    const handleSearch = async () => {
-        setIsLoading(true);
-        setFieldErrors({});
-        try {
-            const users = await searchUsers(query);
-            setResults(users);
-        } catch (error: any) {
-            if (error.status === 422 && error.errors) {
-                setFieldErrors(error.errors);
-            } else {
-                toast.error(error.message || 'Search failed');
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    }, [query, handleSearch]);
 
     const handleSendRequest = async (userId: number) => {
         setIsAdding(userId);
@@ -53,9 +54,7 @@ const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
         setIsAdding(null);
         if (success) {
             toast.success('Friend request sent!');
-            setResults(prev => prev.map(u =>
-                u.id === userId ? { ...u, relationship_status: 'pending', is_requester: true } : u
-            ));
+            setResults((prev) => prev.map((u) => (u.id === userId ? { ...u, relationship_status: 'pending', is_requester: true } : u)));
             onRefresh();
             onClose();
         } else {
@@ -90,7 +89,9 @@ const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
                 </div>
 
                 <div className={styles.searchSection}>
-                    <div className={`${styles.searchBar} ${fieldErrors.query || fieldErrors.search || fieldErrors.friend_code ? 'input-error' : ''}`}>
+                    <div
+                        className={`${styles.searchBar} ${fieldErrors.query || fieldErrors.search || fieldErrors.friend_code ? 'input-error' : ''}`}
+                    >
                         <Search size={20} className={styles.searchIcon} />
                         <input
                             type="text"
@@ -107,14 +108,15 @@ const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
                     {isLoading ? (
                         <div className="empty-state-placeholder">Searching...</div>
                     ) : results.length > 0 ? (
-                        results.map(user => (
-                            <div key={user.id} className={classNames(styles.resultItem, { 'user-blocked': isBlocked(user.id) })}>
+                        results.map((user) => (
+                            <div
+                                key={user.id}
+                                className={classNames(styles.resultItem, {
+                                    'user-blocked': isBlocked(user.id),
+                                })}
+                            >
                                 <div className={styles.userInfoClickable} onClick={() => showProfile(user)}>
-                                    <Avatar 
-                                        user={user} 
-                                        size={40}
-                                        className={styles.avatar}
-                                    />
+                                    <Avatar user={user} size={40} className={styles.avatar} />
                                     <div className={styles.userDetails}>
                                         <span className={styles.userName}>{user.name}</span>
                                         <span className={styles.userCode}>{user.friend_code}</span>
@@ -123,19 +125,28 @@ const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
 
                                 <div className={styles.action}>
                                     {user.relationship_status === 'accepted' ? (
-                                        <span className={styles.statusBadge}><Check size={14} /> Friends</span>
+                                        <span className={styles.statusBadge}>
+                                            <Check size={14} /> Friends
+                                        </span>
                                     ) : user.relationship_status === 'pending' ? (
-                                        <span className={classNames(styles.statusBadge, styles.statusBadgePending)}><Clock size={14} /> Pending</span>
+                                        <span className={classNames(styles.statusBadge, styles.statusBadgePending)}>
+                                            <Clock size={14} /> Pending
+                                        </span>
                                     ) : (
                                         <button
                                             className="btn btn-dark btn-sm"
                                             onClick={() => handleSendRequest(user.id)}
                                             disabled={isAdding === user.id}
                                         >
-                                            {isAdding === user.id
-                                                ? <><Loader2 size={16} className="animate-spin" /> Sending...</>
-                                                : <><UserPlus size={18} /> Add</>
-                                            }
+                                            {isAdding === user.id ? (
+                                                <>
+                                                    <Loader2 size={16} className="animate-spin" /> Sending...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <UserPlus size={18} /> Add
+                                                </>
+                                            )}
                                         </button>
                                     )}
                                 </div>
@@ -144,9 +155,7 @@ const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
                     ) : query.length >= 2 ? (
                         <div className="empty-state-placeholder">No users found.</div>
                     ) : (
-                        <div className="empty-state-placeholder">
-                            Enter at least 2 characters to search for users.
-                        </div>
+                        <div className="empty-state-placeholder">Enter at least 2 characters to search for users.</div>
                     )}
                 </div>
             </div>

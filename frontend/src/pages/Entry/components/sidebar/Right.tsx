@@ -26,7 +26,7 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const [isRemovingParticipant, setIsRemovingParticipant] = useState<number | null>(null);
     const { showProfile, isBlocked } = useUserProfile();
     const mobileOpen = propOpen || false;
-    const toggle = onToggle || (() => { });
+    const toggle = onToggle || (() => {});
 
     useEffect(() => {
         getRelationships().then(setFriends);
@@ -55,8 +55,10 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         if (activeEntry) {
             setIsRemovingParticipant(userId);
             try {
-                const currentIds = activeEntry.participants?.map(p => p.id) || [];
-                await updateEntry(activeEntry.id, { participant_ids: currentIds.filter(id => id !== userId) });
+                const currentIds = activeEntry.participants?.map((p) => p.id) || [];
+                await updateEntry(activeEntry.id, {
+                    participant_ids: currentIds.filter((id) => id !== userId),
+                });
                 toast.success('Participant removed');
             } catch {
                 toast.error('Failed to remove participant');
@@ -68,20 +70,22 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
 
     const addParticipant = async (userId: number) => {
         if (activeEntry) {
-            const currentIds = activeEntry.participants?.map(p => p.id) || [];
+            const currentIds = activeEntry.participants?.map((p) => p.id) || [];
             if (!currentIds.includes(userId)) {
-                await updateEntry(activeEntry.id, { participant_ids: [...currentIds, userId] });
+                await updateEntry(activeEntry.id, {
+                    participant_ids: [...currentIds, userId],
+                });
                 toast.success('Participant added');
             }
         }
     };
 
-    const handleLocationSelect = async (location: { name: string, lat: number, lng: number }) => {
+    const handleLocationSelect = async (location: { name: string; lat: number; lng: number }) => {
         if (activeEntry) {
             await updateEntry(activeEntry.id, {
                 location_name: location.name,
                 latitude: location.lat,
-                longitude: location.lng
+                longitude: location.lng,
             });
             toast.success('Location updated');
         }
@@ -92,9 +96,9 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
             setIsRemovingLocation(true);
             try {
                 await updateEntry(activeEntry.id, {
-                    location_name: null as any,
-                    latitude: null as any,
-                    longitude: null as any
+                    location_name: null,
+                    latitude: null,
+                    longitude: null,
                 });
                 toast.success('Location removed');
             } catch {
@@ -106,13 +110,9 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         }
     };
 
-    const dateValue = activeEntry?.date
-        ? activeEntry.date.substring(0, 10)
-        : '';
+    const dateValue = activeEntry?.date ? activeEntry.date.substring(0, 10) : '';
 
-    const availableUsers = friends.filter(f =>
-        !activeEntry?.participants?.some(p => p.id === f.id)
-    );
+    const availableUsers = friends.filter((f) => !activeEntry?.participants?.some((p) => p.id === f.id));
 
     return (
         <div className={mobileOpen ? styles.mobileVisible : styles.mobileHidden}>
@@ -199,14 +199,15 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
 
                         <div className={styles.participantList}>
                             {activeEntry?.participants && activeEntry.participants.length > 0 ? (
-                                activeEntry.participants.map(user => (
-                                    <div key={user.id} className={classNames(styles.participantRow, { 'user-blocked': isBlocked(user.id) })}>
+                                activeEntry.participants.map((user) => (
+                                    <div
+                                        key={user.id}
+                                        className={classNames(styles.participantRow, {
+                                            'user-blocked': isBlocked(user.id),
+                                        })}
+                                    >
                                         <div className={styles.userItem} onClick={() => showProfile(user)}>
-                                            <Avatar
-                                                user={user}
-                                                size={32}
-                                                className={styles.avatar}
-                                            />
+                                            <Avatar user={user} size={32} className={styles.avatar} />
                                             <span className={styles.userName}>{user.name}</span>
                                         </div>
                                         <button
@@ -215,14 +216,16 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                                             disabled={isRemovingParticipant === user.id}
                                             title="Remove Participant"
                                         >
-                                            {isRemovingParticipant === user.id ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />}
+                                            {isRemovingParticipant === user.id ? (
+                                                <Loader2 size={14} className="animate-spin" />
+                                            ) : (
+                                                <X size={14} />
+                                            )}
                                         </button>
                                     </div>
                                 ))
                             ) : (
-                                <div className="empty-state-placeholder">
-                                    No participants yet
-                                </div>
+                                <div className="empty-state-placeholder">No participants yet</div>
                             )}
                         </div>
 
@@ -237,27 +240,29 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                 </div>
             </aside>
 
-            {isModalOpen && createPortal(
-                <AddParticipant
-                    users={availableUsers}
-                    onClose={() => setIsModalOpen(false)}
-                    onSelectUser={addParticipant}
-                />,
-                document.body
-            )}
+            {isModalOpen &&
+                createPortal(
+                    <AddParticipant users={availableUsers} onClose={() => setIsModalOpen(false)} onSelectUser={addParticipant} />,
+                    document.body,
+                )}
 
-            {isLocationModalOpen && createPortal(
-                <LocationPicker
-                    onClose={() => setIsLocationModalOpen(false)}
-                    onSelect={handleLocationSelect}
-                    initialLocation={activeEntry?.latitude ? {
-                        lat: activeEntry.latitude,
-                        lng: activeEntry.longitude!,
-                        name: activeEntry.location_name!
-                    } : undefined}
-                />,
-                document.body
-            )}
+            {isLocationModalOpen &&
+                createPortal(
+                    <LocationPicker
+                        onClose={() => setIsLocationModalOpen(false)}
+                        onSelect={handleLocationSelect}
+                        initialLocation={
+                            activeEntry?.latitude
+                                ? {
+                                      lat: activeEntry.latitude,
+                                      lng: activeEntry.longitude!,
+                                      name: activeEntry.location_name!,
+                                  }
+                                : undefined
+                        }
+                    />,
+                    document.body,
+                )}
 
             {showLocationConfirm && (
                 <DeleteConfirmation

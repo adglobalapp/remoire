@@ -28,7 +28,9 @@ const EntryCard = ({ entry, side, index = 0 }: EntryCardProps) => {
             <div className={styles.cardContainer}>
                 <div
                     className={styles.card}
-                    style={{ borderTop: entry.color ? `6px solid ${entry.color}` : undefined }}
+                    style={{
+                        borderTop: entry.color ? `6px solid ${entry.color}` : undefined,
+                    }}
                     onClick={() => setIsPreviewOpen(true)}
                 >
                     <div className={styles.cardBody}>
@@ -40,12 +42,7 @@ const EntryCard = ({ entry, side, index = 0 }: EntryCardProps) => {
                                 {entry.participants && entry.participants.length > 0 && (
                                     <div className={styles.participantAvatars}>
                                         {entry.participants.slice(0, 4).map((p) => (
-                                            <Avatar
-                                                key={p.id}
-                                                user={p}
-                                                size={24}
-                                                className={styles.participantAvatar}
-                                            />
+                                            <Avatar key={p.id} user={p} size={24} className={styles.participantAvatar} />
                                         ))}
                                         {entry.participants.length > 4 && (
                                             <Avatar
@@ -60,7 +57,10 @@ const EntryCard = ({ entry, side, index = 0 }: EntryCardProps) => {
                             </div>
                             <button
                                 className={styles.editBtn}
-                                onClick={(e) => { e.stopPropagation(); setIsEditOpen(true); }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsEditOpen(true);
+                                }}
                                 aria-label="Edit node appearance"
                             >
                                 <Settings size={18} />
@@ -77,13 +77,9 @@ const EntryCard = ({ entry, side, index = 0 }: EntryCardProps) => {
 
             <div className={styles.dot} />
 
-            {isPreviewOpen && (
-                <EntryPreview entry={entry} onClose={() => setIsPreviewOpen(false)} />
-            )}
+            {isPreviewOpen && <EntryPreview entry={entry} onClose={() => setIsPreviewOpen(false)} />}
 
-            {isEditOpen && (
-                <AddEntryCard entryToEdit={entry} onClose={() => setIsEditOpen(false)} />
-            )}
+            {isEditOpen && <AddEntryCard entryToEdit={entry} onClose={() => setIsEditOpen(false)} />}
         </div>
     );
 };

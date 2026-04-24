@@ -15,49 +15,64 @@ const ImageNodeView = (props: any) => {
     const moveableRef = useRef<any>(null);
     const canvasScale = useCanvasScale();
 
-    const handleDrag = useCallback(({ target, beforeTranslate }: any) => {
-        target.style.transform = `translate(${beforeTranslate[0]}px, ${beforeTranslate[1]}px) rotate(${rotation ?? 0}deg)`;
-    }, [rotation]);
+    const handleDrag = useCallback(
+        ({ target, beforeTranslate }: any) => {
+            target.style.transform = `translate(${beforeTranslate[0]}px, ${beforeTranslate[1]}px) rotate(${rotation ?? 0}deg)`;
+        },
+        [rotation],
+    );
 
-    const handleDragEnd = useCallback(({ lastEvent }: any) => {
-        if (lastEvent) {
-            updateAttributes({
-                x: lastEvent.beforeTranslate[0],
-                y: lastEvent.beforeTranslate[1],
-            });
-        }
-    }, [updateAttributes]);
+    const handleDragEnd = useCallback(
+        ({ lastEvent }: any) => {
+            if (lastEvent) {
+                updateAttributes({
+                    x: lastEvent.beforeTranslate[0],
+                    y: lastEvent.beforeTranslate[1],
+                });
+            }
+        },
+        [updateAttributes],
+    );
 
-    const handleResize = useCallback(({ target, width, height, drag }: any) => {
-        target.style.width = `${width}px`;
-        target.style.height = `${height}px`;
-        target.style.transform = `translate(${drag.beforeTranslate[0]}px, ${drag.beforeTranslate[1]}px) rotate(${rotation ?? 0}deg)`;
-    }, [rotation]);
+    const handleResize = useCallback(
+        ({ target, width, height, drag }: any) => {
+            target.style.width = `${width}px`;
+            target.style.height = `${height}px`;
+            target.style.transform = `translate(${drag.beforeTranslate[0]}px, ${drag.beforeTranslate[1]}px) rotate(${rotation ?? 0}deg)`;
+        },
+        [rotation],
+    );
 
-    const handleResizeEnd = useCallback(({ lastEvent }: any) => {
-        if (lastEvent) {
-            updateAttributes({
-                width: lastEvent.width,
-                height: lastEvent.height,
-                x: lastEvent.drag.beforeTranslate[0],
-                y: lastEvent.drag.beforeTranslate[1],
-            });
-        }
-    }, [updateAttributes]);
+    const handleResizeEnd = useCallback(
+        ({ lastEvent }: any) => {
+            if (lastEvent) {
+                updateAttributes({
+                    width: lastEvent.width,
+                    height: lastEvent.height,
+                    x: lastEvent.drag.beforeTranslate[0],
+                    y: lastEvent.drag.beforeTranslate[1],
+                });
+            }
+        },
+        [updateAttributes],
+    );
 
     const handleRotate = useCallback(({ target, beforeRotate, drag }: any) => {
         target.style.transform = `translate(${drag.beforeTranslate[0]}px, ${drag.beforeTranslate[1]}px) rotate(${beforeRotate}deg)`;
     }, []);
 
-    const handleRotateEnd = useCallback(({ lastEvent }: any) => {
-        if (lastEvent) {
-            updateAttributes({
-                rotation: lastEvent.beforeRotate,
-                x: lastEvent.drag.beforeTranslate[0],
-                y: lastEvent.drag.beforeTranslate[1],
-            });
-        }
-    }, [updateAttributes]);
+    const handleRotateEnd = useCallback(
+        ({ lastEvent }: any) => {
+            if (lastEvent) {
+                updateAttributes({
+                    rotation: lastEvent.beforeRotate,
+                    x: lastEvent.drag.beforeTranslate[0],
+                    y: lastEvent.drag.beforeTranslate[1],
+                });
+            }
+        },
+        [updateAttributes],
+    );
 
     useEffect(() => {
         if (selected && moveableRef.current) {
@@ -104,15 +119,14 @@ const ImageNodeView = (props: any) => {
             }}
             onPointerDown={(e: React.PointerEvent) => {
                 const target = e.target as HTMLElement;
-                
+
                 if (target.closest('.moveable-control-box')) return;
 
                 if (window.innerWidth <= 800) {
-                    
                     props.editor.commands.blur();
                     setTimeout(() => props.editor.commands.blur(), 10);
                 }
-                
+
                 if (!selected) {
                     const pos = typeof props.getPos === 'function' ? props.getPos() : undefined;
                     if (pos !== undefined) {
@@ -208,43 +222,43 @@ export const ResizableImage = Node.create({
         return {
             src: {
                 default: null,
-                parseHTML: el => el.getAttribute('src'),
-                renderHTML: attrs => ({ src: attrs.src }),
+                parseHTML: (el) => el.getAttribute('src'),
+                renderHTML: (attrs) => ({ src: attrs.src }),
             },
             alt: {
                 default: null,
-                parseHTML: el => el.getAttribute('alt'),
-                renderHTML: attrs => ({ alt: attrs.alt }),
+                parseHTML: (el) => el.getAttribute('alt'),
+                renderHTML: (attrs) => ({ alt: attrs.alt }),
             },
             title: {
                 default: null,
-                parseHTML: el => el.getAttribute('title'),
-                renderHTML: attrs => ({ title: attrs.title }),
+                parseHTML: (el) => el.getAttribute('title'),
+                renderHTML: (attrs) => ({ title: attrs.title }),
             },
             width: {
                 default: 300,
-                parseHTML: el => parseFloat(el.getAttribute('data-width') || '300'),
-                renderHTML: attrs => ({ 'data-width': attrs.width }),
+                parseHTML: (el) => parseFloat(el.getAttribute('data-width') || '300'),
+                renderHTML: (attrs) => ({ 'data-width': attrs.width }),
             },
             height: {
                 default: 0,
-                parseHTML: el => parseFloat(el.getAttribute('data-height') || '0'),
-                renderHTML: attrs => ({ 'data-height': attrs.height }),
+                parseHTML: (el) => parseFloat(el.getAttribute('data-height') || '0'),
+                renderHTML: (attrs) => ({ 'data-height': attrs.height }),
             },
             rotation: {
                 default: 0,
-                parseHTML: el => parseFloat(el.getAttribute('data-rotation') || '0'),
-                renderHTML: attrs => ({ 'data-rotation': attrs.rotation }),
+                parseHTML: (el) => parseFloat(el.getAttribute('data-rotation') || '0'),
+                renderHTML: (attrs) => ({ 'data-rotation': attrs.rotation }),
             },
             x: {
                 default: 0,
-                parseHTML: el => parseFloat(el.getAttribute('data-x') || '0'),
-                renderHTML: attrs => ({ 'data-x': attrs.x }),
+                parseHTML: (el) => parseFloat(el.getAttribute('data-x') || '0'),
+                renderHTML: (attrs) => ({ 'data-x': attrs.x }),
             },
             y: {
                 default: 0,
-                parseHTML: el => parseFloat(el.getAttribute('data-y') || '0'),
-                renderHTML: attrs => ({ 'data-y': attrs.y }),
+                parseHTML: (el) => parseFloat(el.getAttribute('data-y') || '0'),
+                renderHTML: (attrs) => ({ 'data-y': attrs.y }),
             },
         };
     },
@@ -263,7 +277,8 @@ export const ResizableImage = Node.create({
 
     addCommands() {
         return {
-            setImage: (options: { src: string; alt?: string; title?: string }) =>
+            setImage:
+                (options: { src: string; alt?: string; title?: string }) =>
                 ({ commands }: any) =>
                     commands.insertContent({ type: this.name, attrs: options }),
         } as any;

@@ -59,8 +59,8 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
         try {
             const newTimeline = await api.createTimeline(name);
             if (newTimeline) {
-                setTimelines(prev => {
-                    const next = [newTimeline, ...prev.filter(t => !t.isDefault), ...prev.filter(t => t.isDefault)];
+                setTimelines((prev) => {
+                    const next = [newTimeline, ...prev.filter((t) => !t.isDefault), ...prev.filter((t) => t.isDefault)];
                     return next;
                 });
                 setActiveTimeline(newTimeline);
@@ -70,62 +70,76 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
         }
     }, []);
 
-    const deleteTimeline = useCallback(async (id: number) => {
-        const timeline = timelines.find(t => t.id === id);
-        if (timeline?.isDefault) return;
+    const deleteTimeline = useCallback(
+        async (id: number) => {
+            const timeline = timelines.find((t) => t.id === id);
+            if (timeline?.isDefault) return;
 
-        try {
-            const success = await api.deleteTimeline(id);
-            if (success) {
-                setTimelines(prev => {
-                    const next = prev.filter(t => t.id !== id);
-                    setActiveTimeline(curr => {
-                        if (curr?.id === id) return next[0] || DEFAULT_TIMELINE;
-                        return curr;
+            try {
+                const success = await api.deleteTimeline(id);
+                if (success) {
+                    setTimelines((prev) => {
+                        const next = prev.filter((t) => t.id !== id);
+                        setActiveTimeline((curr) => {
+                            if (curr?.id === id) return next[0] || DEFAULT_TIMELINE;
+                            return curr;
+                        });
+                        return next;
                     });
-                    return next;
-                });
+                }
+            } catch (error) {
+                throw error;
             }
-        } catch (error) {
-            throw error;
-        }
-    }, [timelines]);
+        },
+        [timelines],
+    );
 
     const updateTimelineState = useCallback((id: number, entryIds: number[]) => {
-        const update = (t: Timeline) => t.id === id ? { ...t, entryIds } : t;
-        setTimelines(prev => prev.map(update));
-        setActiveTimeline(curr => curr?.id === id ? { ...curr, entryIds } : curr);
+        const update = (t: Timeline) => (t.id === id ? { ...t, entryIds } : t);
+        setTimelines((prev) => prev.map(update));
+        setActiveTimeline((curr) => (curr?.id === id ? { ...curr, entryIds } : curr));
     }, []);
 
-    const addEntryToTimeline = useCallback(async (timelineId: number, entryId: number) => {
-        const timeline = timelines.find(t => t.id === timelineId);
-        if (timeline?.isDefault || timeline?.entryIds.includes(entryId)) return;
+    const addEntryToTimeline = useCallback(
+        async (timelineId: number, entryId: number) => {
+            const timeline = timelines.find((t) => t.id === timelineId);
+            if (timeline?.isDefault || timeline?.entryIds.includes(entryId)) return;
 
-        if (await api.addEntryToTimeline(timelineId, entryId)) {
-            updateTimelineState(timelineId, [...timeline!.entryIds, entryId]);
-        }
-    }, [timelines, updateTimelineState]);
+            if (await api.addEntryToTimeline(timelineId, entryId)) {
+                updateTimelineState(timelineId, [...timeline!.entryIds, entryId]);
+            }
+        },
+        [timelines, updateTimelineState],
+    );
 
-    const removeEntryFromTimeline = useCallback(async (timelineId: number, entryId: number) => {
-        const timeline = timelines.find(t => t.id === timelineId);
-        if (timeline?.isDefault || !timeline?.entryIds.includes(entryId)) return;
+    const removeEntryFromTimeline = useCallback(
+        async (timelineId: number, entryId: number) => {
+            const timeline = timelines.find((t) => t.id === timelineId);
+            if (timeline?.isDefault || !timeline?.entryIds.includes(entryId)) return;
 
-        if (await api.removeEntryFromTimeline(timelineId, entryId)) {
-            updateTimelineState(timelineId, timeline.entryIds.filter(id => id !== entryId));
-        }
-    }, [timelines, updateTimelineState]);
+            if (await api.removeEntryFromTimeline(timelineId, entryId)) {
+                updateTimelineState(
+                    timelineId,
+                    timeline.entryIds.filter((id) => id !== entryId),
+                );
+            }
+        },
+        [timelines, updateTimelineState],
+    );
 
     return (
-        <TimelineContext.Provider value={{
-            timelines,
-            activeTimeline,
-            selectTimeline,
-            createTimeline,
-            deleteTimeline,
-            addEntryToTimeline,
-            removeEntryFromTimeline,
-            isLoading,
-        }}>
+        <TimelineContext.Provider
+            value={{
+                timelines,
+                activeTimeline,
+                selectTimeline,
+                createTimeline,
+                deleteTimeline,
+                addEntryToTimeline,
+                removeEntryFromTimeline,
+                isLoading,
+            }}
+        >
             {children}
         </TimelineContext.Provider>
     );

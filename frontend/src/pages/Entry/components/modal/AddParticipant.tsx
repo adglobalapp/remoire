@@ -31,40 +31,51 @@ const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectUser, 
                 </div>
 
                 <div className={styles.resultsList}>
-                    {users.filter(f => !isBlocked(f.id)).length > 0 ? (
-                        users.filter(f => !isBlocked(f.id)).map(friend => (
-                            <div
-                                key={friend.id}
-                                className={classNames(styles.resultItem, { 'user-blocked': isBlocked(friend.id) })}
-                                onClick={() => { onSelectUser(friend.id); }}
-                            >
-                                <div 
-                                    className={styles.userInfo} 
-                                    onClick={(e) => { e.stopPropagation(); showProfile(friend); }}
+                    {users.filter((f) => !isBlocked(f.id)).length > 0 ? (
+                        users
+                            .filter((f) => !isBlocked(f.id))
+                            .map((friend) => (
+                                <div
+                                    key={friend.id}
+                                    className={classNames(styles.resultItem, {
+                                        'user-blocked': isBlocked(friend.id),
+                                    })}
+                                    onClick={() => {
+                                        onSelectUser(friend.id);
+                                    }}
                                 >
-                                    <Avatar 
-                                        user={friend} 
-                                        size={36} 
-                                        className={styles.avatar} 
-                                    />
-                                    <div className={styles.userDetails}>
-                                        <span className={styles.userName}>{friend.name}</span>
+                                    <div
+                                        className={styles.userInfo}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            showProfile(friend);
+                                        }}
+                                    >
+                                        <Avatar user={friend} size={36} className={styles.avatar} />
+                                        <div className={styles.userDetails}>
+                                            <span className={styles.userName}>{friend.name}</span>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <button
-                                    className="btn btn-dark btn-sm"
-                                    onClick={(e) => handleSelect(e, friend.id)}
-                                    disabled={isAdding === friend.id}
-                                >
-                                    {isAdding === friend.id ? <><Loader2 size={16} className="animate-spin" /> Adding...</> : <><UserPlus size={16} /> Add</>}
-                                </button>
-                            </div>
-                        ))
+                                    <button
+                                        className="btn btn-dark btn-sm"
+                                        onClick={(e) => handleSelect(e, friend.id)}
+                                        disabled={isAdding === friend.id}
+                                    >
+                                        {isAdding === friend.id ? (
+                                            <>
+                                                <Loader2 size={16} className="animate-spin" /> Adding...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <UserPlus size={16} /> Add
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            ))
                     ) : (
-                        <div className="empty-state-placeholder">
-                            You have no friends to add as participants.
-                        </div>
+                        <div className="empty-state-placeholder">You have no friends to add as participants.</div>
                     )}
                 </div>
             </div>

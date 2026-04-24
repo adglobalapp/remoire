@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import * as api from '../api/auth';
 import { type User, type LoginCredentials, type RegisterCredentials, type AuthContextType } from '../types';
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);

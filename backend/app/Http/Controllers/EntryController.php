@@ -11,10 +11,10 @@ class EntryController extends Controller
     public function index()
     {
         $user = auth()->user();
-        
+
         $owned = $user->entries()->with('participants')->get();
         $participated = $user->participatedEntries()->with('participants')->get();
-        
+
         return $owned->concat($participated)
             ->unique('id')
             ->sortByDesc('date')
@@ -24,10 +24,10 @@ class EntryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'   => 'nullable|string|max:255',
-            'date'    => 'required|date',
+            'title' => 'nullable|string|max:255',
+            'date' => 'required|date',
             'content' => 'nullable|string',
-            'color'   => 'nullable|string',
+            'color' => 'nullable|string',
             'image_url' => 'nullable|string',
             'location_name' => 'nullable|string|max:255',
             'latitude' => 'nullable|numeric',
@@ -50,14 +50,14 @@ class EntryController extends Controller
     public function show(Entry $entry)
     {
         $user = Auth::user();
-        
+
         $isOwner = $entry->user_id === $user->id;
         $isParticipant = $entry->participants()->where('users.id', $user->id)->exists();
 
-        if (!$isOwner && !$isParticipant) {
+        if (! $isOwner && ! $isParticipant) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-        
+
         return $entry->load('participants');
     }
 
@@ -67,10 +67,10 @@ class EntryController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
         $validated = $request->validate([
-            'title'   => 'nullable|string|max:255',
-            'date'    => 'sometimes|date',
+            'title' => 'nullable|string|max:255',
+            'date' => 'sometimes|date',
             'content' => 'nullable|string',
-            'color'   => 'nullable|string',
+            'color' => 'nullable|string',
             'image_url' => 'nullable|string',
             'location_name' => 'nullable|string|max:255',
             'latitude' => 'nullable|numeric',
@@ -97,5 +97,4 @@ class EntryController extends Controller
 
         return response()->json(['message' => 'Deleted']);
     }
-
 }

@@ -3,11 +3,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { type Transform, type Options } from '../types';
 
 export const useCanvasNavigation = (options: Options = {}) => {
-    const {
-        minScale = 0.3,
-        maxScale = 2,
-        initialTransform = { x: 0, y: 0, scale: 1 }
-    } = options;
+    const { minScale = 0.3, maxScale = 2, initialTransform = { x: 0, y: 0, scale: 1 } } = options;
 
     const [transform, setTransform] = useState<Transform>(initialTransform);
     const [isDragging, setIsDragging] = useState(false);
@@ -26,14 +22,17 @@ export const useCanvasNavigation = (options: Options = {}) => {
         return false;
     }, []);
 
-    const handleMouseMove = useCallback((e: MouseEvent) => {
-        if (isDragging) {
-            const dx = e.clientX - lastMousePosRef.current.x;
-            const dy = e.clientY - lastMousePosRef.current.y;
-            setTransform(prev => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
-            lastMousePosRef.current = { x: e.clientX, y: e.clientY };
-        }
-    }, [isDragging]);
+    const handleMouseMove = useCallback(
+        (e: MouseEvent) => {
+            if (isDragging) {
+                const dx = e.clientX - lastMousePosRef.current.x;
+                const dy = e.clientY - lastMousePosRef.current.y;
+                setTransform((prev) => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
+                lastMousePosRef.current = { x: e.clientX, y: e.clientY };
+            }
+        },
+        [isDragging],
+    );
 
     const handleMouseUp = useCallback(() => setIsDragging(false), []);
 
@@ -42,7 +41,10 @@ export const useCanvasNavigation = (options: Options = {}) => {
 
         if (e.touches.length === 1) {
             setIsDragging(true);
-            lastTouchPosRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            lastTouchPosRef.current = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY,
+            };
             lastTouchDistanceRef.current = null;
         } else if (e.touches.length === 2) {
             setIsDragging(true);
@@ -52,41 +54,45 @@ export const useCanvasNavigation = (options: Options = {}) => {
         }
     }, []);
 
-    const handleTouchMove = useCallback((e: TouchEvent) => {
-        if (!isDragging) return;
+    const handleTouchMove = useCallback(
+        (e: TouchEvent) => {
+            if (!isDragging) return;
 
-        if (e.touches.length === 1 && lastTouchDistanceRef.current === null) {
-            
-            const dx = e.touches[0].clientX - lastTouchPosRef.current.x;
-            const dy = e.touches[0].clientY - lastTouchPosRef.current.y;
-            setTransform(prev => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
-            lastTouchPosRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        } else if (e.touches.length === 2) {
-            
-            e.preventDefault(); 
-            const dx = e.touches[0].clientX - e.touches[1].clientX;
-            const dy = e.touches[0].clientY - e.touches[1].clientY;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (e.touches.length === 1 && lastTouchDistanceRef.current === null) {
+                const dx = e.touches[0].clientX - lastTouchPosRef.current.x;
+                const dy = e.touches[0].clientY - lastTouchPosRef.current.y;
+                setTransform((prev) => ({ ...prev, x: prev.x + dx, y: prev.y + dy }));
+                lastTouchPosRef.current = {
+                    x: e.touches[0].clientX,
+                    y: e.touches[0].clientY,
+                };
+            } else if (e.touches.length === 2) {
+                e.preventDefault();
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (lastTouchDistanceRef.current !== null && containerRef.current) {
-                const rect = containerRef.current.getBoundingClientRect();
-                const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
-                const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+                if (lastTouchDistanceRef.current !== null && containerRef.current) {
+                    const rect = containerRef.current.getBoundingClientRect();
+                    const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+                    const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
 
-                const ratio = distance / lastTouchDistanceRef.current;
-                
-                setTransform(prev => {
-                    const nextScale = Math.min(maxScale, Math.max(minScale, prev.scale * ratio));
-                    if (nextScale === prev.scale) return prev;
-                    
-                    const nextX = centerX - (centerX - prev.x) * nextScale / prev.scale;
-                    const nextY = centerY - (centerY - prev.y) * nextScale / prev.scale;
-                    return { x: nextX, y: nextY, scale: nextScale };
-                });
+                    const ratio = distance / lastTouchDistanceRef.current;
+
+                    setTransform((prev) => {
+                        const nextScale = Math.min(maxScale, Math.max(minScale, prev.scale * ratio));
+                        if (nextScale === prev.scale) return prev;
+
+                        const nextX = centerX - ((centerX - prev.x) * nextScale) / prev.scale;
+                        const nextY = centerY - ((centerY - prev.y) * nextScale) / prev.scale;
+                        return { x: nextX, y: nextY, scale: nextScale };
+                    });
+                }
+                lastTouchDistanceRef.current = distance;
             }
-            lastTouchDistanceRef.current = distance;
-        }
-    }, [isDragging, maxScale, minScale]);
+        },
+        [isDragging, maxScale, minScale],
+    );
 
     const handleTouchEnd = useCallback(() => {
         setIsDragging(false);
@@ -114,7 +120,7 @@ export const useCanvasNavigation = (options: Options = {}) => {
 
         const onWheel = (e: WheelEvent) => {
             e.preventDefault();
-            
+
             if (e.ctrlKey) {
                 const rect = container.getBoundingClientRect();
                 const mouseX = e.clientX - rect.left;
@@ -122,15 +128,15 @@ export const useCanvasNavigation = (options: Options = {}) => {
                 const sensitivity = 0.001;
                 const delta = e.deltaY * sensitivity;
 
-                setTransform(prev => {
+                setTransform((prev) => {
                     const nextScale = Math.min(maxScale, Math.max(minScale, prev.scale - delta));
                     if (nextScale === prev.scale) return prev;
-                    const nextX = mouseX - (mouseX - prev.x) * nextScale / prev.scale;
-                    const nextY = mouseY - (mouseY - prev.y) * nextScale / prev.scale;
+                    const nextX = mouseX - ((mouseX - prev.x) * nextScale) / prev.scale;
+                    const nextY = mouseY - ((mouseY - prev.y) * nextScale) / prev.scale;
                     return { x: nextX, y: nextY, scale: nextScale };
                 });
             } else {
-                setTransform(prev => ({
+                setTransform((prev) => ({
                     ...prev,
                     x: prev.x - e.deltaX,
                     y: prev.y - e.deltaY,

@@ -53,75 +53,93 @@ function AppContent() {
         <EntryProvider>
             <TimelineProvider>
                 <Routes>
-                    <Route path="/" element={
-                        <AuthGuard type="guest">
-                            <>
-                                <LandingPage
-                                    onLogin={() => setShowLogin(true)}
-                                    onRegister={() => setShowRegister(true)}
-                                />
-                                {showLogin && (
-                                    <Login
-                                        onClose={() => setShowLogin(false)}
-                                        onSwitchToRegister={() => {
-                                            setShowLogin(false);
-                                            setShowRegister(true);
-                                        }}
-                                    />
-                                )}
-                                {showRegister && (
-                                    <Register
-                                        onClose={() => setShowRegister(false)}
-                                        onSwitchToLogin={() => {
-                                            setShowRegister(false);
-                                            setShowLogin(true);
-                                        }}
-                                    />
-                                )}
-                            </>
-                        </AuthGuard>
-                    } />
+                    <Route
+                        path="/"
+                        element={
+                            <AuthGuard type="guest">
+                                <>
+                                    <LandingPage onLogin={() => setShowLogin(true)} onRegister={() => setShowRegister(true)} />
+                                    {showLogin && (
+                                        <Login
+                                            onClose={() => setShowLogin(false)}
+                                            onSwitchToRegister={() => {
+                                                setShowLogin(false);
+                                                setShowRegister(true);
+                                            }}
+                                        />
+                                    )}
+                                    {showRegister && (
+                                        <Register
+                                            onClose={() => setShowRegister(false)}
+                                            onSwitchToLogin={() => {
+                                                setShowRegister(false);
+                                                setShowLogin(true);
+                                            }}
+                                        />
+                                    )}
+                                </>
+                            </AuthGuard>
+                        }
+                    />
 
-                    <Route path="/entries" element={
-                        <AuthGuard type="private">
-                            <EntryPage />
-                        </AuthGuard>
-                    } />
+                    <Route
+                        path="/entries"
+                        element={
+                            <AuthGuard type="private">
+                                <EntryPage />
+                            </AuthGuard>
+                        }
+                    />
 
-                    <Route path="/timelines" element={
-                        <AuthGuard type="private">
-                            <TimelinePage />
-                        </AuthGuard>
-                    } />
+                    <Route
+                        path="/timelines"
+                        element={
+                            <AuthGuard type="private">
+                                <TimelinePage />
+                            </AuthGuard>
+                        }
+                    />
 
-                    <Route path="/friends" element={
-                        <AuthGuard type="private">
-                            <FriendlistPage />
-                        </AuthGuard>
-                    } />
+                    <Route
+                        path="/friends"
+                        element={
+                            <AuthGuard type="private">
+                                <FriendlistPage />
+                            </AuthGuard>
+                        }
+                    />
 
-                    <Route path="/notes" element={
-                        <AuthGuard type="private">
-                            <NotesPage />
-                        </AuthGuard>
-                    } />
+                    <Route
+                        path="/notes"
+                        element={
+                            <AuthGuard type="private">
+                                <NotesPage />
+                            </AuthGuard>
+                        }
+                    />
 
-                    <Route path="/maps" element={
-                        <AuthGuard type="private">
-                            <MapsPage />
-                        </AuthGuard>
-                    } />
+                    <Route
+                        path="/maps"
+                        element={
+                            <AuthGuard type="private">
+                                <MapsPage />
+                            </AuthGuard>
+                        }
+                    />
 
-                    <Route path="/profile" element={
-                        <AuthGuard type="private">
-                            <div className="page-container">
-                                <Navbar />
-                                <main className="main-layout">
-                                    <ProfilePage />
-                                </main>
-                            </div>
-                        </AuthGuard>
-                    } />
+                    <Route
+                        path="/profile"
+                        element={
+                            <AuthGuard type="private">
+                                <div className="page-container">
+                                    <Navbar />
+                                    <main className="main-layout">
+                                        <ProfilePage />
+                                    </main>
+                                </div>
+                            </AuthGuard>
+                        }
+                    />
 
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>

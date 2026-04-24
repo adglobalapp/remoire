@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Plus } from 'lucide-react';
 import Loader from '../../components/common/Loader';
 import toast from 'react-hot-toast';
@@ -26,40 +26,40 @@ const NotesPage = () => {
         });
     };
 
-    const fetchNotes = async () => {
+    const fetchNotes = useCallback(async () => {
         setIsLoading(true);
         try {
             const data = await getNotes();
             setNotes(sortNotes(data));
-        } catch (error) {
+        } catch {
             toast.error('Failed to load notes');
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchNotes();
-    }, []);
+    }, [fetchNotes]);
 
     const handleSaveNote = async (data: Partial<NoteType>) => {
         try {
             if (selectedNote) {
                 const updated = await updateNote(selectedNote.id, data);
                 if (updated) {
-                    setNotes(prev => sortNotes(prev.map(n => n.id === updated.id ? updated : n)));
+                    setNotes((prev) => sortNotes(prev.map((n) => (n.id === updated.id ? updated : n))));
                     toast.success('Note updated');
                 }
             } else {
                 const created = await createNote(data);
                 if (created) {
-                    setNotes(prev => sortNotes([created, ...prev]));
+                    setNotes((prev) => sortNotes([created, ...prev]));
                     toast.success('Note created');
                 }
             }
             setSelectedNote(null);
             setShowAddModal(false);
-        } catch (error) {
+        } catch {
             toast.error('Failed to save note');
         }
     };
@@ -70,7 +70,7 @@ const NotesPage = () => {
         try {
             const success = await deleteNote(noteToDelete);
             if (success) {
-                setNotes(prev => prev.filter(n => n.id !== noteToDelete));
+                setNotes((prev) => prev.filter((n) => n.id !== noteToDelete));
                 toast.success('Note deleted');
                 setNoteToDelete(null);
                 setSelectedNote(null);
@@ -106,12 +106,7 @@ const NotesPage = () => {
                         ) : (
                             <div className={styles.notesGrid}>
                                 {notes.map((note, i) => (
-                                    <Note
-                                        key={note.id}
-                                        note={note}
-                                        index={i}
-                                        onClick={() => setSelectedNote(note)}
-                                    />
+                                    <Note key={note.id} note={note} index={i} onClick={() => setSelectedNote(note)} />
                                 ))}
                             </div>
                         )}
@@ -136,7 +131,11 @@ const NotesPage = () => {
                     <DeleteConfirmation
                         title="Delete Note?"
                         message={
-                            <span>Are you sure you want to delete <strong>{notes.find(n => n.id === noteToDelete)?.title || 'Untitled'}</strong>? This action cannot be undone.</span>
+                            <span>
+                                Are you sure you want to delete{' '}
+                                <strong>{notes.find((n) => n.id === noteToDelete)?.title || 'Untitled'}</strong>? This action cannot be
+                                undone.
+                            </span>
                         }
                         confirmText="Delete"
                         isLoading={isDeleting}

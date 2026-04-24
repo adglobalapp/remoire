@@ -11,7 +11,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
     onConfirm,
     onCancel,
     isLoading = false,
-    loadingText
+    loadingText,
 }) => {
     return createPortal(
         <div className="global-modal-overlay" onClick={isLoading ? undefined : onCancel}>
@@ -27,9 +27,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
                 </div>
 
                 <div className={styles.modalBody}>
-                    <p className={styles.modalMessage}>
-                        {message}
-                    </p>
+                    <p className={styles.modalMessage}>{message}</p>
                 </div>
 
                 <div className={styles.modalFooter}>
@@ -37,15 +35,18 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
                         {cancelText}
                     </button>
                     <button className={`btn btn-danger`} onClick={onConfirm} disabled={isLoading}>
-                        {isLoading
-                            ? <><Loader2 size={16} className="animate-spin" /> {loadingText || 'Processing...'}</>
-                            : confirmText
-                        }
+                        {isLoading ? (
+                            <>
+                                <Loader2 size={16} className="animate-spin" /> {loadingText || 'Processing...'}
+                            </>
+                        ) : (
+                            confirmText
+                        )}
                     </button>
                 </div>
             </div>
         </div>,
-        document.body
+        document.body,
     );
 };
 

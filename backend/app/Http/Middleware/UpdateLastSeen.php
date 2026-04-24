@@ -18,7 +18,7 @@ class UpdateLastSeen
         if (auth()->check()) {
             $user = auth()->user();
 
-            if (!$user->last_seen_at || !$user->last_seen_at->isToday()) {
+            if (! $user->last_seen_at || ! $user->last_seen_at->isToday()) {
                 $user->update(['last_seen_at' => now()]);
             }
         }

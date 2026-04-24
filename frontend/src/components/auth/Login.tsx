@@ -23,12 +23,14 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister }) => {
             if (err.status === 422 && err.errors) {
                 setFieldErrors(err.errors);
             } else if (err.status === 401) {
-                setFieldErrors({ 
+                setFieldErrors({
                     email: ['Invalid email or password.'],
-                    password: [' ']
+                    password: [' '],
                 });
             } else {
-                setFieldErrors({ email: [err.message || 'An unexpected error occurred.'] });
+                setFieldErrors({
+                    email: [err.message || 'An unexpected error occurred.'],
+                });
             }
         } finally {
             setIsLoading(false);
@@ -103,7 +105,7 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister }) => {
 
                 <div className={styles.modalFooter}>
                     <p className={styles.footerText}>
-                        New to Remoire? 
+                        New to Remoire?
                         <button onClick={onSwitchToRegister} className={styles.switchBtn}>
                             Create an account
                         </button>
