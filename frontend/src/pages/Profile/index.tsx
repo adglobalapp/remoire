@@ -177,17 +177,19 @@ const Profile = () => {
             <div className={styles.profileContainer}>
                 <header className={`${styles.profileCard} ${styles.profileHeader}`}>
                     <div className={styles.avatarWrapper}>
-                        <Avatar
-                            user={user}
-                            size={140}
-                            className={styles.avatarLarge}
-                            onClick={() => fileInputRef.current?.click()}
-                        />
+                        <Avatar user={user} size={140} className={styles.avatarLarge} onClick={() => fileInputRef.current?.click()} />
                         <div className={styles.editAvatarOverlay} onClick={() => fileInputRef.current?.click()} title="Upload new avatar">
                             <Camera size={16} />
                         </div>
                         {user?.avatar_url && (
-                            <div className={styles.deleteAvatarBtn} onClick={(e) => { e.stopPropagation(); handleAvatarDelete(); }} title="Delete avatar">
+                            <div
+                                className={styles.deleteAvatarBtn}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAvatarDelete();
+                                }}
+                                title="Delete avatar"
+                            >
                                 <Trash2 size={16} />
                             </div>
                         )}

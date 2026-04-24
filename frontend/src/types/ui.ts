@@ -78,6 +78,8 @@ export interface RowProps {
     onDelete: (id: number) => void;
     onViewProfile: (user: User) => void;
     index?: number;
+    acceptingId?: number | null;
+    deletingId?: number | null;
 }
 
 export interface LocationData {
@@ -108,6 +110,8 @@ export interface RelationshipListProps {
     showEmptyState?: boolean;
     emptyMessage?: string;
     delay?: number;
+    acceptingId?: number | null;
+    deletingId?: number | null;
 }
 
 export interface AddParticipantProps {

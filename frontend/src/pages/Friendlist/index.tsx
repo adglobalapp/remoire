@@ -16,6 +16,8 @@ const FriendlistPage = () => {
     const [pendingRequests, setPendingRequests] = useState<UserType[]>([]);
     const [sentRequests, setSentRequests] = useState<UserType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [acceptingId, setAcceptingId] = useState<number | null>(null);
+    const [directDeletingId, setDirectDeletingId] = useState<number | null>(null);
     const [showAddModal, setShowAddModal] = useState(false);
     const [isConfirming, setIsConfirming] = useState(false);
     const { showProfile, blockedUserIds, blockUser } = useUserProfile();
@@ -50,6 +52,7 @@ const FriendlistPage = () => {
     const visibleFriends = friends.filter((u) => !isBlocked(u.id));
 
     const handleAccept = async (id: number) => {
+        setAcceptingId(id);
         const success = await acceptRelationshipRequest(id);
         if (success) {
             toast.success('Friend request accepted!');
@@ -57,6 +60,19 @@ const FriendlistPage = () => {
         } else {
             toast.error('Failed to accept request');
         }
+        setAcceptingId(null);
+    };
+
+    const handleReject = async (id: number) => {
+        setDirectDeletingId(id);
+        const success = await deleteRelationship(id);
+        if (success) {
+            toast.success('Request rejected');
+            fetchData();
+        } else {
+            toast.error('Failed to reject request');
+        }
+        setDirectDeletingId(null);
     };
 
     const handleConfirmAction = async () => {
@@ -99,13 +115,9 @@ const FriendlistPage = () => {
                             type="pending"
                             delay={0}
                             onAccept={handleAccept}
-                            onDelete={(user) =>
-                                setConfirmAction({
-                                    type: 'delete',
-                                    userId: user.id,
-                                    userName: user.name,
-                                })
-                            }
+                            acceptingId={acceptingId}
+                            deletingId={directDeletingId}
+                            onDelete={(user) => handleReject(user.id)}
                             onViewProfile={showProfile}
                             titleClassName={styles.bgDarkBlue}
                         />

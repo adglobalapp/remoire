@@ -14,6 +14,8 @@ const RelationshipList = ({
     showEmptyState = false,
     emptyMessage = "You haven't added any friends yet.",
     delay = 0,
+    acceptingId,
+    deletingId,
 }: RelationshipListProps) => {
     if (users.length === 0 && !showEmptyState) return null;
 
@@ -36,6 +38,8 @@ const RelationshipList = ({
                         onAccept={onAccept}
                         onDelete={() => onDelete(user)}
                         onViewProfile={onViewProfile}
+                        acceptingId={acceptingId}
+                        deletingId={deletingId}
                     />
                 ))
             ) : (

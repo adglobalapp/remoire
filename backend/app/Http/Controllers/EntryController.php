@@ -54,7 +54,7 @@ class EntryController extends Controller
         $isOwner = $entry->user_id === $user->id;
         $isParticipant = $entry->participants()->where('users.id', $user->id)->exists();
 
-        if (!$isOwner && !$isParticipant) {
+        if (! $isOwner && ! $isParticipant) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

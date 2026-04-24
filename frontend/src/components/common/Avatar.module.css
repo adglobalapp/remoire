@@ -6,7 +6,9 @@
     position: relative;
     background-color: var(--color-light-beige);
     flex-shrink: 0;
-    box-shadow: 0 0 0 2px white, 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow:
+        0 0 0 2px white,
+        0 2px 8px rgba(0, 0, 0, 0.08);
     box-sizing: border-box;
 }
 
