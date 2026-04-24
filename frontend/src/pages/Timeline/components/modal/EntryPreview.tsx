@@ -129,7 +129,7 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
                         {entry.location_name && (
                             <div className={styles.locationTag}>
                                 <MapPin size={22} />
-                                <span>{entry.location_name}</span>
+                                <span title={entry.location_name}>{entry.location_name}</span>
                             </div>
                         )}
 

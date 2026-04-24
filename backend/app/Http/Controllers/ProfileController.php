@@ -21,7 +21,18 @@ class ProfileController extends Controller
             'avatar_url' => 'nullable|string',
         ]);
 
-        $user->update($request->only('name', 'bio', 'avatar_url'));
+        if ($request->has('avatar_url')) {
+            $newAvatar = $request->avatar_url;
+            if ($user->avatar_url && $user->avatar_url !== $newAvatar) {
+                $oldPath = str_replace(asset('storage/'), '', $user->avatar_url);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            }
+            $user->avatar_url = $newAvatar;
+        }
+
+        $user->name = $request->name;
+        $user->bio = $request->bio;
+        $user->save();
 
         return response()->json([
             'message' => 'Profile updated',

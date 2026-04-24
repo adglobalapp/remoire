@@ -141,11 +141,14 @@
     font-size: 1.3rem;
     font-family: var(--font-ui);
     color: var(--color-burgundy);
+    min-width: 0;
+    flex: 0 1 auto;
+}
+
+.locationTag span {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 0;
-    flex: 0 1 auto;
 }
 
 .participantStack {

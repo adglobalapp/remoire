@@ -3,7 +3,7 @@ import { type AvatarProps } from '../../types';
 import { PRESET_COLORS } from '../../utils/constants';
 import styles from './Avatar.module.css';
 
-const Avatar: React.FC<AvatarProps> = ({ user, text, size = 32, className = '', showName = false, backgroundColor, color }) => {
+const Avatar: React.FC<AvatarProps> = ({ user, text, size = 32, className = '', showName = false, backgroundColor, color, onClick }) => {
     const getInitials = (name: string) => {
         if (!name) return '?';
         const parts = name.trim().split(/\s+/);
@@ -18,7 +18,7 @@ const Avatar: React.FC<AvatarProps> = ({ user, text, size = 32, className = '', 
     const finalColor = color || (backgroundColor ? 'var(--color-burgundy)' : 'var(--color-dark-brown)');
 
     return (
-        <div className={`${styles.avatarWrapper} ${className}`} title={user?.name || text || ''}>
+        <div className={`${styles.avatarWrapper} ${className}`} title={user?.name || text || ''} onClick={onClick}>
             <div
                 className={styles.avatarCircle}
                 style={{

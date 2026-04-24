@@ -4,7 +4,7 @@ export interface Entry {
     title: string;
     date: string;
     content: string | null;
-    image_url?: string;
+    image_url?: string | null;
     color?: string | null;
     location_name?: string | null;
     latitude?: number | null;

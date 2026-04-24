@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './index.module.css';
 import Avatar from '../../components/common/Avatar';
-import { User, Lock, Camera, Copy, Check, UserMinus, AlertCircle, Loader2 } from 'lucide-react';
+import { User, Lock, Camera, Copy, Check, UserMinus, AlertCircle, Loader2, Trash2 } from 'lucide-react';
 import { updateProfile, updatePassword, getBlockedUsers } from '../../api/profile';
 import { uploadImage } from '../../api/entries';
 import toast from 'react-hot-toast';
@@ -118,6 +118,26 @@ const Profile = () => {
         }
     };
 
+    const handleAvatarDelete = async () => {
+        if (!user || !user.avatar_url) return;
+
+        setIsProfileLoading(true);
+        try {
+            const profileRes = await updateProfile({
+                name,
+                bio,
+                avatar_url: null,
+            });
+            setUser(profileRes.user);
+            toast.success('Avatar removed');
+        } catch (err) {
+            const error = err as Error;
+            toast.error(error.message || 'Failed to remove avatar');
+        } finally {
+            setIsProfileLoading(false);
+        }
+    };
+
     const handleUnblock = async (id: number) => {
         setUnblockingId(id);
         await unblockUser(id);
@@ -157,12 +177,20 @@ const Profile = () => {
             <div className={styles.profileContainer}>
                 <header className={`${styles.profileCard} ${styles.profileHeader}`}>
                     <div className={styles.avatarWrapper}>
-                        <div className={styles.avatarCircle} onClick={() => fileInputRef.current?.click()}>
-                            <Avatar user={user} size={140} className={styles.avatarLarge} />
-                        </div>
-                        <div className={styles.editAvatarOverlay} onClick={() => fileInputRef.current?.click()}>
+                        <Avatar
+                            user={user}
+                            size={140}
+                            className={styles.avatarLarge}
+                            onClick={() => fileInputRef.current?.click()}
+                        />
+                        <div className={styles.editAvatarOverlay} onClick={() => fileInputRef.current?.click()} title="Upload new avatar">
                             <Camera size={16} />
                         </div>
+                        {user?.avatar_url && (
+                            <div className={styles.deleteAvatarBtn} onClick={(e) => { e.stopPropagation(); handleAvatarDelete(); }} title="Delete avatar">
+                                <Trash2 size={16} />
+                            </div>
+                        )}
                         <input
                             type="file"
                             ref={fileInputRef}

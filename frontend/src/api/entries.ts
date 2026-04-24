@@ -12,7 +12,6 @@ export const getEntries = async (): Promise<Entry[]> => {
         return [];
     }
 };
-
 export const createEntry = async (title: string): Promise<Entry | null> => {
     try {
         const response = await fetch(`${API_BASE_URL}/entries`, {
@@ -23,8 +22,16 @@ export const createEntry = async (title: string): Promise<Entry | null> => {
                 date: new Date().toISOString().split('T')[0],
             }),
         });
-        if (!response.ok) throw new Error(`Error: ${response.status}`);
-        return await response.json();
+
+        const resData = await response.json();
+        if (!response.ok) {
+            let errorMessage = resData.message || 'Failed to create entry';
+            if (resData.errors) {
+                errorMessage = Object.values(resData.errors).flat().join(' ');
+            }
+            throw new Error(errorMessage);
+        }
+        return resData;
     } catch (error) {
         return null;
     }
@@ -46,7 +53,11 @@ export const updateEntry = async (
         const resData = await response.json();
 
         if (!response.ok) {
-            const error = new Error(resData.message || 'Failed to update entry') as ApiError;
+            let errorMessage = resData.message || 'Failed to update entry';
+            if (resData.errors) {
+                errorMessage = Object.values(resData.errors).flat().join(' ');
+            }
+            const error = new Error(errorMessage) as ApiError;
             error.status = response.status;
             error.errors = resData.errors;
             throw error;
@@ -83,7 +94,12 @@ export const uploadImage = async (file: File): Promise<{ url?: string; error?: s
         const data = await response.json();
 
         if (!response.ok) {
-            const errorMessage = data.message || (data.errors ? Object.values(data.errors).flat().join(' ') : `Error: ${response.status}`);
+            let errorMessage = `Error: ${response.status}`;
+            if (data.errors) {
+                errorMessage = Object.values(data.errors).flat().join(' ');
+            } else if (data.message) {
+                errorMessage = data.message;
+            }
             throw new Error(errorMessage);
         }
 

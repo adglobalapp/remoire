@@ -54,7 +54,7 @@ class EntryController extends Controller
         $isOwner = $entry->user_id === $user->id;
         $isParticipant = $entry->participants()->where('users.id', $user->id)->exists();
 
-        if (! $isOwner && ! $isParticipant) {
+        if (!$isOwner && !$isParticipant) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -79,7 +79,14 @@ class EntryController extends Controller
             'participant_ids.*' => 'exists:users,id',
         ]);
 
+        $oldImages = $this->getAllImages($entry);
         $entry->update($validated);
+        $newImages = $this->getAllImages($entry);
+
+        $toDelete = array_diff($oldImages, $newImages);
+        foreach ($toDelete as $path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+        }
 
         if ($request->has('participant_ids')) {
             $entry->participants()->sync($request->participant_ids);
@@ -93,8 +100,53 @@ class EntryController extends Controller
         if ($entry->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
+
+        $images = $this->getAllImages($entry);
+        foreach ($images as $path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+        }
+
         $entry->delete();
 
         return response()->json(['message' => 'Deleted']);
+    }
+
+    private function getAllImages(Entry $entry)
+    {
+        $images = [];
+
+        if ($entry->image_url) {
+            $images[] = str_replace(asset('storage/'), '', $entry->image_url);
+        }
+        if ($entry->content) {
+            $data = json_decode($entry->content, true);
+
+            if (isset($data['pageSettings']['backgroundUrl']) && $data['pageSettings']['backgroundUrl']) {
+                $images[] = str_replace(asset('storage/'), '', $data['pageSettings']['backgroundUrl']);
+            }
+
+            if (isset($data['contentJSON'])) {
+                $images = array_merge($images, $this->extractImagesFromJSON($data['contentJSON']));
+            }
+        }
+
+        return array_unique($images);
+    }
+
+    private function extractImagesFromJSON($node)
+    {
+        $images = [];
+        if (isset($node['type']) && $node['type'] === 'resizableImage' && isset($node['attrs']['src'])) {
+            $images[] = str_replace(asset('storage/'), '', $node['attrs']['src']);
+        }
+        if (isset($node['type']) && $node['type'] === 'image' && isset($node['attrs']['src'])) {
+            $images[] = str_replace(asset('storage/'), '', $node['attrs']['src']);
+        }
+
+        foreach ($node['content'] ?? [] as $child) {
+            $images = array_merge($images, $this->extractImagesFromJSON($child));
+        }
+
+        return $images;
     }
 }

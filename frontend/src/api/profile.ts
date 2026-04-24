@@ -1,7 +1,7 @@
 import { type User } from '../types';
 import { API_BASE_URL, getHeaders } from './client';
 
-export const updateProfile = async (data: { name: string; bio?: string; avatar_url?: string }) => {
+export const updateProfile = async (data: { name: string; bio?: string; avatar_url?: string | null }) => {
     const response = await fetch(`${API_BASE_URL}/user/profile`, {
         method: 'PUT',
         headers: getHeaders(),
@@ -9,7 +9,11 @@ export const updateProfile = async (data: { name: string; bio?: string; avatar_u
     });
     if (!response.ok) {
         const errData = await response.json();
-        const error = new Error(errData.message || 'Failed to update profile') as any;
+        let errorMessage = errData.message || 'Failed to update profile';
+        if (errData.errors) {
+            errorMessage = Object.values(errData.errors).flat().join(' ');
+        }
+        const error = new Error(errorMessage) as any;
         error.status = response.status;
         error.errors = errData.errors;
         throw error;
@@ -25,7 +29,11 @@ export const updatePassword = async (data: any) => {
     });
     if (!response.ok) {
         const errData = await response.json();
-        const error = new Error(errData.message || 'Failed to update password') as any;
+        let errorMessage = errData.message || 'Failed to update password';
+        if (errData.errors) {
+            errorMessage = Object.values(errData.errors).flat().join(' ');
+        }
+        const error = new Error(errorMessage) as any;
         error.status = response.status;
         error.errors = errData.errors;
         throw error;

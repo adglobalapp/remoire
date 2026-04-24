@@ -50,23 +50,8 @@
     height: 140px;
 }
 
-.avatarCircle {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    overflow: hidden;
-    cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    background-color: white;
-}
-
 .avatarLarge {
-    border: 3px solid white !important;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.avatarCircle:hover .avatarLarge {
-    transform: scale(1.05);
+    transition: background-color 0.2s ease;
 }
 
 .editAvatarOverlay {
@@ -85,6 +70,29 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 10;
     cursor: pointer;
+}
+
+.deleteAvatarBtn {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    background: #dc2626;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.deleteAvatarBtn:hover {
+    background: #b91c1c;
 }
 
 .headerMain {
