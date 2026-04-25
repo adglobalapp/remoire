@@ -1,11 +1,15 @@
 import React from 'react';
 import { Book, History, StickyNote, Sparkles, Users, MapPin } from 'lucide-react';
 import styles from './index.module.css';
-import { type LandingPageProps } from '../../types';
 import Avatar from '../../components/common/Avatar';
 import FeatureCard from './components/FeatureCard';
+import Login from '../../components/auth/Login';
+import Register from '../../components/auth/Register';
 
-const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onRegister }) => {
+const LandingPage: React.FC = () => {
+    const [showLogin, setShowLogin] = React.useState(false);
+    const [showRegister, setShowRegister] = React.useState(false);
+
     return (
         <div className={styles.landingContainer}>
             <svg width="0" height="0" style={{ position: 'absolute' }}>
@@ -26,14 +30,33 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onRegister }) => {
                     Capture the rhythm of your life. A personal space for your stories, memories, and milestones.
                 </p>
                 <div className={styles.ctaButtons}>
-                    <button onClick={onRegister} className={styles.primaryBtn}>
+                    <button onClick={() => setShowRegister(true)} className={styles.primaryBtn}>
                         Get Started
                     </button>
-                    <button onClick={onLogin} className={styles.secondaryBtn}>
+                    <button onClick={() => setShowLogin(true)} className={styles.secondaryBtn}>
                         Sign In
                     </button>
                 </div>
             </header>
+
+            {showLogin && (
+                <Login
+                    onClose={() => setShowLogin(false)}
+                    onSwitchToRegister={() => {
+                        setShowLogin(false);
+                        setShowRegister(true);
+                    }}
+                />
+            )}
+            {showRegister && (
+                <Register
+                    onClose={() => setShowRegister(false)}
+                    onSwitchToLogin={() => {
+                        setShowRegister(false);
+                        setShowLogin(true);
+                    }}
+                />
+            )}
 
             <section className={styles.showcase}>
                 <FeatureCard

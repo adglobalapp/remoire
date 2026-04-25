@@ -3,7 +3,7 @@ import { type AvatarProps } from '../../types';
 import { PRESET_COLORS } from '../../utils/constants';
 import styles from './Avatar.module.css';
 
-const Avatar: React.FC<AvatarProps> = ({ user, text, size = 32, className = '', showName = false, backgroundColor, color, onClick }) => {
+const Avatar: React.FC<AvatarProps> = ({ user, size = 32, className = '', onClick }) => {
     const getInitials = (name: string) => {
         if (!name) return '?';
         const parts = name.trim().split(/\s+/);
@@ -13,20 +13,16 @@ const Avatar: React.FC<AvatarProps> = ({ user, text, size = 32, className = '', 
 
     const getColor = (id?: number) => (id === undefined ? PRESET_COLORS[0] : PRESET_COLORS[id % PRESET_COLORS.length]);
 
-    const displayText = text || (user ? getInitials(user.name) : '?');
-    const finalBgColor = backgroundColor || (user?.avatar_url ? 'transparent' : getColor(user?.id));
-    const finalColor = color || (backgroundColor ? 'var(--color-burgundy)' : 'var(--color-dark-brown)');
-
     return (
-        <div className={`${styles.avatarWrapper} ${className}`} title={user?.name || text || ''} onClick={onClick}>
+        <div className={`${styles.avatarWrapper} ${className}`} title={user?.name || ''} onClick={onClick}>
             <div
                 className={styles.avatarCircle}
                 style={{
                     width: `${size}px`,
                     height: `${size}px`,
                     fontSize: `${size * 0.6}px`,
-                    backgroundColor: finalBgColor,
-                    color: finalColor,
+                    backgroundColor: user?.avatar_url ? 'transparent' : getColor(user?.id),
+                    color: 'var(--color-dark-brown)',
                     display: 'grid',
                     placeItems: 'center',
                     flexShrink: 0,
@@ -35,10 +31,9 @@ const Avatar: React.FC<AvatarProps> = ({ user, text, size = 32, className = '', 
                 {user?.avatar_url ? (
                     <img src={user.avatar_url} alt={user.name} className={styles.avatarImage} />
                 ) : (
-                    <span className={styles.initials}>{displayText}</span>
+                    <span className={styles.initials}>{user ? getInitials(user.name) : '?'}</span>
                 )}
             </div>
-            {showName && user && <span className={styles.userName}>{user.name}</span>}
         </div>
     );
 };

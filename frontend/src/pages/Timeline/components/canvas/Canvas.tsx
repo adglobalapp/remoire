@@ -3,7 +3,6 @@ import { Plus } from 'lucide-react';
 import AddEntryCard from '../modal/AddEntryCard';
 import EntryCard from './EntryCard';
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
-import Loader from '../../../../components/common/Loader';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { useCanvasNavigation } from '../../../../hooks/useCanvasNavigation';
 import { compareDates } from '../../../../utils/dateUtils';
@@ -71,7 +70,6 @@ const Canvas = () => {
             onMouseDown={onMouseDown}
             onTouchStart={onTouchStart}
         >
-            {isLoading && <Loader contextual />}
             {!isLoading && visibleEntries.length === 0 && (
                 <div className={styles.emptyStateOverlay}>
                     <div className="empty-state-placeholder">

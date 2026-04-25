@@ -15,7 +15,7 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         setFieldErrors({});
         setIsLoading(true);
@@ -26,10 +26,10 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
                 onClose();
             }
         } catch (err: any) {
-            if (err.status === 422 && err.errors) {
+            if (err.errors) {
                 setFieldErrors(err.errors);
             } else {
-                setFieldErrors({ name: [err.message || 'Registration failed.'] });
+                setFieldErrors({ password_confirmation: [err.message || 'Registration failed.'] });
             }
         } finally {
             setIsLoading(false);
@@ -38,18 +38,18 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
 
     const renderFieldError = (fieldName: string) => {
         const errors = fieldErrors[fieldName];
-        if (errors && errors.length > 0) {
-            return (
-                <div className="field-errors-container">
-                    {errors.map((msg, idx) => (
-                        <span key={idx} className="field-error-text">
-                            <AlertCircle size={16} /> {msg}
-                        </span>
-                    ))}
-                </div>
-            );
-        }
-        return null;
+        if (!errors || errors.length === 0) return null;
+        const messages = errors.filter((msg) => msg && msg.trim());
+        if (messages.length === 0) return null;
+        return (
+            <div className="field-errors-container">
+                {messages.map((msg, idx) => (
+                    <span key={idx} className="field-error-text">
+                        <AlertCircle size={16} /> {msg}
+                    </span>
+                ))}
+            </div>
+        );
     };
 
     return (

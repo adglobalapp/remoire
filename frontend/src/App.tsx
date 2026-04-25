@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Loader from './components/common/Loader';
@@ -10,8 +9,6 @@ import FriendlistPage from './pages/Friendlist';
 import NotesPage from './pages/Notes';
 import MapsPage from './pages/Maps';
 import ProfilePage from './pages/Profile';
-import Login from './components/auth/Login';
-import Register from './components/auth/Register';
 import { EntryProvider } from './contexts/EntryContext';
 import { TimelineProvider } from './contexts/TimelineContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -46,9 +43,6 @@ function AuthGuard({ children, type }: { children: React.ReactNode; type: 'priva
 }
 
 function AppContent() {
-    const [showLogin, setShowLogin] = useState(false);
-    const [showRegister, setShowRegister] = useState(false);
-
     return (
         <EntryProvider>
             <TimelineProvider>
@@ -57,27 +51,7 @@ function AppContent() {
                         path="/"
                         element={
                             <AuthGuard type="guest">
-                                <>
-                                    <LandingPage onLogin={() => setShowLogin(true)} onRegister={() => setShowRegister(true)} />
-                                    {showLogin && (
-                                        <Login
-                                            onClose={() => setShowLogin(false)}
-                                            onSwitchToRegister={() => {
-                                                setShowLogin(false);
-                                                setShowRegister(true);
-                                            }}
-                                        />
-                                    )}
-                                    {showRegister && (
-                                        <Register
-                                            onClose={() => setShowRegister(false)}
-                                            onSwitchToLogin={() => {
-                                                setShowRegister(false);
-                                                setShowLogin(true);
-                                            }}
-                                        />
-                                    )}
-                                </>
+                                <LandingPage />
                             </AuthGuard>
                         }
                     />

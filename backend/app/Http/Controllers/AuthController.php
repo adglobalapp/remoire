@@ -6,17 +6,45 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
+
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors()->toArray();
+
+            if (isset($errors['password'])) {
+                $confirmErrors = [];
+                $passwordErrors = [];
+
+                foreach ($errors['password'] as $msg) {
+                    if (str_contains(strtolower($msg), 'confirmation')) {
+                        $confirmErrors[] = $msg;
+                    } else {
+                        $passwordErrors[] = $msg;
+                    }
+                }
+
+                if (!empty($confirmErrors)) {
+                    $errors['password'] = empty($passwordErrors) ? [''] : $passwordErrors;
+                    $errors['password_confirmation'] = $confirmErrors;
+                }
+            }
+
+            return response()->json([
+                'message' => 'The given data was invalid.',
+                'errors' => $errors,
+            ], 422);
+        }
 
         $user = User::create([
             'name' => $request->name,
@@ -41,9 +69,13 @@ class AuthController extends Controller
         ]);
 
         if (! Auth::attempt($request->only('email', 'password'))) {
-            throw ValidationException::withMessages([
-                'email' => ['Invalid credentials.'],
-            ]);
+            return response()->json([
+                'message' => 'The provided credentials are incorrect.',
+                'errors' => [
+                    'email' => [''],
+                    'password' => ['The provided credentials are incorrect.'],
+                ],
+            ], 422);
         }
 
         $user = User::where('email', $request->email)->firstOrFail();

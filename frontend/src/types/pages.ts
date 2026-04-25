@@ -1,8 +1,3 @@
-export interface LandingPageProps {
-    onLogin: () => void;
-    onRegister: () => void;
-}
-
 export interface PageSettings {
     backgroundUrl: string | null;
     paddingTop: number;

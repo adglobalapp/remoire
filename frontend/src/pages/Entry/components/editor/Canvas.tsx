@@ -10,7 +10,6 @@ import classNames from 'classnames';
 import Toolbar from './Toolbar';
 import { ResizableImage } from './extensions/ResizableImage';
 import { FontSize } from './extensions/FontSize';
-import Loader from '../../../../components/common/Loader';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { CanvasScaleContext } from '../../../../contexts/CanvasScaleContext';
 import { useCanvasNavigation } from '../../../../hooks/useCanvasNavigation';
@@ -27,7 +26,6 @@ const Canvas = () => {
 
     const [isDragMode, setIsDragMode] = useState(false);
     const [isColorPicking, setIsColorPicking] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const mouseDownTargetRef = useRef<EventTarget | null>(null);
     const [pageSettings, setPageSettings] = useState<PageSettings>(DEFAULT_PAGE_SETTINGS);
     const pageSettingsRef = useRef<PageSettings>(DEFAULT_PAGE_SETTINGS);
@@ -152,14 +150,7 @@ const Canvas = () => {
 
             setPageSettings(settings);
             pageSettingsRef.current = settings;
-
-            setTimeout(() => {
-                setIsLoading(true);
-                if (editor) {
-                    editor.commands.setContent(contentJSON, { emitUpdate: false });
-                    setIsLoading(false);
-                }
-            }, 10);
+            editor.commands.setContent(contentJSON, { emitUpdate: false });
         } else {
             lastContentRef.current = activeEntry.content;
             if (JSON.stringify(settings) !== JSON.stringify(pageSettingsRef.current)) {
@@ -261,7 +252,6 @@ const Canvas = () => {
                         </div>
                     </div>
                 )}
-                {isLoading && <Loader contextual />}
                 <CanvasScaleContext.Provider value={transform.scale}>
                     <div
                         className={styles.canvas}

@@ -3,8 +3,8 @@ import styles from './Loader.module.css';
 
 import { type LoaderProps } from '../../types';
 
-const Loader: React.FC<LoaderProps> = ({ className = '', size = 40, contextual = false, centered = false }) => {
-    const classNames = [contextual ? styles.contextual : centered ? styles.centered : styles.loader, className].filter(Boolean).join(' ');
+const Loader: React.FC<LoaderProps> = ({ className = '', size = 40, centered = false }) => {
+    const classNames = [centered ? styles.centered : styles.loader, className].filter(Boolean).join(' ');
 
     return (
         <div className={classNames}>
