@@ -6,8 +6,9 @@ export const getEntries = async (): Promise<Entry[]> => {
         const response = await fetch(`${API_BASE_URL}/entries`, {
             headers: getHeaders(),
         });
+        const data = await response.json();
         if (!response.ok) throw new Error(`Error: ${response.status}`);
-        return await response.json();
+        return data;
     } catch {
         return [];
     }
@@ -24,15 +25,15 @@ export const createEntry = async (title: string) => {
             }),
         });
 
-        const resData = await response.json();
+        const data = await response.json();
         if (!response.ok) {
-            let errorMessage = resData.message || 'Failed to create entry';
-            if (resData.errors) {
-                errorMessage = Object.values(resData.errors).flat().join(' ');
+            let errorMessage = data.message || 'Failed to create entry';
+            if (data.errors) {
+                errorMessage = Object.values(data.errors).flat().join(' ');
             }
             throw new Error(errorMessage);
         }
-        return resData;
+        return data;
     } catch (error) {
         throw error;
     }
@@ -40,7 +41,7 @@ export const createEntry = async (title: string) => {
 
 export const updateEntry = async (
     id: number,
-    data: Partial<Pick<Entry, 'title' | 'date' | 'content' | 'color' | 'image_url' | 'location_name' | 'latitude' | 'longitude'>> & {
+    payload: Partial<Pick<Entry, 'title' | 'date' | 'content' | 'color' | 'image_url' | 'location_name' | 'latitude' | 'longitude'>> & {
         participant_ids?: number[];
     },
 ) => {
@@ -48,23 +49,23 @@ export const updateEntry = async (
         const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
             method: 'PUT',
             headers: getHeaders(),
-            body: JSON.stringify(data),
+            body: JSON.stringify(payload),
         });
 
-        const resData = await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
-            let errorMessage = resData.message || 'Failed to update entry';
-            if (resData.errors) {
-                errorMessage = Object.values(resData.errors).flat().join(' ');
+            let errorMessage = data.message || 'Failed to update entry';
+            if (data.errors) {
+                errorMessage = Object.values(data.errors).flat().join(' ');
             }
             const error = new Error(errorMessage) as ApiError;
             error.status = response.status;
-            error.errors = resData.errors;
+            error.errors = data.errors;
             throw error;
         }
 
-        return resData;
+        return data;
     } catch (error) {
         throw error;
     }

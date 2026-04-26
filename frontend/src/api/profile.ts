@@ -1,41 +1,41 @@
 import { type User, type ApiError } from '../types';
 import { API_BASE_URL, getHeaders } from './client';
 
-export const updateProfile = async (data: { name: string; bio?: string; avatar_url?: string | null }) => {
+export const updateProfile = async (payload: { name: string; bio?: string; avatar_url?: string | null }) => {
     try {
         const response = await fetch(`${API_BASE_URL}/user/profile`, {
             method: 'PUT',
             headers: getHeaders(),
-            body: JSON.stringify(data),
+            body: JSON.stringify(payload),
         });
-        const resData = await response.json();
+        const data = await response.json();
         if (!response.ok) {
-            const error = new Error(resData.message || 'Failed to update profile') as ApiError;
+            const error = new Error(data.message || 'Failed to update profile') as ApiError;
             error.status = response.status;
-            error.errors = resData.errors;
+            error.errors = data.errors;
             throw error;
         }
-        return resData;
+        return data;
     } catch (error) {
         throw error;
     }
 };
 
-export const updatePassword = async (data: Record<string, string>) => {
+export const updatePassword = async (payload: Record<string, string>) => {
     try {
         const response = await fetch(`${API_BASE_URL}/user/password`, {
             method: 'PUT',
             headers: getHeaders(),
-            body: JSON.stringify(data),
+            body: JSON.stringify(payload),
         });
-        const resData = await response.json();
+        const data = await response.json();
         if (!response.ok) {
-            const error = new Error(resData.message || 'Failed to update password') as ApiError;
+            const error = new Error(data.message || 'Failed to update password') as ApiError;
             error.status = response.status;
-            error.errors = resData.errors;
+            error.errors = data.errors;
             throw error;
         }
-        return resData;
+        return data;
     } catch (error) {
         throw error;
     }
@@ -46,8 +46,9 @@ export const getBlockedUsers = async (): Promise<User[]> => {
         const response = await fetch(`${API_BASE_URL}/user/blocked`, {
             headers: getHeaders(),
         });
+        const data = await response.json();
         if (!response.ok) return [];
-        return await response.json();
+        return data;
     } catch {
         return [];
     }

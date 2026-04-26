@@ -6,8 +6,9 @@ export const getRelationships = async (): Promise<User[]> => {
         const response = await fetch(`${API_BASE_URL}/relationships`, {
             headers: getHeaders(),
         });
+        const data = await response.json();
         if (!response.ok) throw new Error(`Error: ${response.status}`);
-        return await response.json();
+        return data;
     } catch {
         return [];
     }
@@ -21,8 +22,9 @@ export const getRelationshipRequests = async (): Promise<{
         const response = await fetch(`${API_BASE_URL}/relationships/requests`, {
             headers: getHeaders(),
         });
+        const data = await response.json();
         if (!response.ok) throw new Error(`Error: ${response.status}`);
-        return await response.json();
+        return data;
     } catch {
         return { pending: [], sent: [] };
     }
@@ -33,8 +35,9 @@ export const searchUsers = async (query: string): Promise<User[]> => {
         const response = await fetch(`${API_BASE_URL}/relationships/search?q=${encodeURIComponent(query)}`, {
             headers: getHeaders(),
         });
+        const data = await response.json();
         if (!response.ok) throw new Error(`Error: ${response.status}`);
-        return await response.json();
+        return data;
     } catch {
         return [];
     }

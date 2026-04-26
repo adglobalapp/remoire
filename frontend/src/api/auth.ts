@@ -46,12 +46,13 @@ export const getCurrentUser = async (): Promise<User> => {
         const response = await fetch(`${API_BASE_URL}/auth/me`, {
             headers: getHeaders(),
         });
+        const data = await response.json();
         if (!response.ok) {
             const error = new Error('Unauthorized') as ApiError;
             error.status = response.status;
             throw error;
         }
-        return await response.json();
+        return data;
     } catch (error) {
         throw error;
     }

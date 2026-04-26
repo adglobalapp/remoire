@@ -6,8 +6,9 @@ export const getTimelines = async (): Promise<Timeline[]> => {
         const response = await fetch(`${API_BASE_URL}/timelines`, {
             headers: getHeaders(),
         });
+        const data = await response.json();
         if (!response.ok) throw new Error(`Error: ${response.status}`);
-        return await response.json();
+        return data;
     } catch {
         return [];
     }
@@ -20,9 +21,9 @@ export const createTimeline = async (name: string): Promise<Timeline> => {
             headers: getHeaders(),
             body: JSON.stringify({ name }),
         });
-        const resData = await response.json();
-        if (!response.ok) throw new Error(resData.message || `Error: ${response.status}`);
-        return resData;
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+        return data;
     } catch (error) {
         throw error;
     }
