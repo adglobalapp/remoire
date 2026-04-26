@@ -18,6 +18,8 @@ class MockDataSeeder extends Seeder
      */
     public function run(): void
     {
+        \Illuminate\Support\Facades\Storage::disk('public')->deleteDirectory('uploads');
+        \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory('uploads');
 
         $mainUser = User::updateOrCreate(
             ['email' => 'test@example.com'],

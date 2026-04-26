@@ -27,11 +27,10 @@ export const createEntry = async (title: string) => {
 
         const data = await response.json();
         if (!response.ok) {
-            let errorMessage = data.message || 'Failed to create entry';
-            if (data.errors) {
-                errorMessage = Object.values(data.errors).flat().join(' ');
-            }
-            throw new Error(errorMessage);
+            const error = new Error(data.message || 'Failed to create entry') as ApiError;
+            error.status = response.status;
+            error.errors = data.errors;
+            throw error;
         }
         return data;
     } catch (error) {
@@ -55,11 +54,7 @@ export const updateEntry = async (
         const data = await response.json();
 
         if (!response.ok) {
-            let errorMessage = data.message || 'Failed to update entry';
-            if (data.errors) {
-                errorMessage = Object.values(data.errors).flat().join(' ');
-            }
-            const error = new Error(errorMessage) as ApiError;
+            const error = new Error(data.message || 'Failed to update entry') as ApiError;
             error.status = response.status;
             error.errors = data.errors;
             throw error;
@@ -98,13 +93,10 @@ export const uploadImage = async (file: File): Promise<{ url?: string; message?:
         const data = await response.json();
 
         if (!response.ok) {
-            let errorMessage = `Error: ${response.status}`;
-            if (data.errors) {
-                errorMessage = Object.values(data.errors).flat().join(' ');
-            } else if (data.message) {
-                errorMessage = data.message;
-            }
-            throw new Error(errorMessage);
+            const error = new Error(data.message || `Error: ${response.status}`) as ApiError;
+            error.status = response.status;
+            error.errors = data.errors;
+            throw error;
         }
 
         return { url: data.url, message: data.message };
