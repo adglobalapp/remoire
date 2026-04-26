@@ -12,38 +12,12 @@ class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8',
+            'password_confirmation' => 'required|same:password',
         ]);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors()->toArray();
-
-            if (isset($errors['password'])) {
-                $confirmErrors = [];
-                $passwordErrors = [];
-
-                foreach ($errors['password'] as $msg) {
-                    if (str_contains(strtolower($msg), 'confirmation')) {
-                        $confirmErrors[] = $msg;
-                    } else {
-                        $passwordErrors[] = $msg;
-                    }
-                }
-
-                if (! empty($confirmErrors)) {
-                    $errors['password'] = empty($passwordErrors) ? [''] : $passwordErrors;
-                    $errors['password_confirmation'] = $confirmErrors;
-                }
-            }
-
-            return response()->json([
-                'message' => 'The given data was invalid',
-                'errors' => $errors,
-            ], 422);
-        }
 
         $user = User::create([
             'name' => $request->name,

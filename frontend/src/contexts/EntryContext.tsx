@@ -17,17 +17,13 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
 
     useEffect(() => {
         if (!token) {
-            Promise.resolve().then(() => {
-                setEntries([]);
-                setActiveEntry(null);
-                setIsLoading(false);
-            });
+            setEntries([]);
+            setActiveEntry(null);
+            setIsLoading(false);
             return;
         }
 
-        Promise.resolve().then(() => {
-            setIsLoading(true);
-        });
+        setIsLoading(true);
         getEntries()
             .then(async (data) => {
                 if (data && data.length > 0) {

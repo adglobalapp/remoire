@@ -47,37 +47,11 @@ class ProfileController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+        $request->validate([
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', Password::defaults()],
+            'password' => ['required', Password::defaults()],
+            'password_confirmation' => ['required', 'same:password'],
         ]);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors()->toArray();
-
-            if (isset($errors['password'])) {
-                $confirmErrors = [];
-                $passwordErrors = [];
-
-                foreach ($errors['password'] as $msg) {
-                    if (str_contains(strtolower($msg), 'confirmation')) {
-                        $confirmErrors[] = $msg;
-                    } else {
-                        $passwordErrors[] = $msg;
-                    }
-                }
-
-                if (! empty($confirmErrors)) {
-                    $errors['password'] = empty($passwordErrors) ? [''] : $passwordErrors;
-                    $errors['password_confirmation'] = $confirmErrors;
-                }
-            }
-
-            return response()->json([
-                'message' => 'The given data was invalid',
-                'errors' => $errors,
-            ], 422);
-        }
 
         $user = $request->user();
         $user->update([

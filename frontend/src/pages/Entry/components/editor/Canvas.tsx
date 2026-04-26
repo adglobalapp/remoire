@@ -38,23 +38,16 @@ const Canvas = () => {
     const parseStoredContent = (raw: string | null | undefined) => {
         if (!raw) return null;
         try {
-            const parsed = JSON.parse(raw);
-            return parsed;
+            return JSON.parse(raw) as { contentJSON: TiptapNode; pageSettings?: PageSettings };
         } catch {
-            return raw;
+            return null;
         }
     };
 
     const getInitialContent = () => {
-        if (!activeEntry) return '<h1>Untitled</h1><p>Dear Diary...</p>';
+        if (!activeEntry) return '';
         const stored = parseStoredContent(activeEntry.content);
-        if (stored && typeof stored === 'object' && !Array.isArray(stored) && (stored as Record<string, unknown>).contentJSON) {
-            return (stored as Record<string, unknown>).contentJSON as string;
-        }
-
-        if (typeof stored === 'string' && stored) return stored;
-
-        return '<h1>Untitled</h1><p>Dear Diary...</p>';
+        return stored?.contentJSON ?? '<h1>Untitled</h1><p>Dear Diary...</p>';
     };
 
     const editor = useEditor({
@@ -133,29 +126,20 @@ const Canvas = () => {
             return;
 
         const stored = parseStoredContent(activeEntry.content);
-        const contentJSON =
-            stored && typeof stored === 'object' && stored.contentJSON
-                ? stored.contentJSON
-                : typeof stored === 'string'
-                  ? stored
-                  : '<h1>Untitled</h1><p>Dear Diary...</p>';
-
-        let settings = DEFAULT_PAGE_SETTINGS;
-        if (stored && typeof stored === 'object' && stored.pageSettings) {
-            settings = { ...DEFAULT_PAGE_SETTINGS, ...stored.pageSettings };
-        }
+        const contentJSON = stored?.contentJSON ?? '<h1>Untitled</h1><p>Dear Diary...</p>';
+        const settings = { ...DEFAULT_PAGE_SETTINGS, ...stored?.pageSettings };
 
         if (loadedEntryIdRef.current !== activeEntry.id) {
             loadedEntryIdRef.current = activeEntry.id;
             lastContentRef.current = activeEntry.content;
 
-            Promise.resolve().then(() => setPageSettings(settings));
+            setPageSettings(settings);
             pageSettingsRef.current = settings;
             editor.commands.setContent(contentJSON, { emitUpdate: false });
         } else {
             lastContentRef.current = activeEntry.content;
             if (JSON.stringify(settings) !== JSON.stringify(pageSettingsRef.current)) {
-                Promise.resolve().then(() => setPageSettings(settings));
+                setPageSettings(settings);
                 pageSettingsRef.current = settings;
             }
         }

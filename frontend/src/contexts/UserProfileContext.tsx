@@ -27,9 +27,7 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
     }, [isAuthenticated]);
 
     useEffect(() => {
-        Promise.resolve().then(() => {
-            refreshBlockedUsers();
-        });
+        refreshBlockedUsers();
     }, [refreshBlockedUsers]);
 
     const isBlocked = (userId: number) => blockedUserIds.has(userId);
