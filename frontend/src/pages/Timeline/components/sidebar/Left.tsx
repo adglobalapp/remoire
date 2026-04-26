@@ -5,7 +5,7 @@ import DeleteConfirmation from '../../../../components/common/DeleteConfirmation
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
 import { useLocation } from 'react-router-dom';
 import styles from './Left.module.css';
-import { type LeftProps } from '../../../../types';
+import { type LeftProps, type ApiError } from '../../../../types';
 
 const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const { timelines, activeTimeline, selectTimeline, createTimeline, deleteTimeline, isLoading } = useTimelineContext();
@@ -47,12 +47,13 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         if (name) {
             setIsSaving(true);
             try {
-                await createTimeline(name);
-                toast.success('Timeline created!');
+                const res = await createTimeline(name);
+                if (res?.message) toast.success(res.message);
                 setNewName('');
                 setIsCreating(false);
-            } catch {
-                toast.error('Failed to create timeline.');
+            } catch (err: unknown) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to create timeline.');
             } finally {
                 setIsSaving(false);
             }
@@ -71,10 +72,11 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         if (itemToDelete !== null) {
             setIsDeleting(true);
             try {
-                await deleteTimeline(itemToDelete);
-                toast.success('Timeline deleted.');
-            } catch {
-                toast.error('Failed to delete timeline.');
+                const res = await deleteTimeline(itemToDelete);
+                if (res?.message) toast.success(res.message);
+            } catch (err: unknown) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to delete timeline.');
             } finally {
                 setIsDeleting(false);
                 setItemToDelete(null);

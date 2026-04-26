@@ -13,7 +13,8 @@ import { FontSize } from './extensions/FontSize';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { CanvasScaleContext } from '../../../../contexts/CanvasScaleContext';
 import { useCanvasNavigation } from '../../../../hooks/useCanvasNavigation';
-import { type PageSettings, DEFAULT_PAGE_SETTINGS } from '../../../../types';
+import { type PageSettings, DEFAULT_PAGE_SETTINGS, type TiptapNode } from '../../../../types';
+import { type Transaction } from '@tiptap/pm/state';
 import styles from './Canvas.module.css';
 
 const Canvas = () => {
@@ -47,8 +48,8 @@ const Canvas = () => {
     const getInitialContent = () => {
         if (!activeEntry) return '<h1>Untitled</h1><p>Dear Diary...</p>';
         const stored = parseStoredContent(activeEntry.content);
-        if (stored && typeof stored === 'object' && !Array.isArray(stored) && stored.contentJSON) {
-            return (stored as any).contentJSON;
+        if (stored && typeof stored === 'object' && !Array.isArray(stored) && (stored as Record<string, unknown>).contentJSON) {
+            return (stored as Record<string, unknown>).contentJSON as string;
         }
 
         if (typeof stored === 'string' && stored) return stored;
@@ -85,10 +86,10 @@ const Canvas = () => {
         },
     });
 
-    const extractTitleFromJSON = (json: Record<string, any> | null): string => {
+    const extractTitleFromJSON = (json: TiptapNode | null): string => {
         if (!json || !json.content) return 'Untitled';
 
-        const findFirstText = (node: any): string | null => {
+        const findFirstText = (node: TiptapNode): string | null => {
             if (node.text) return node.text.trim();
             if (node.content && Array.isArray(node.content)) {
                 for (const child of node.content) {
@@ -102,17 +103,17 @@ const Canvas = () => {
         return findFirstText(json) || 'Untitled';
     };
 
-    const { updateEntryTitle } = useEntryContext();
+    const { updateEntry } = useEntryContext();
     useEffect(() => {
         if (!editor || initialEntryId === null) return;
-        const handleUpdate = ({ transaction }: { transaction: any }) => {
+        const handleUpdate = ({ transaction }: { transaction: Transaction }) => {
             if (transaction.getMeta('isColorPreview')) return;
 
             const contentJSON = editor.getJSON();
-            const currentTitle = extractTitleFromJSON(contentJSON as Record<string, any>);
+            const currentTitle = extractTitleFromJSON(contentJSON as TiptapNode);
 
             if (currentTitle !== activeEntry?.title) {
-                updateEntryTitle(initialEntryId, currentTitle);
+                updateEntry(initialEntryId, { title: currentTitle });
             }
 
             const serialized = JSON.stringify({
@@ -125,7 +126,7 @@ const Canvas = () => {
         return () => {
             editor.off('update', handleUpdate);
         };
-    }, [editor, saveEntry, initialEntryId, activeEntry?.title, updateEntryTitle]);
+    }, [editor, saveEntry, initialEntryId, activeEntry?.title, updateEntry]);
 
     useEffect(() => {
         if (!editor || !activeEntry || (loadedEntryIdRef.current === activeEntry.id && lastContentRef.current === activeEntry.content))
@@ -148,13 +149,13 @@ const Canvas = () => {
             loadedEntryIdRef.current = activeEntry.id;
             lastContentRef.current = activeEntry.content;
 
-            setPageSettings(settings);
+            Promise.resolve().then(() => setPageSettings(settings));
             pageSettingsRef.current = settings;
             editor.commands.setContent(contentJSON, { emitUpdate: false });
         } else {
             lastContentRef.current = activeEntry.content;
             if (JSON.stringify(settings) !== JSON.stringify(pageSettingsRef.current)) {
-                setPageSettings(settings);
+                Promise.resolve().then(() => setPageSettings(settings));
                 pageSettingsRef.current = settings;
             }
         }
@@ -207,7 +208,7 @@ const Canvas = () => {
             const initialX = (width / 2) * (1 - initialScale);
             setTransform({ x: initialX, y: 0, scale: initialScale });
         }
-    }, [setTransform]);
+    }, [setTransform, containerRef]);
 
     const handlePageSettingsChange = (newSettings: PageSettings) => {
         setPageSettings(newSettings);

@@ -45,12 +45,12 @@ export const getCurrentUser = async (): Promise<User> => {
     return await response.json();
 };
 
-export const logout = async (): Promise<void> => {
+export const logout = async () => {
     const response = await fetch(`${API_BASE_URL}/auth/logout`, {
         method: 'POST',
         headers: getHeaders(),
     });
-    if (!response.ok) {
-        throw new Error('Logout failed');
-    }
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+    return data;
 };

@@ -6,7 +6,7 @@ import { uploadImage } from '../../../../api';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
 import DeleteConfirmation from '../../../../components/common/DeleteConfirmation';
-import { type AddEntryCardProps } from '../../../../types';
+import { type AddEntryCardProps, type ApiError } from '../../../../types';
 import { PRESET_COLORS } from '../../../../utils/constants';
 import styles from './AddEntryCard.module.css';
 
@@ -84,20 +84,21 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
         setIsLoading(true);
         setFieldErrors({});
         try {
-            await updateEntry(Number(selectedEntryId), {
+            const res = await updateEntry(Number(selectedEntryId), {
                 color: handleColorSave(),
                 image_url: imageUrl || undefined,
             });
 
             if (!entryToEdit && activeTimeline && !activeTimeline.isDefault) {
-                await addEntryToTimeline(activeTimeline.id, Number(selectedEntryId));
-                toast.success('Entry added to timeline.');
+                const addRes = await addEntryToTimeline(activeTimeline.id, Number(selectedEntryId));
+                if (addRes?.message) toast.success(addRes.message);
             } else {
-                toast.success(entryToEdit ? 'Changes saved.' : 'Entry appearance updated.');
+                if (res?.message) toast.success(res.message);
             }
 
             onClose();
-        } catch (error: any) {
+        } catch (err: unknown) {
+            const error = err as ApiError;
             if (error.status === 422 && error.errors) {
                 setFieldErrors(error.errors);
             } else {
@@ -113,11 +114,12 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
 
         setIsDeleting(true);
         try {
-            await removeEntryFromTimeline(activeTimeline.id, entryToEdit.id);
-            toast.success('Entry removed from timeline.');
+            const res = await removeEntryFromTimeline(activeTimeline.id, entryToEdit.id);
+            if (res?.message) toast.success(res.message);
             onClose();
-        } catch {
-            toast.error('Failed to remove entry.');
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to remove entry.');
         } finally {
             setIsDeleting(false);
             setIsConfirmOpen(false);
@@ -278,7 +280,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                                             const result = await uploadImage(file);
                                             if (result.url) {
                                                 setImageUrl(result.url);
-                                                toast.success('Image uploaded!');
+                                                toast.success(result.message || 'Image uploaded');
                                             } else if (result.error) {
                                                 setUploadError(result.error);
                                                 toast.error(`Upload error: ${result.error}`);

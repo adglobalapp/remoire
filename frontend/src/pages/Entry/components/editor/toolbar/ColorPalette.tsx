@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Palette } from 'lucide-react';
 import classNames from 'classnames';
 import { type ColorPaletteProps } from '../../../../../types';
+import { type Transaction } from '@tiptap/pm/state';
 import { PRESET_COLORS } from '../../../../../utils/constants';
 import styles from './ColorPalette.module.css';
 
@@ -48,7 +49,7 @@ const ColorPalette = ({ editor, isDragMode, onColorPickerToggle }: ColorPaletteP
             );
         };
 
-        const updateState = (props?: { transaction?: any }) => {
+        const updateState = (props?: { transaction?: Transaction }) => {
             if (isPickingColorRef.current) return;
 
             try {
@@ -77,7 +78,7 @@ const ColorPalette = ({ editor, isDragMode, onColorPickerToggle }: ColorPaletteP
                     updateRecentColors();
                 }
             } catch (err) {
-                console.warn('Toolbar color update error:', err);
+                console.error('Toolbar color update error:', err);
             }
         };
 

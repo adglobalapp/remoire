@@ -13,7 +13,7 @@ class RelationshipController extends Controller
     {
         $user = Auth::user();
 
-        return response()->json($user->friends()->get());
+        return response()->json($user->friends()->get(), 200);
     }
 
     public function requests()
@@ -35,7 +35,7 @@ class RelationshipController extends Controller
         $currentUser = Auth::user();
 
         if (strlen($query) < 2) {
-            return response()->json([]);
+            return response()->json([], 200);
         }
 
         $blockedUserIds = Relationship::where(function ($q) use ($currentUser) {
@@ -73,7 +73,7 @@ class RelationshipController extends Controller
             return $user;
         });
 
-        return response()->json($users);
+        return response()->json($users, 200);
     }
 
     public function store(Request $request)
@@ -86,7 +86,7 @@ class RelationshipController extends Controller
         $targetId = $request->target_id;
 
         if ($user->id == $targetId) {
-            return response()->json(['message' => 'You cannot connect with yourself.'], 400);
+            return response()->json(['message' => 'You cannot connect with yourself'], 400);
         }
 
         $existing = Relationship::where(function ($q) use ($user, $targetId) {
@@ -96,7 +96,7 @@ class RelationshipController extends Controller
         })->first();
 
         if ($existing) {
-            return response()->json(['message' => 'Already connected or request pending.'], 400);
+            return response()->json(['message' => 'Already connected or request pending'], 400);
         }
 
         Relationship::create([
@@ -105,7 +105,7 @@ class RelationshipController extends Controller
             'status' => 'pending',
         ]);
 
-        return response()->json(['message' => 'Connection request sent.']);
+        return response()->json(['message' => 'Request sent'], 200);
     }
 
     public function accept(User $user)
@@ -115,11 +115,15 @@ class RelationshipController extends Controller
         $relationship = Relationship::where('user_id', $user->id)
             ->where('target_id', $currentUser->id)
             ->where('status', 'pending')
-            ->firstOrFail();
+            ->first();
+
+        if (! $relationship) {
+            return response()->json(['message' => 'Friend request no longer exists'], 404);
+        }
 
         $relationship->update(['status' => 'accepted']);
 
-        return response()->json(['message' => 'Request accepted.']);
+        return response()->json(['message' => 'Request accepted'], 200);
     }
 
     public function destroy(User $user)
@@ -130,11 +134,25 @@ class RelationshipController extends Controller
             $q->where('user_id', $currentUser->id)->where('target_id', $user->id);
         })->orWhere(function ($q) use ($currentUser, $user) {
             $q->where('user_id', $user->id)->where('target_id', $currentUser->id);
-        })->firstOrFail();
+        })->first();
+
+        if (! $relationship) {
+            return response()->json(['message' => 'Relationship no longer exists'], 404);
+        }
+
+        $status = $relationship->status;
+        $isRequester = $relationship->user_id === $currentUser->id;
 
         $relationship->delete();
 
-        return response()->json(['message' => 'Relationship removed/request rejected.']);
+        $message = 'Connection removed';
+        if ($status === 'pending') {
+            $message = $isRequester ? 'Request removed' : 'Request rejected';
+        } elseif ($status === 'accepted') {
+            $message = 'Friend removed';
+        }
+
+        return response()->json(['message' => $message], 200);
     }
 
     public function block(User $user)
@@ -161,6 +179,6 @@ class RelationshipController extends Controller
             ]);
         }
 
-        return response()->json(['message' => 'User blocked.']);
+        return response()->json(['message' => 'User blocked'], 200);
     }
 }

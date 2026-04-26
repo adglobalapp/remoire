@@ -7,6 +7,7 @@ import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import { useEntryContext } from '../../contexts/EntryContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { type Entry, type MarkerCluster } from '../../types';
 import Navbar from '../../components/common/Navbar';
 import { Calendar, MapPin, Eye, User } from 'lucide-react';
 import MarkerClusterGroup from 'react-leaflet-cluster';
@@ -23,7 +24,7 @@ const createCustomIcon = (color: string) => {
     });
 };
 
-const createClusterIcon = (cluster: any) => {
+const createClusterIcon = (cluster: MarkerCluster) => {
     const count = cluster.getChildCount();
     const color = PRESET_COLORS[count % PRESET_COLORS.length];
 
@@ -47,7 +48,7 @@ const MapsPage = () => {
         return entries.filter((e) => e.latitude && e.longitude);
     }, [entries]);
 
-    const handleViewEntry = (entry: any) => {
+    const handleViewEntry = (entry: Entry) => {
         selectEntry(entry);
         navigate('/entries');
     };

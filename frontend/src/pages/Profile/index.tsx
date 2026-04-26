@@ -33,14 +33,9 @@ const Profile = () => {
 
     const fetchBlocked = useCallback(async (silent = false) => {
         if (!silent) setBlockedLoading(true);
-        try {
-            const data = await getBlockedUsers();
-            setBlocked(data.map((u) => ({ ...u, relationship_status: 'blocked' })));
-        } catch (err) {
-            console.error(err);
-        } finally {
-            if (!silent) setBlockedLoading(false);
-        }
+        const data = await getBlockedUsers();
+        setBlocked(data.map((u) => ({ ...u, relationship_status: 'blocked' })));
+        if (!silent) setBlockedLoading(false);
     }, []);
 
     useEffect(() => {
@@ -54,7 +49,7 @@ const Profile = () => {
         try {
             const res = await updateProfile({ name, bio });
             setUser(res.user);
-            toast.success('Profile updated');
+            if (res?.message) toast.success(res.message);
         } catch (err) {
             const error = err as ApiError;
             if (error.status === 422 && error.errors) {
@@ -72,13 +67,13 @@ const Profile = () => {
         setIsPasswordLoading(true);
         setFieldErrors({});
         try {
-            await updatePassword(passwords);
+            const res = await updatePassword(passwords);
             setPasswords({
                 current_password: '',
                 password: '',
                 password_confirmation: '',
             });
-            toast.success('Password changed');
+            if (res?.message) toast.success(res.message);
         } catch (err) {
             const error = err as ApiError;
             if (error.status === 422 && error.errors) {
@@ -108,7 +103,7 @@ const Profile = () => {
                     avatar_url: newUrl,
                 });
                 setUser(profileRes.user);
-                toast.success('Avatar updated');
+                if (profileRes.message) toast.success(profileRes.message);
             }
         } catch (err) {
             const error = err as Error;
@@ -129,7 +124,7 @@ const Profile = () => {
                 avatar_url: null,
             });
             setUser(profileRes.user);
-            toast.success('Avatar removed');
+            if (profileRes.message) toast.success(profileRes.message);
         } catch (err) {
             const error = err as Error;
             toast.error(error.message || 'Failed to remove avatar');
@@ -140,8 +135,10 @@ const Profile = () => {
 
     const handleUnblock = async (id: number) => {
         setUnblockingId(id);
-        await unblockUser(id);
-        setBlocked((prev) => prev.filter((u) => u.id !== id));
+        const success = await unblockUser(id);
+        if (success) {
+            setBlocked((prev) => prev.filter((u) => u.id !== id));
+        }
         setUnblockingId(null);
     };
 

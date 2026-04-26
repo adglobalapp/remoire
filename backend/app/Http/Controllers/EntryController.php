@@ -17,7 +17,7 @@ class EntryController extends Controller
 
         return $owned->concat($participated)
             ->unique('id')
-            ->sortByDesc('date')
+            ->sortByDesc('created_at')
             ->values();
     }
 
@@ -44,7 +44,9 @@ class EntryController extends Controller
             $entry->participants()->sync($request->participant_ids);
         }
 
-        return response()->json($entry->load('participants'), 201);
+        return response()->json(array_merge($entry->load('participants')->toArray(), [
+            'message' => 'Entry created',
+        ]), 201);
     }
 
     public function show(Entry $entry)
@@ -80,6 +82,7 @@ class EntryController extends Controller
         ]);
 
         $oldImages = $this->getAllImages($entry);
+        $oldParticipantCount = $entry->participants()->count();
         $entry->update($validated);
         $newImages = $this->getAllImages($entry);
 
@@ -92,7 +95,23 @@ class EntryController extends Controller
             $entry->participants()->sync($request->participant_ids);
         }
 
-        return response()->json($entry->load('participants'));
+        $message = 'Entry updated';
+        if ($request->hasAny(['location_name', 'latitude', 'longitude'])) {
+            $message = $request->location_name ? 'Location updated' : 'Location removed';
+        } elseif ($request->has('participant_ids')) {
+            $newCount = count($request->participant_ids);
+            if ($newCount > $oldParticipantCount) {
+                $message = 'Participant added';
+            } elseif ($newCount < $oldParticipantCount) {
+                $message = 'Participant removed';
+            }
+        } elseif ($request->has('date')) {
+            $message = 'Date updated';
+        }
+
+        return response()->json(array_merge($entry->load('participants')->toArray(), [
+            'message' => $message,
+        ]), 200);
     }
 
     public function destroy(Entry $entry)
@@ -108,7 +127,7 @@ class EntryController extends Controller
 
         $entry->delete();
 
-        return response()->json(['message' => 'Deleted']);
+        return response()->json(['message' => 'Entry deleted'], 200);
     }
 
     private function getAllImages(Entry $entry)

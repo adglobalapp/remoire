@@ -40,7 +40,7 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
                     setTimelines([DEFAULT_TIMELINE]);
                     setActiveTimeline(DEFAULT_TIMELINE);
                 }
-            } catch (error) {
+            } catch {
                 toast.error('Failed to load timelines');
                 setTimelines([DEFAULT_TIMELINE]);
                 setActiveTimeline(DEFAULT_TIMELINE);
@@ -56,18 +56,16 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
     }, []);
 
     const createTimeline = useCallback(async (name: string) => {
-        try {
-            const newTimeline = await api.createTimeline(name);
-            if (newTimeline) {
-                setTimelines((prev) => {
-                    const next = [newTimeline, ...prev.filter((t) => !t.isDefault), ...prev.filter((t) => t.isDefault)];
-                    return next;
-                });
-                setActiveTimeline(newTimeline);
-            }
-        } catch (error) {
-            throw error;
+        const newTimeline = await api.createTimeline(name);
+        if (newTimeline) {
+            setTimelines((prev) => {
+                const next = [newTimeline, ...prev.filter((t) => !t.isDefault), ...prev.filter((t) => t.isDefault)];
+                return next;
+            });
+            setActiveTimeline(newTimeline);
+            return newTimeline;
         }
+        return null;
     }, []);
 
     const deleteTimeline = useCallback(
@@ -75,21 +73,16 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
             const timeline = timelines.find((t) => t.id === id);
             if (timeline?.isDefault) return;
 
-            try {
-                const success = await api.deleteTimeline(id);
-                if (success) {
-                    setTimelines((prev) => {
-                        const next = prev.filter((t) => t.id !== id);
-                        setActiveTimeline((curr) => {
-                            if (curr?.id === id) return next[0] || DEFAULT_TIMELINE;
-                            return curr;
-                        });
-                        return next;
-                    });
-                }
-            } catch (error) {
-                throw error;
-            }
+            const res = await api.deleteTimeline(id);
+            setTimelines((prev) => {
+                const next = prev.filter((t) => t.id !== id);
+                setActiveTimeline((curr) => {
+                    if (curr?.id === id) return next[0] || DEFAULT_TIMELINE;
+                    return curr;
+                });
+                return next;
+            });
+            return res;
         },
         [timelines],
     );
@@ -105,9 +98,9 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
             const timeline = timelines.find((t) => t.id === timelineId);
             if (timeline?.isDefault || timeline?.entryIds.includes(entryId)) return;
 
-            if (await api.addEntryToTimeline(timelineId, entryId)) {
-                updateTimelineState(timelineId, [...timeline!.entryIds, entryId]);
-            }
+            const res = await api.addEntryToTimeline(timelineId, entryId);
+            updateTimelineState(timelineId, [...timeline!.entryIds, entryId]);
+            return res;
         },
         [timelines, updateTimelineState],
     );
@@ -117,12 +110,12 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
             const timeline = timelines.find((t) => t.id === timelineId);
             if (timeline?.isDefault || !timeline?.entryIds.includes(entryId)) return;
 
-            if (await api.removeEntryFromTimeline(timelineId, entryId)) {
-                updateTimelineState(
-                    timelineId,
-                    timeline.entryIds.filter((id) => id !== entryId),
-                );
-            }
+            const res = await api.removeEntryFromTimeline(timelineId, entryId);
+            updateTimelineState(
+                timelineId,
+                timeline.entryIds.filter((id) => id !== entryId),
+            );
+            return res;
         },
         [timelines, updateTimelineState],
     );

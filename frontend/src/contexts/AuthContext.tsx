@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import * as api from '../api/auth';
-import { type User, type LoginCredentials, type RegisterCredentials, type AuthContextType } from '../types';
+import { type User, type LoginCredentials, type RegisterCredentials, type AuthContextType, type ApiError } from '../types';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -10,14 +10,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [token, setToken] = useState<string | null>(localStorage.getItem('auth_token'));
     const [isLoading, setIsLoading] = useState(true);
 
+    const logout = useCallback(async () => {
+        let msg = 'Logged out';
+        try {
+            if (token || user) {
+                const res = await api.logout();
+                if (res?.message) msg = res.message;
+            }
+        } catch (error) {
+            console.error('Logout API call failed:', error);
+        } finally {
+            setToken(null);
+            setUser(null);
+            localStorage.removeItem('auth_token');
+            toast.success(msg, { id: 'logout-success' });
+        }
+    }, [token]);
+
     useEffect(() => {
         const initAuth = async () => {
             if (token) {
                 try {
                     const userData = await api.getCurrentUser();
                     setUser(userData);
-                } catch (error: any) {
-                    toast.error('Authentication failed', { id: 'auth-fail' });
+                } catch (err: unknown) {
+                    const error = err as ApiError;
+                    toast.error(error.message || 'Authentication failed', { id: 'auth-fail' });
                     if (error.status === 401) {
                         logout();
                     }
@@ -26,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setIsLoading(false);
         };
         initAuth();
-    }, [token]);
+    }, [token, logout]);
 
     const login = async (credentials: LoginCredentials) => {
         try {
@@ -34,10 +52,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setToken(data.access_token);
             setUser(data.user);
             localStorage.setItem('auth_token', data.access_token);
-            toast.success('Logged in');
+            if (data.message) toast.success(data.message);
             return data;
-        } catch (error: any) {
-            toast.error(error.message || 'Login failed');
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            if (error.status !== 422) {
+                toast.error(error.message || 'Login failed');
+            }
             throw error;
         }
     };
@@ -48,25 +69,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setToken(data.access_token);
             setUser(data.user);
             localStorage.setItem('auth_token', data.access_token);
-            toast.success('Registered');
+            if (data.message) toast.success(data.message);
             return data;
-        } catch (error: any) {
-            toast.error(error.message || 'Registration failed');
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            if (error.status !== 422) {
+                toast.error(error.message || 'Registration failed');
+            }
             throw error;
         }
-    };
-
-    const logout = async () => {
-        if (!token && !user) return;
-        try {
-            await api.logout();
-        } catch (error) {
-            console.error('Logout failed on server', error);
-        }
-        setToken(null);
-        setUser(null);
-        localStorage.removeItem('auth_token');
-        toast.success('Logged out', { id: 'logout-success' });
     };
 
     return (

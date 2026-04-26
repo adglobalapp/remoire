@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { getEntries, createEntry as apiCreateEntry, updateEntry as apiUpdateEntry, deleteEntry as apiDeleteEntry } from '../api/entries';
-import { type Entry, type EntryContextValue, type EntryProviderProps } from '../types';
+import { type Entry, type EntryContextValue, type EntryProviderProps, type ApiError } from '../types';
 import { useAutoSave } from '../hooks/useAutoSave';
 import { useAuth } from './AuthContext';
 
@@ -17,13 +17,17 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
 
     useEffect(() => {
         if (!token) {
-            setEntries([]);
-            setActiveEntry(null);
-            setIsLoading(false);
+            Promise.resolve().then(() => {
+                setEntries([]);
+                setActiveEntry(null);
+                setIsLoading(false);
+            });
             return;
         }
 
-        setIsLoading(true);
+        Promise.resolve().then(() => {
+            setIsLoading(true);
+        });
         getEntries()
             .then(async (data) => {
                 if (data && data.length > 0) {
@@ -48,45 +52,61 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
     }, []);
 
     const createEntry = useCallback(async () => {
-        const newEntry = await apiCreateEntry('Untitled');
-        if (!newEntry) {
-            toast.error('Failed to create entry.');
-            return;
+        try {
+            const newEntry = await apiCreateEntry('Untitled');
+            setEntries((prev) => [newEntry, ...prev]);
+            setActiveEntry(newEntry);
+            if (newEntry.message) toast.success(newEntry.message);
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to create entry.');
         }
-        setEntries((prev) => [newEntry, ...prev]);
-        setActiveEntry(newEntry);
-        toast.success('New entry created!');
     }, []);
 
     const deleteEntry = useCallback(async (id: number) => {
-        const ok = await apiDeleteEntry(id);
-        if (!ok) {
-            toast.error('Failed to delete entry.');
-            return;
-        }
-        setEntries((prev) => {
-            const next = prev.filter((e) => e.id !== id);
-            setActiveEntry((curr) => {
-                if (curr?.id === id) return next.length > 0 ? next[0] : null;
-                return curr;
+        try {
+            const res = await apiDeleteEntry(id);
+            setEntries((prev) => {
+                const newList = prev.filter((e) => e.id !== id);
+                setActiveEntry((curr) => {
+                    if (curr?.id === id) return newList.length > 0 ? newList[0] : null;
+                    return curr;
+                });
+                return newList;
             });
-            return next;
-        });
-        toast.success('Entry deleted.');
+            if (res.message) toast.success(res.message);
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to delete entry.');
+        }
     }, []);
 
-    const updateEntryTitle = useCallback(async (id: number, title: string) => {
-        setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, title } : e)));
-        setActiveEntry((prev) => (prev?.id === id ? { ...prev, title } : prev));
-        await apiUpdateEntry(id, { title });
-    }, []);
+    const updateEntry = useCallback(
+        async (id: number, data: Partial<Entry>) => {
+            const original = entries.find((e) => e.id === id);
 
-    const updateEntry = useCallback(async (id: number, data: any) => {
-        const updated = await apiUpdateEntry(id, data);
-        if (!updated) return;
-        setEntries((prev) => prev.map((e) => (e.id === id ? updated : e)));
-        setActiveEntry((prev) => (prev?.id === id ? updated : prev));
-    }, []);
+            setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, ...data } : e)));
+            setActiveEntry((prev) => (prev?.id === id ? { ...prev, ...data } : prev));
+
+            try {
+                const updated = await apiUpdateEntry(id, data);
+                if (updated) {
+                    setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, ...updated } : e)));
+                    setActiveEntry((prev) => (prev?.id === id ? { ...prev, ...updated } : prev));
+                }
+                return updated;
+            } catch (err: unknown) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to save changes.');
+                if (original) {
+                    setEntries((prev) => prev.map((e) => (e.id === id ? original : e)));
+                    setActiveEntry((prev) => (prev?.id === id ? original : prev));
+                }
+                throw error;
+            }
+        },
+        [entries],
+    );
 
     return (
         <EntryContext.Provider
@@ -98,7 +118,6 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
                 createEntry,
                 deleteEntry,
                 saveEntry,
-                updateEntryTitle,
                 updateEntry,
             }}
         >

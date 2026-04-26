@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { type User, type UserProfileContextType } from '../types';
+import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { type User, type UserProfileContextType, type ApiError } from '../types';
 import UserProfile from '../pages/Friendlist/components/modal/UserProfile';
 import { getBlockedUsers, unblockUser as apiUnblockUser } from '../api/profile';
 import { blockUser as apiBlockUser } from '../api/relationships';
@@ -13,49 +13,47 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
     const [blockedUserIds, setBlockedUserIds] = useState<Set<number>>(new Set());
     const { isAuthenticated } = useAuth();
 
-    const refreshBlockedUsers = async () => {
+    const refreshBlockedUsers = useCallback(async () => {
         if (!isAuthenticated) {
             setBlockedUserIds(new Set());
             return;
         }
-        try {
-            const blocked = await getBlockedUsers();
-            setBlockedUserIds(new Set(blocked.map((u) => u.id)));
-        } catch (error) {
-            console.error('Failed to fetch blocked users:', error);
-        }
-    };
+        const blocked = await getBlockedUsers();
+        setBlockedUserIds(new Set(blocked.map((u) => u.id)));
+    }, [isAuthenticated]);
 
     useEffect(() => {
-        refreshBlockedUsers();
-    }, [isAuthenticated]);
+        Promise.resolve().then(() => {
+            refreshBlockedUsers();
+        });
+    }, [refreshBlockedUsers]);
 
     const isBlocked = (userId: number) => blockedUserIds.has(userId);
 
     const blockUser = async (userId: number) => {
         try {
-            const success = await apiBlockUser(userId);
-            if (success) {
-                toast.success('User blocked');
-                refreshBlockedUsers();
-                return true;
-            }
-        } catch (error) {
-            toast.error('Failed to block user');
+            const res = await apiBlockUser(userId);
+            if (res?.message) toast.success(res.message);
+            refreshBlockedUsers();
+            return true;
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to block user');
+            return false;
         }
-        return false;
     };
 
     const unblockUser = async (userId: number) => {
         try {
-            await apiUnblockUser(userId);
-            toast.success('User unblocked');
+            const res = await apiUnblockUser(userId);
+            if (res?.message) toast.success(res.message);
             refreshBlockedUsers();
             return true;
-        } catch (error) {
-            toast.error('Failed to unblock user');
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to unblock user');
+            return false;
         }
-        return false;
     };
 
     const handleShowProfile = (user: User) => {

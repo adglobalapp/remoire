@@ -77,7 +77,7 @@ const Toolbar = ({
             const reader = new FileReader();
             reader.onload = (e) => {
                 const result = e.target?.result as string;
-                (editor.chain() as any).setImage({ src: result }).run();
+                editor.chain().setImage({ src: result }).run();
             };
             reader.readAsDataURL(file);
             event.target.value = '';

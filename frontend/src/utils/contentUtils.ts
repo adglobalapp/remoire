@@ -34,8 +34,8 @@ export const getImageUrl = (content: string | null): string | null => {
         if (contentJSON?.content) {
             const findImage = (nodes: TiptapNode[]): string | null => {
                 for (const node of nodes) {
-                    if (node.type === 'resizableImage' && node.attrs?.src) return node.attrs.src;
-                    if (node.type === 'image' && node.attrs?.src) return node.attrs.src;
+                    if (node.type === 'resizableImage' && typeof node.attrs?.src === 'string') return node.attrs.src;
+                    if (node.type === 'image' && typeof node.attrs?.src === 'string') return node.attrs.src;
                     if (node.content) {
                         const found = findImage(node.content);
                         if (found) return found;

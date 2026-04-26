@@ -8,33 +8,30 @@ export const getEntries = async (): Promise<Entry[]> => {
         });
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         return await response.json();
-    } catch (error) {
+    } catch {
         return [];
     }
 };
-export const createEntry = async (title: string): Promise<Entry | null> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/entries`, {
-            method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify({
-                title,
-                date: new Date().toISOString().split('T')[0],
-            }),
-        });
 
-        const resData = await response.json();
-        if (!response.ok) {
-            let errorMessage = resData.message || 'Failed to create entry';
-            if (resData.errors) {
-                errorMessage = Object.values(resData.errors).flat().join(' ');
-            }
-            throw new Error(errorMessage);
+export const createEntry = async (title: string) => {
+    const response = await fetch(`${API_BASE_URL}/entries`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({
+            title,
+            date: new Date().toISOString().split('T')[0],
+        }),
+    });
+
+    const resData = await response.json();
+    if (!response.ok) {
+        let errorMessage = resData.message || 'Failed to create entry';
+        if (resData.errors) {
+            errorMessage = Object.values(resData.errors).flat().join(' ');
         }
-        return resData;
-    } catch (error) {
-        return null;
+        throw new Error(errorMessage);
     }
+    return resData;
 };
 
 export const updateEntry = async (
@@ -42,46 +39,40 @@ export const updateEntry = async (
     data: Partial<Pick<Entry, 'title' | 'date' | 'content' | 'color' | 'image_url' | 'location_name' | 'latitude' | 'longitude'>> & {
         participant_ids?: number[];
     },
-): Promise<Entry | null> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
-            method: 'PUT',
-            headers: getHeaders(),
-            body: JSON.stringify(data),
-        });
+) => {
+    const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(data),
+    });
 
-        const resData = await response.json();
+    const resData = await response.json();
 
-        if (!response.ok) {
-            let errorMessage = resData.message || 'Failed to update entry';
-            if (resData.errors) {
-                errorMessage = Object.values(resData.errors).flat().join(' ');
-            }
-            const error = new Error(errorMessage) as ApiError;
-            error.status = response.status;
-            error.errors = resData.errors;
-            throw error;
+    if (!response.ok) {
+        let errorMessage = resData.message || 'Failed to update entry';
+        if (resData.errors) {
+            errorMessage = Object.values(resData.errors).flat().join(' ');
         }
-
-        return resData;
-    } catch (error) {
-        return null;
+        const error = new Error(errorMessage) as ApiError;
+        error.status = response.status;
+        error.errors = resData.errors;
+        throw error;
     }
+
+    return resData;
 };
 
-export const deleteEntry = async (id: number): Promise<boolean> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
-            method: 'DELETE',
-            headers: getHeaders(),
-        });
-        return response.ok;
-    } catch (error) {
-        return false;
-    }
+export const deleteEntry = async (id: number) => {
+    const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+    return data;
 };
 
-export const uploadImage = async (file: File): Promise<{ url?: string; error?: string }> => {
+export const uploadImage = async (file: File): Promise<{ url?: string; message?: string; error?: string }> => {
     try {
         const formData = new FormData();
         formData.append('image', file);
@@ -103,7 +94,7 @@ export const uploadImage = async (file: File): Promise<{ url?: string; error?: s
             throw new Error(errorMessage);
         }
 
-        return { url: data.url };
+        return { url: data.url, message: data.message };
     } catch (error) {
         const err = error as Error;
         return { error: err.message || 'Unknown upload error' };

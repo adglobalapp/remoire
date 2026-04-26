@@ -34,27 +34,57 @@ class ProfileController extends Controller
         $user->bio = $request->bio;
         $user->save();
 
+        $message = 'Profile updated';
+        if ($request->has('avatar_url')) {
+            $message = $request->avatar_url ? 'Avatar updated' : 'Avatar removed';
+        }
+
         return response()->json([
-            'message' => 'Profile updated',
+            'message' => $message,
             'user' => $user,
-        ]);
+        ], 200);
     }
 
     public function updatePassword(Request $request)
     {
-        $request->validate([
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'current_password' => ['required', 'current_password'],
             'password' => ['required', 'confirmed', Password::defaults()],
         ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors()->toArray();
+
+            if (isset($errors['password'])) {
+                $confirmErrors = [];
+                $passwordErrors = [];
+
+                foreach ($errors['password'] as $msg) {
+                    if (str_contains(strtolower($msg), 'confirmation')) {
+                        $confirmErrors[] = $msg;
+                    } else {
+                        $passwordErrors[] = $msg;
+                    }
+                }
+
+                if (! empty($confirmErrors)) {
+                    $errors['password'] = empty($passwordErrors) ? [''] : $passwordErrors;
+                    $errors['password_confirmation'] = $confirmErrors;
+                }
+            }
+
+            return response()->json([
+                'message' => 'The given data was invalid',
+                'errors' => $errors,
+            ], 422);
+        }
 
         $user = $request->user();
         $user->update([
             'password' => Hash::make($request->password),
         ]);
 
-        return response()->json([
-            'message' => 'Password updated',
-        ]);
+        return response()->json(['message' => 'Password updated'], 200);
     }
 
     public function blockedUsers()
@@ -67,7 +97,7 @@ class ProfileController extends Controller
             ->get()
             ->pluck('target');
 
-        return response()->json($blocked);
+        return response()->json($blocked, 200);
     }
 
     public function unblock(User $user)
@@ -79,8 +109,6 @@ class ProfileController extends Controller
             ->where('status', 'blocked')
             ->delete();
 
-        return response()->json([
-            'message' => 'User unblocked',
-        ]);
+        return response()->json(['message' => 'User unblocked'], 200);
     }
 }

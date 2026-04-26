@@ -8,7 +8,7 @@ export const getTimelines = async (): Promise<Timeline[]> => {
         });
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         return await response.json();
-    } catch (error) {
+    } catch {
         return [];
     }
 };
@@ -22,43 +22,37 @@ export const createTimeline = async (name: string): Promise<Timeline | null> => 
         });
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         return await response.json();
-    } catch (error) {
+    } catch {
         return null;
     }
 };
 
-export const deleteTimeline = async (id: number): Promise<boolean> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/timelines/${id}`, {
-            method: 'DELETE',
-            headers: getHeaders(),
-        });
-        return response.ok;
-    } catch (error) {
-        return false;
-    }
+export const deleteTimeline = async (id: number) => {
+    const response = await fetch(`${API_BASE_URL}/timelines/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+    return data;
 };
 
-export const addEntryToTimeline = async (timelineId: number, entryId: number): Promise<boolean> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/timelines/${timelineId}/entries/${entryId}`, {
-            method: 'POST',
-            headers: getHeaders(),
-        });
-        return response.ok;
-    } catch (error) {
-        return false;
-    }
+export const addEntryToTimeline = async (timelineId: number, entryId: number) => {
+    const response = await fetch(`${API_BASE_URL}/timelines/${timelineId}/entries/${entryId}`, {
+        method: 'POST',
+        headers: getHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+    return data;
 };
 
-export const removeEntryFromTimeline = async (timelineId: number, entryId: number): Promise<boolean> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/timelines/${timelineId}/entries/${entryId}`, {
-            method: 'DELETE',
-            headers: getHeaders(),
-        });
-        return response.ok;
-    } catch (error) {
-        return false;
-    }
+export const removeEntryFromTimeline = async (timelineId: number, entryId: number) => {
+    const response = await fetch(`${API_BASE_URL}/timelines/${timelineId}/entries/${entryId}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+    return data;
 };

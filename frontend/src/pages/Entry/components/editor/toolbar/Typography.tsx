@@ -88,7 +88,7 @@ const Typography = ({ editor, isDragMode }: TypographyProps) => {
                 else if (editor.isActive({ textAlign: 'justify' })) setCurrentAlign('justify');
                 else setCurrentAlign('left');
             } catch (err) {
-                console.warn('Typography controls update error:', err);
+                console.error('Typography controls update error:', err);
             }
         };
 

@@ -44,7 +44,7 @@ describe('Profile Page', () => {
 
     it('renders user details correctly', async () => {
         render(
-            <AuthContext.Provider value={mockAuthContextValue as any}>
+            <AuthContext.Provider value={mockAuthContextValue as AuthContextType}>
                 <UserProfileContext.Provider value={mockUserProfileContextValue}>
                     <Profile />
                 </UserProfileContext.Provider>
@@ -65,7 +65,7 @@ describe('Profile Page', () => {
         });
 
         render(
-            <AuthContext.Provider value={mockAuthContextValue as any}>
+            <AuthContext.Provider value={mockAuthContextValue as AuthContextType}>
                 <UserProfileContext.Provider value={mockUserProfileContextValue}>
                     <Profile />
                 </UserProfileContext.Provider>
@@ -92,7 +92,7 @@ describe('Profile Page', () => {
         vi.mocked(profileApi.updatePassword).mockResolvedValue(true);
 
         render(
-            <AuthContext.Provider value={mockAuthContextValue as any}>
+            <AuthContext.Provider value={mockAuthContextValue as AuthContextType}>
                 <UserProfileContext.Provider value={mockUserProfileContextValue}>
                     <Profile />
                 </UserProfileContext.Provider>

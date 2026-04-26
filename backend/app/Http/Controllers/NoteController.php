@@ -25,7 +25,9 @@ class NoteController extends Controller
 
         $note = Note::create($validated);
 
-        return response()->json($note, 201);
+        return response()->json(array_merge($note->toArray(), [
+            'message' => 'Note created',
+        ]), 201);
     }
 
     public function show(Note $note)
@@ -52,7 +54,9 @@ class NoteController extends Controller
 
         $note->update($validated);
 
-        return response()->json($note);
+        return response()->json(array_merge($note->toArray(), [
+            'message' => 'Note updated',
+        ]), 200);
     }
 
     public function destroy(Note $note)
@@ -63,6 +67,6 @@ class NoteController extends Controller
 
         $note->delete();
 
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Note deleted'], 200);
     }
 }

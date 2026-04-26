@@ -8,7 +8,7 @@ export const getRelationships = async (): Promise<User[]> => {
         });
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         return await response.json();
-    } catch (error) {
+    } catch {
         return [];
     }
 };
@@ -23,7 +23,7 @@ export const getRelationshipRequests = async (): Promise<{
         });
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         return await response.json();
-    } catch (error) {
+    } catch {
         return { pending: [], sent: [] };
     }
 };
@@ -35,56 +35,48 @@ export const searchUsers = async (query: string): Promise<User[]> => {
         });
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         return await response.json();
-    } catch (error) {
+    } catch {
         return [];
     }
 };
 
-export const sendRelationshipRequest = async (targetId: number): Promise<boolean> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/relationships`, {
-            method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify({ target_id: targetId }),
-        });
-        return response.ok;
-    } catch (error) {
-        return false;
-    }
+export const sendRelationshipRequest = async (targetId: number) => {
+    const response = await fetch(`${API_BASE_URL}/relationships`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ target_id: targetId }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+    return data;
 };
 
-export const acceptRelationshipRequest = async (userId: number): Promise<boolean> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/relationships/${userId}/accept`, {
-            method: 'POST',
-            headers: getHeaders(),
-        });
-        return response.ok;
-    } catch (error) {
-        return false;
-    }
+export const acceptRelationshipRequest = async (userId: number) => {
+    const response = await fetch(`${API_BASE_URL}/relationships/${userId}/accept`, {
+        method: 'POST',
+        headers: getHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+    return data;
 };
 
-export const deleteRelationship = async (userId: number): Promise<boolean> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/relationships/${userId}`, {
-            method: 'DELETE',
-            headers: getHeaders(),
-        });
-        return response.ok;
-    } catch (error) {
-        return false;
-    }
+export const deleteRelationship = async (userId: number) => {
+    const response = await fetch(`${API_BASE_URL}/relationships/${userId}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+    return data;
 };
 
-export const blockUser = async (userId: number): Promise<boolean> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/relationships/${userId}/block`, {
-            method: 'POST',
-            headers: getHeaders(),
-        });
-        return response.ok;
-    } catch (error) {
-        return false;
-    }
+export const blockUser = async (userId: number) => {
+    const response = await fetch(`${API_BASE_URL}/relationships/${userId}/block`, {
+        method: 'POST',
+        headers: getHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+    return data;
 };

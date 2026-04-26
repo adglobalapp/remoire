@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, UserPlus, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Auth.module.css';
-import { type RegisterProps } from '../../types';
+import { type RegisterProps, type ApiError } from '../../types';
 
 const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
     const { register } = useAuth();
@@ -25,11 +25,12 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
             if (data) {
                 onClose();
             }
-        } catch (err: any) {
-            if (err.errors) {
-                setFieldErrors(err.errors);
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            if (error.errors) {
+                setFieldErrors(error.errors);
             } else {
-                setFieldErrors({ password_confirmation: [err.message || 'Registration failed.'] });
+                setFieldErrors({ password_confirmation: [error.message || 'Registration failed.'] });
             }
         } finally {
             setIsLoading(false);

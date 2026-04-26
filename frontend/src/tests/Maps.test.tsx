@@ -47,8 +47,8 @@ describe('MapsPage', () => {
     it('renders map with markers', () => {
         render(
             <BrowserRouter>
-                <AuthContext.Provider value={mockAuthContextValue as any}>
-                    <EntryContext.Provider value={mockEntryContextValue as any}>
+                <AuthContext.Provider value={mockAuthContextValue as AuthContextType}>
+                    <EntryContext.Provider value={mockEntryContextValue as EntryContextValue}>
                         <MapsPage />
                     </EntryContext.Provider>
                 </AuthContext.Provider>

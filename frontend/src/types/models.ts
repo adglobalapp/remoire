@@ -12,6 +12,7 @@ export interface Entry {
     created_at: string;
     updated_at: string;
     participants?: User[];
+    message?: string;
 }
 
 export interface User {
@@ -27,20 +28,12 @@ export interface User {
     is_requester?: boolean;
 }
 
-export interface Relationship {
-    id: number;
-    user_id: number;
-    target_id: number;
-    status: 'pending' | 'accepted' | 'blocked';
-    created_at: string;
-    updated_at: string;
-}
-
 export interface Timeline {
     id: number;
     name: string;
     isDefault: boolean;
     entryIds: number[];
+    message?: string;
 }
 
 export interface Note {
@@ -52,4 +45,5 @@ export interface Note {
     is_pinned: boolean;
     created_at: string;
     updated_at: string;
+    message?: string;
 }

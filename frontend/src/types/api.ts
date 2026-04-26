@@ -1,8 +1,3 @@
-export interface ApiErrorResponse {
-    message: string;
-    errors?: Record<string, string[]>;
-}
-
 export interface ApiError extends Error {
     status?: number;
     errors?: Record<string, string[]>;

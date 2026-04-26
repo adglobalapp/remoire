@@ -86,7 +86,7 @@ describe('AddFriend Component', () => {
             },
         ];
         vi.mocked(api.searchUsers).mockResolvedValue(mockUsers);
-        vi.mocked(api.sendRelationshipRequest).mockResolvedValue({ message: 'Request sent' } as any);
+        vi.mocked(api.sendRelationshipRequest).mockResolvedValue({ message: 'Request sent' });
 
         render(
             <UserProfileContext.Provider value={mockContextValue}>

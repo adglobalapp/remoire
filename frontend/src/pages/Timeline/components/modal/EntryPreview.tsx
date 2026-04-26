@@ -146,7 +146,10 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
                                         size={34}
                                         backgroundColor="var(--color-dark-beige)"
                                         className={styles.avatarMore}
-                                        title={entry.participants.slice(4).map(p => p.name).join(', ')}
+                                        title={entry.participants
+                                            .slice(4)
+                                            .map((p) => p.name)
+                                            .join(', ')}
                                     />
                                 )}
                             </div>

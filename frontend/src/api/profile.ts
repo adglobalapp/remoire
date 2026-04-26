@@ -1,4 +1,4 @@
-import { type User } from '../types';
+import { type User, type ApiError } from '../types';
 import { API_BASE_URL, getHeaders } from './client';
 
 export const updateProfile = async (data: { name: string; bio?: string; avatar_url?: string | null }) => {
@@ -7,46 +7,42 @@ export const updateProfile = async (data: { name: string; bio?: string; avatar_u
         headers: getHeaders(),
         body: JSON.stringify(data),
     });
+    const resData = await response.json();
     if (!response.ok) {
-        const errData = await response.json();
-        let errorMessage = errData.message || 'Failed to update profile';
-        if (errData.errors) {
-            errorMessage = Object.values(errData.errors).flat().join(' ');
-        }
-        const error = new Error(errorMessage) as any;
+        const error = new Error(resData.message || 'Failed to update profile') as ApiError;
         error.status = response.status;
-        error.errors = errData.errors;
+        error.errors = resData.errors;
         throw error;
     }
-    return await response.json();
+    return resData;
 };
 
-export const updatePassword = async (data: any) => {
+export const updatePassword = async (data: Record<string, string>) => {
     const response = await fetch(`${API_BASE_URL}/user/password`, {
         method: 'PUT',
         headers: getHeaders(),
         body: JSON.stringify(data),
     });
+    const resData = await response.json();
     if (!response.ok) {
-        const errData = await response.json();
-        let errorMessage = errData.message || 'Failed to update password';
-        if (errData.errors) {
-            errorMessage = Object.values(errData.errors).flat().join(' ');
-        }
-        const error = new Error(errorMessage) as any;
+        const error = new Error(resData.message || 'Failed to update password') as ApiError;
         error.status = response.status;
-        error.errors = errData.errors;
+        error.errors = resData.errors;
         throw error;
     }
-    return await response.json();
+    return resData;
 };
 
 export const getBlockedUsers = async (): Promise<User[]> => {
-    const response = await fetch(`${API_BASE_URL}/user/blocked`, {
-        headers: getHeaders(),
-    });
-    if (!response.ok) return [];
-    return await response.json();
+    try {
+        const response = await fetch(`${API_BASE_URL}/user/blocked`, {
+            headers: getHeaders(),
+        });
+        if (!response.ok) return [];
+        return await response.json();
+    } catch {
+        return [];
+    }
 };
 
 export const unblockUser = async (userId: number) => {
@@ -54,8 +50,7 @@ export const unblockUser = async (userId: number) => {
         method: 'DELETE',
         headers: getHeaders(),
     });
-    if (!response.ok) {
-        throw new Error('Failed to unblock user');
-    }
-    return await response.json();
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+    return data;
 };

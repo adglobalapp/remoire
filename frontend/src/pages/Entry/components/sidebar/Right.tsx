@@ -44,10 +44,15 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         lastPage.current = pathname;
     }, [pathname, onToggle, propOpen]);
 
-    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleDateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (activeEntry) {
-            updateEntry(activeEntry.id, { date: e.target.value });
-            toast.success('Date updated');
+            try {
+                const res = await updateEntry(activeEntry.id, { date: e.target.value });
+                if (res?.message) toast.success(res.message);
+            } catch (err: unknown) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to update date');
+            }
         }
     };
 
@@ -56,12 +61,13 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
             setIsRemovingParticipant(userId);
             try {
                 const currentIds = activeEntry.participants?.map((p) => p.id) || [];
-                await updateEntry(activeEntry.id, {
+                const res = await updateEntry(activeEntry.id, {
                     participant_ids: currentIds.filter((id) => id !== userId),
                 });
-                toast.success('Participant removed');
-            } catch {
-                toast.error('Failed to remove participant');
+                if (res?.message) toast.success(res.message);
+            } catch (err: unknown) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to remove participant');
             } finally {
                 setIsRemovingParticipant(null);
             }
@@ -72,22 +78,32 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         if (activeEntry) {
             const currentIds = activeEntry.participants?.map((p) => p.id) || [];
             if (!currentIds.includes(userId)) {
-                await updateEntry(activeEntry.id, {
-                    participant_ids: [...currentIds, userId],
-                });
-                toast.success('Participant added');
+                try {
+                    const res = await updateEntry(activeEntry.id, {
+                        participant_ids: [...currentIds, userId],
+                    });
+                    if (res?.message) toast.success(res.message);
+                } catch (err: unknown) {
+                    const error = err as ApiError;
+                    toast.error(error.message || 'Failed to add participant');
+                }
             }
         }
     };
 
     const handleLocationSelect = async (location: { name: string; lat: number; lng: number }) => {
         if (activeEntry) {
-            await updateEntry(activeEntry.id, {
-                location_name: location.name,
-                latitude: location.lat,
-                longitude: location.lng,
-            });
-            toast.success('Location updated');
+            try {
+                const res = await updateEntry(activeEntry.id, {
+                    location_name: location.name,
+                    latitude: location.lat,
+                    longitude: location.lng,
+                });
+                if (res?.message) toast.success(res.message);
+            } catch (err: unknown) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to update location');
+            }
         }
     };
 
@@ -95,14 +111,15 @@ const Right = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         if (activeEntry) {
             setIsRemovingLocation(true);
             try {
-                await updateEntry(activeEntry.id, {
+                const res = await updateEntry(activeEntry.id, {
                     location_name: null,
                     latitude: null,
                     longitude: null,
                 });
-                toast.success('Location removed');
-            } catch {
-                toast.error('Failed to remove location');
+                if (res?.message) toast.success(res.message);
+            } catch (err: unknown) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to remove location');
             } finally {
                 setIsRemovingLocation(false);
                 setShowLocationConfirm(false);

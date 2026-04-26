@@ -29,7 +29,7 @@ const Canvas = () => {
                 scale: initialScale,
             });
         }
-    }, [setTransform]);
+    }, [setTransform, containerRef]);
 
     const visibleEntries: Entry[] = useMemo(() => {
         if (!activeTimeline) return [];

@@ -116,9 +116,9 @@ const LandingPage: React.FC = () => {
                 >
                     <div className={styles.mockCommunity}>
                         <div className={styles.mockAvatars}>
-                            <Avatar user={{ id: 1, name: 'L B' } as any} size={36} className={styles.mockAvatarItem} />
-                            <Avatar user={{ id: 2, name: 'J D' } as any} size={36} className={styles.mockAvatarItem} />
-                            <Avatar user={{ id: 3, name: 'K L' } as any} size={36} className={styles.mockAvatarItem} />
+                            <Avatar user={{ id: 1, name: 'L B' }} size={36} className={styles.mockAvatarItem} />
+                            <Avatar user={{ id: 2, name: 'J D' }} size={36} className={styles.mockAvatarItem} />
+                            <Avatar user={{ id: 3, name: 'K L' }} size={36} className={styles.mockAvatarItem} />
                         </div>
                         <div className={styles.mockLocation}>
                             <MapPin size={14} />

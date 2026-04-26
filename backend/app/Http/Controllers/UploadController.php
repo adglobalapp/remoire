@@ -16,6 +16,7 @@ class UploadController extends Controller
 
         return response()->json([
             'url' => asset('storage/'.$path),
+            'message' => 'Image uploaded',
         ]);
     }
 }

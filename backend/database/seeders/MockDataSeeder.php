@@ -7,6 +7,7 @@ use App\Models\Note;
 use App\Models\Relationship;
 use App\Models\Timeline;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -83,9 +84,21 @@ class MockDataSeeder extends Seeder
 
         $timelines = [$travelTimeline, $cookingTimeline, $familyTimeline];
 
-        $entries = Entry::factory(50)->create([
-            'user_id' => $mainUser->id,
-        ]);
+        $entries = collect();
+        for ($i = 0; $i < 50; $i++) {
+            $createdAt = match (true) {
+                $i < 5 => Carbon::now(),
+                $i < 15 => Carbon::now()->subDays(rand(1, 25)),
+                $i < 30 => Carbon::now()->subMonths(rand(1, 10)),
+                default => Carbon::now()->subYears(rand(1, 2)),
+            };
+
+            $entries->push(Entry::factory()->create([
+                'user_id' => $mainUser->id,
+                'created_at' => $createdAt,
+                'updated_at' => $createdAt,
+            ]));
+        }
 
         $specialEntries = [
             ['title' => 'Sunset in Santorini', 'color' => '#f8a5c2'],
@@ -119,11 +132,14 @@ class MockDataSeeder extends Seeder
             }
         }
 
-        $budapestEntries = Entry::factory(40)->create([
-            'user_id' => $mainUser->id,
-            'location_name' => 'Budapest, Hungary',
-        ]);
-        foreach ($budapestEntries as $entry) {
+        for ($i = 0; $i < 40; $i++) {
+            $createdAt = Carbon::now()->subDays(rand(0, 730));
+            $entry = Entry::factory()->create([
+                'user_id' => $mainUser->id,
+                'location_name' => 'Budapest, Hungary',
+                'created_at' => $createdAt,
+                'updated_at' => $createdAt,
+            ]);
             $entry->update([
                 'latitude' => 47.4979 + fake()->randomFloat(4, -0.05, 0.05),
                 'longitude' => 19.0402 + fake()->randomFloat(4, -0.05, 0.05),

@@ -50,15 +50,17 @@ const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
 
     const handleSendRequest = async (userId: number) => {
         setIsAdding(userId);
-        const success = await sendRelationshipRequest(userId);
-        setIsAdding(null);
-        if (success) {
-            toast.success('Friend request sent!');
+        try {
+            const res = await sendRelationshipRequest(userId);
+            if (res?.message) toast.success(res.message);
             setResults((prev) => prev.map((u) => (u.id === userId ? { ...u, relationship_status: 'pending', is_requester: true } : u)));
             onRefresh();
             onClose();
-        } else {
-            toast.error('Failed to send request');
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to send request');
+        } finally {
+            setIsAdding(null);
         }
     };
 

@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { UserPlus } from 'lucide-react';
 import Loader from '../../components/common/Loader';
 import Navbar from '../../components/common/Navbar';
 import styles from './index.module.css';
-import { type User as UserType } from '../../types';
+import { type User as UserType, type ApiError } from '../../types';
 import { getRelationships, getRelationshipRequests, acceptRelationshipRequest, deleteRelationship } from '../../api';
 import List from './components/list/List';
 import AddFriend from './components/modal/AddFriend';
@@ -24,27 +24,29 @@ const FriendlistPage = () => {
 
     const [confirmAction, setConfirmAction] = useState<{
         type: 'delete' | 'block';
+        source?: 'friend' | 'sent' | 'pending';
         userId: number;
         userName: string;
     } | null>(null);
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
             const [friendsData, requestsData] = await Promise.all([getRelationships(), getRelationshipRequests()]);
             setFriends(friendsData);
             setPendingRequests(requestsData.pending);
             setSentRequests(requestsData.sent);
-        } catch {
-            toast.error('Failed to load friends');
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to load friends');
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [fetchData]);
 
     const isBlocked = (id: number) => blockedUserIds.has(id);
     const visiblePending = pendingRequests.filter((u) => !isBlocked(u.id));
@@ -53,37 +55,44 @@ const FriendlistPage = () => {
 
     const handleAccept = async (id: number) => {
         setAcceptingId(id);
-        const success = await acceptRelationshipRequest(id);
-        if (success) {
-            toast.success('Friend request accepted!');
+        try {
+            const res = await acceptRelationshipRequest(id);
+            if (res?.message) toast.success(res.message);
             fetchData();
-        } else {
-            toast.error('Failed to accept request');
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to accept request');
+        } finally {
+            setAcceptingId(null);
         }
-        setAcceptingId(null);
     };
 
     const handleReject = async (id: number) => {
         setDirectDeletingId(id);
-        const success = await deleteRelationship(id);
-        if (success) {
-            toast.success('Request rejected');
+        try {
+            const res = await deleteRelationship(id);
+            if (res?.message) toast.success(res.message);
             fetchData();
-        } else {
-            toast.error('Failed to reject request');
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to remove request');
+        } finally {
+            setDirectDeletingId(null);
         }
-        setDirectDeletingId(null);
     };
 
     const handleConfirmAction = async () => {
         if (!confirmAction) return;
         setIsConfirming(true);
         if (confirmAction.type === 'delete') {
-            const success = await deleteRelationship(confirmAction.userId);
-            if (success) {
-                toast.success('Connection removed');
+            try {
+                const res = await deleteRelationship(confirmAction.userId);
+                if (res?.message) toast.success(res.message);
                 fetchData();
-            } else toast.error('Failed to remove connection');
+            } catch (err: unknown) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to complete action');
+            }
         } else {
             await blockUser(confirmAction.userId);
             fetchData();
@@ -91,6 +100,39 @@ const FriendlistPage = () => {
         setIsConfirming(false);
         setConfirmAction(null);
     };
+
+    const getModalContent = () => {
+        if (!confirmAction) return null;
+        if (confirmAction.type === 'block') {
+            return {
+                title: 'Block User?',
+                message: (
+                    <span>
+                        Are you sure you want to block <strong>{confirmAction.userName}</strong>? They won't be able to search for you or
+                        send requests.
+                    </span>
+                ),
+                confirmText: 'Block User',
+                loadingText: 'Blocking...',
+            };
+        }
+
+        const isFriend = confirmAction.source === 'friend';
+        return {
+            title: isFriend ? 'Remove Friend?' : 'Remove Request?',
+            message: (
+                <span>
+                    Are you sure you want to remove {isFriend ? '' : 'your friend request to '}
+                    <strong>{confirmAction.userName}</strong>
+                    {isFriend ? ' from your friends' : ''}?
+                </span>
+            ),
+            confirmText: 'Remove',
+            loadingText: 'Removing...',
+        };
+    };
+
+    const modalContent = getModalContent();
 
     return (
         <div className="page-container">
@@ -130,6 +172,7 @@ const FriendlistPage = () => {
                             onDelete={(user) =>
                                 setConfirmAction({
                                     type: 'delete',
+                                    source: 'sent',
                                     userId: user.id,
                                     userName: user.name,
                                 })
@@ -146,6 +189,7 @@ const FriendlistPage = () => {
                             onDelete={(user) =>
                                 setConfirmAction({
                                     type: 'delete',
+                                    source: 'friend',
                                     userId: user.id,
                                     userName: user.name,
                                 })
@@ -158,24 +202,13 @@ const FriendlistPage = () => {
 
                 {showAddModal && <AddFriend onClose={() => setShowAddModal(false)} onRefresh={fetchData} />}
 
-                {confirmAction && (
+                {confirmAction && modalContent && (
                     <DeleteConfirmation
-                        title={confirmAction.type === 'delete' ? 'Remove Friend?' : 'Block User?'}
-                        message={
-                            confirmAction.type === 'delete' ? (
-                                <span>
-                                    Are you sure you want to remove <strong>{confirmAction.userName}</strong> from your friends?
-                                </span>
-                            ) : (
-                                <span>
-                                    Are you sure you want to block <strong>{confirmAction.userName}</strong>? They won't be able to search
-                                    for you or send requests.
-                                </span>
-                            )
-                        }
-                        confirmText={confirmAction.type === 'delete' ? 'Remove' : 'Block User'}
+                        title={modalContent.title}
+                        message={modalContent.message}
+                        confirmText={modalContent.confirmText}
                         isLoading={isConfirming}
-                        loadingText={confirmAction.type === 'delete' ? 'Removing...' : 'Blocking...'}
+                        loadingText={modalContent.loadingText}
                         onConfirm={handleConfirmAction}
                         onCancel={() => setConfirmAction(null)}
                     />

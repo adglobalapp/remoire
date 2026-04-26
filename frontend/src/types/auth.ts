@@ -16,6 +16,7 @@ export interface RegisterCredentials {
 export interface AuthResponse {
     user: User;
     access_token: string;
+    message?: string;
 }
 
 export interface AuthContextType {

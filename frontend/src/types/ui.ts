@@ -1,16 +1,9 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, type ComponentType } from 'react';
 import { type Entry, type User } from './models';
-import { type PageSettings } from './pages';
 
 export interface LeftProps {
     isOpen?: boolean;
     onToggle?: () => void;
-}
-
-export interface EditorProps {
-    isDragMode: boolean;
-    pageSettings?: PageSettings;
-    onPageSettingsChange?: (settings: PageSettings) => void;
 }
 
 export interface LoaderProps {
@@ -20,7 +13,7 @@ export interface LoaderProps {
 }
 
 export interface FeatureCardProps {
-    icon: any;
+    icon: ComponentType<{ size?: number | string; className?: string }>;
     title: string;
     content: string;
     children?: ReactNode;

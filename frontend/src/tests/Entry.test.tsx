@@ -33,7 +33,6 @@ const mockEntryContextValue: EntryContextValue = {
     createEntry: vi.fn(),
     deleteEntry: vi.fn(),
     saveEntry: vi.fn(),
-    updateEntryTitle: vi.fn(),
     updateEntry: vi.fn(),
 };
 

@@ -4,7 +4,7 @@ import Loader from '../../components/common/Loader';
 import toast from 'react-hot-toast';
 import Navbar from '../../components/common/Navbar';
 import styles from './index.module.css';
-import { type Note as NoteType } from '../../types';
+import { type Note as NoteType, type ApiError } from '../../types';
 import { getNotes, createNote, updateNote, deleteNote } from '../../api';
 import Note from './components/Note/Note';
 import NoteModal from './components/Modal/NoteModal';
@@ -28,14 +28,13 @@ const NotesPage = () => {
 
     const fetchNotes = useCallback(async () => {
         setIsLoading(true);
-        try {
-            const data = await getNotes();
+        const data = await getNotes();
+        if (data) {
             setNotes(sortNotes(data));
-        } catch {
+        } else {
             toast.error('Failed to load notes');
-        } finally {
-            setIsLoading(false);
         }
+        setIsLoading(false);
     }, []);
 
     useEffect(() => {
@@ -43,24 +42,28 @@ const NotesPage = () => {
     }, [fetchNotes]);
 
     const handleSaveNote = async (data: Partial<NoteType>) => {
-        try {
-            if (selectedNote) {
+        if (selectedNote) {
+            try {
                 const updated = await updateNote(selectedNote.id, data);
-                if (updated) {
-                    setNotes((prev) => sortNotes(prev.map((n) => (n.id === updated.id ? updated : n))));
-                    toast.success('Note updated');
-                }
-            } else {
-                const created = await createNote(data);
-                if (created) {
-                    setNotes((prev) => sortNotes([created, ...prev]));
-                    toast.success('Note created');
-                }
+                setNotes((prev) => sortNotes(prev.map((n) => (n.id === updated.id ? updated : n))));
+                if (updated?.message) toast.success(updated.message);
+                setSelectedNote(null);
+                setShowAddModal(false);
+            } catch (err: unknown) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to update note');
             }
-            setSelectedNote(null);
-            setShowAddModal(false);
-        } catch {
-            toast.error('Failed to save note');
+        } else {
+            try {
+                const created = await createNote(data);
+                setNotes((prev) => sortNotes([created, ...prev]));
+                if (created?.message) toast.success(created.message);
+                setSelectedNote(null);
+                setShowAddModal(false);
+            } catch (err: unknown) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to create note');
+            }
         }
     };
 
@@ -68,15 +71,14 @@ const NotesPage = () => {
         if (!noteToDelete) return;
         setIsDeleting(true);
         try {
-            const success = await deleteNote(noteToDelete);
-            if (success) {
-                setNotes((prev) => prev.filter((n) => n.id !== noteToDelete));
-                toast.success('Note deleted');
-                setNoteToDelete(null);
-                setSelectedNote(null);
-            }
-        } catch {
-            toast.error('Failed to delete note');
+            const res = await deleteNote(noteToDelete);
+            setNotes((prev) => prev.filter((n) => n.id !== noteToDelete));
+            if (res?.message) toast.success(res.message);
+            setNoteToDelete(null);
+            setSelectedNote(null);
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to delete note');
         } finally {
             setIsDeleting(false);
         }

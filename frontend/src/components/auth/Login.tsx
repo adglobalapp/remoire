@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, LogIn, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Auth.module.css';
-import { type LoginProps } from '../../types';
+import { type LoginProps, type ApiError } from '../../types';
 
 const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister }) => {
     const { login } = useAuth();
@@ -19,11 +19,12 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister }) => {
             if (data) {
                 onClose();
             }
-        } catch (err: any) {
-            if (err.errors) {
-                setFieldErrors(err.errors);
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            if (error.errors) {
+                setFieldErrors(error.errors);
             } else {
-                setFieldErrors({ password: [err.message || 'An unexpected error occurred.'] });
+                setFieldErrors({ password: [error.message || 'An unexpected error occurred.'] });
             }
         } finally {
             setIsLoading(false);

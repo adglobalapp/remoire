@@ -46,6 +46,7 @@ class TimelineController extends Controller
         ]);
 
         return response()->json([
+            'message' => 'Timeline created',
             'id' => $timeline->id,
             'name' => $timeline->name,
             'isDefault' => $timeline->is_default,
@@ -74,7 +75,9 @@ class TimelineController extends Controller
 
         $timeline->update($request->only(['name', 'is_default']));
 
-        return response()->json($timeline);
+        return response()->json(array_merge($timeline->toArray(), [
+            'message' => 'Timeline updated',
+        ]), 200);
     }
 
     public function destroy(Request $request, Timeline $timeline)
@@ -89,7 +92,7 @@ class TimelineController extends Controller
 
         $timeline->delete();
 
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Timeline deleted'], 200);
     }
 
     public function addEntry(Timeline $timeline, Entry $entry)
@@ -107,7 +110,7 @@ class TimelineController extends Controller
 
         $timeline->entries()->syncWithoutDetaching([$entry->id]);
 
-        return response()->json(['message' => 'Entry added to timeline']);
+        return response()->json(['message' => 'Entry added to timeline'], 200);
     }
 
     public function removeEntry(Timeline $timeline, Entry $entry)
@@ -118,6 +121,6 @@ class TimelineController extends Controller
 
         $timeline->entries()->detach($entry->id);
 
-        return response()->json(['message' => 'Entry removed from timeline']);
+        return response()->json(['message' => 'Entry removed from timeline'], 200);
     }
 }

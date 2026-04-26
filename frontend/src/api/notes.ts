@@ -8,47 +8,39 @@ export const getNotes = async (): Promise<Note[]> => {
         });
         if (!response.ok) throw new Error(`Error: ${response.status}`);
         return await response.json();
-    } catch (error) {
+    } catch {
         return [];
     }
 };
 
-export const createNote = async (data: Partial<Note>): Promise<Note | null> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/notes`, {
-            method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify(data),
-        });
-        if (!response.ok) throw new Error(`Error: ${response.status}`);
-        return await response.json();
-    } catch (error) {
-        return null;
-    }
+export const createNote = async (data: Partial<Note>) => {
+    const response = await fetch(`${API_BASE_URL}/notes`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(data),
+    });
+    const resData = await response.json();
+    if (!response.ok) throw new Error(resData.message || `Error: ${response.status}`);
+    return resData;
 };
 
-export const updateNote = async (id: number, data: Partial<Note>): Promise<Note | null> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
-            method: 'PUT',
-            headers: getHeaders(),
-            body: JSON.stringify(data),
-        });
-        if (!response.ok) throw new Error(`Error: ${response.status}`);
-        return await response.json();
-    } catch (error) {
-        return null;
-    }
+export const updateNote = async (id: number, data: Partial<Note>) => {
+    const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(data),
+    });
+    const resData = await response.json();
+    if (!response.ok) throw new Error(resData.message || `Error: ${response.status}`);
+    return resData;
 };
 
-export const deleteNote = async (id: number): Promise<boolean> => {
-    try {
-        const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
-            method: 'DELETE',
-            headers: getHeaders(),
-        });
-        return response.ok;
-    } catch (error) {
-        return false;
-    }
+export const deleteNote = async (id: number) => {
+    const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+    return data;
 };

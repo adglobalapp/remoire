@@ -7,3 +7,4 @@ export * from './ui';
 export * from './pages';
 export * from './notes';
 export * from './api';
+export * from './maps';

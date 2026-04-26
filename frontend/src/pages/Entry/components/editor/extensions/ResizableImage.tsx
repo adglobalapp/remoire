@@ -1,29 +1,37 @@
-import { Node, mergeAttributes } from '@tiptap/core';
-import { ReactNodeViewRenderer, NodeViewWrapper } from '@tiptap/react';
+import { Node, mergeAttributes, type CommandProps } from '@tiptap/core';
+import { ReactNodeViewRenderer, NodeViewWrapper, type NodeViewProps } from '@tiptap/react';
 import { useRef, useEffect, useCallback } from 'react';
 import { Trash2 } from 'lucide-react';
-import Moveable from 'react-moveable';
+import Moveable, { type OnDrag, type OnDragEnd, type OnResize, type OnResizeEnd, type OnRotate, type OnRotateEnd } from 'react-moveable';
 import classNames from 'classnames';
 import { useCanvasScale } from '../../../../../contexts/CanvasScaleContext';
 import styles from './ResizableImage.module.css';
 
-const ImageNodeView = (props: any) => {
+declare module '@tiptap/core' {
+    interface Commands<ReturnType> {
+        resizableImage: {
+            setImage: (options: { src: string; alt?: string; title?: string }) => ReturnType;
+        };
+    }
+}
+
+const ImageNodeView = (props: NodeViewProps) => {
     const { node, updateAttributes, selected } = props;
     const { src, width, height, x, y, rotation, alt, title } = node.attrs;
 
     const targetRef = useRef<HTMLDivElement>(null);
-    const moveableRef = useRef<any>(null);
+    const moveableRef = useRef<Moveable>(null);
     const canvasScale = useCanvasScale();
 
     const handleDrag = useCallback(
-        ({ target, beforeTranslate }: any) => {
+        ({ target, beforeTranslate }: OnDrag) => {
             target.style.transform = `translate(${beforeTranslate[0]}px, ${beforeTranslate[1]}px) rotate(${rotation ?? 0}deg)`;
         },
         [rotation],
     );
 
     const handleDragEnd = useCallback(
-        ({ lastEvent }: any) => {
+        ({ lastEvent }: OnDragEnd) => {
             if (lastEvent) {
                 updateAttributes({
                     x: lastEvent.beforeTranslate[0],
@@ -35,7 +43,7 @@ const ImageNodeView = (props: any) => {
     );
 
     const handleResize = useCallback(
-        ({ target, width, height, drag }: any) => {
+        ({ target, width, height, drag }: OnResize) => {
             target.style.width = `${width}px`;
             target.style.height = `${height}px`;
             target.style.transform = `translate(${drag.beforeTranslate[0]}px, ${drag.beforeTranslate[1]}px) rotate(${rotation ?? 0}deg)`;
@@ -44,7 +52,7 @@ const ImageNodeView = (props: any) => {
     );
 
     const handleResizeEnd = useCallback(
-        ({ lastEvent }: any) => {
+        ({ lastEvent }: OnResizeEnd) => {
             if (lastEvent) {
                 updateAttributes({
                     width: lastEvent.width,
@@ -57,12 +65,12 @@ const ImageNodeView = (props: any) => {
         [updateAttributes],
     );
 
-    const handleRotate = useCallback(({ target, beforeRotate, drag }: any) => {
+    const handleRotate = useCallback(({ target, beforeRotate, drag }: OnRotate) => {
         target.style.transform = `translate(${drag.beforeTranslate[0]}px, ${drag.beforeTranslate[1]}px) rotate(${beforeRotate}deg)`;
     }, []);
 
     const handleRotateEnd = useCallback(
-        ({ lastEvent }: any) => {
+        ({ lastEvent }: OnRotateEnd) => {
             if (lastEvent) {
                 updateAttributes({
                     rotation: lastEvent.beforeRotate,
@@ -279,8 +287,8 @@ export const ResizableImage = Node.create({
         return {
             setImage:
                 (options: { src: string; alt?: string; title?: string }) =>
-                ({ commands }: any) =>
+                ({ commands }: CommandProps) =>
                     commands.insertContent({ type: this.name, attrs: options }),
-        } as any;
+        };
     },
 });

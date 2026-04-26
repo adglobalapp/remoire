@@ -13,17 +13,6 @@ export type FontSizeOptions = {
     types: string[];
 };
 
-export interface ResizableImageAttributes {
-    src: string;
-    alt?: string;
-    title?: string;
-    width?: number;
-    height?: number;
-    x?: number;
-    y?: number;
-    rotation?: number;
-}
-
 export interface EditorToolbarProps {
     editor: Editor | null;
     isDragMode?: boolean;
@@ -69,14 +58,9 @@ export interface PageSettingsProps {
     onPageSettingsChange?: (settings: PageSettings) => void;
 }
 
-export interface ColorOption {
-    accentColor?: string;
-    index: number;
-}
-
 export interface TiptapNode {
     type: string;
     text?: string;
     content?: TiptapNode[];
-    attrs?: Record<string, any>;
+    attrs?: Record<string, unknown>;
 }
