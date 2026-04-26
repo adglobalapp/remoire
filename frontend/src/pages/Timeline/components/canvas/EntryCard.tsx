@@ -41,17 +41,18 @@ const EntryCard = ({ entry, side, index = 0 }: EntryCardProps) => {
                                 <span className={styles.date}>{dateStr}</span>
                                 {entry.participants && entry.participants.length > 0 && (
                                     <div className={styles.participantAvatars}>
-                                        {entry.participants.slice(0, 4).map((p) => (
-                                            <Avatar key={p.id} user={p} size={24} className={styles.participantAvatar} />
-                                        ))}
                                         {entry.participants.length > 4 && (
                                             <Avatar
                                                 text={`+${entry.participants.length - 4}`}
                                                 size={24}
                                                 className={styles.participantAvatar}
                                                 backgroundColor="var(--color-dark-beige)"
+                                                title={entry.participants.slice(4).map(p => p.name).join(', ')}
                                             />
                                         )}
+                                        {entry.participants.slice(0, 4).reverse().map((p) => (
+                                            <Avatar key={p.id} user={p} size={24} className={styles.participantAvatar} />
+                                        ))}
                                     </div>
                                 )}
                             </div>

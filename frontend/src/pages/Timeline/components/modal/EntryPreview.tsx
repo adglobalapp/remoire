@@ -135,18 +135,18 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
 
                         {entry.participants && entry.participants.length > 0 && (
                             <div className={styles.participantStack}>
-                                {entry.participants.slice(0, 3).map((p, idx) => (
+                                {entry.participants.slice(0, 4).map((p, idx) => (
                                     <div key={p.id} className={styles.avatarMiniWrapper} style={{ zIndex: 10 - idx }}>
                                         <Avatar user={p} size={34} />
                                     </div>
                                 ))}
-                                {entry.participants.length > 3 && (
+                                {entry.participants.length > 4 && (
                                     <Avatar
-                                        text={`+${entry.participants.length - 3}`}
+                                        text={`+${entry.participants.length - 4}`}
                                         size={34}
                                         backgroundColor="var(--color-dark-beige)"
-                                        color="var(--color-burgundy)"
                                         className={styles.avatarMore}
+                                        title={entry.participants.slice(4).map(p => p.name).join(', ')}
                                     />
                                 )}
                             </div>
