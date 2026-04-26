@@ -20,7 +20,7 @@ test('authenticated user can send friend request', function () {
     $this->actingAs($user)
         ->postJson('/api/relationships', ['target_id' => $target->id])
         ->assertStatus(200)
-        ->assertJson(['message' => 'Connection request sent.']);
+        ->assertJson(['message' => 'Request sent']);
 
     $this->assertDatabaseHas('relationships', [
         'user_id' => $user->id,

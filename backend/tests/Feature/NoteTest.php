@@ -60,7 +60,8 @@ test('user can delete their own note', function () {
 
     $this->actingAs($user)
         ->deleteJson("/api/notes/{$note->id}")
-        ->assertStatus(204);
+        ->assertStatus(200)
+        ->assertJson(['message' => 'Note deleted']);
 
     $this->assertDatabaseMissing('notes', ['id' => $note->id]);
 });
