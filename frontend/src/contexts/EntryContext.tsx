@@ -35,12 +35,19 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
                     setActiveEntry(data[0]);
                 } else if (!localStorage.getItem('remoire_initialized')) {
                     localStorage.setItem('remoire_initialized', '1');
-                    const newEntry = await apiCreateEntry('Untitled');
-                    if (newEntry) {
-                        setEntries([newEntry]);
-                        setActiveEntry(newEntry);
+                    try {
+                        const newEntry = await apiCreateEntry('Untitled');
+                        if (newEntry) {
+                            setEntries([newEntry]);
+                            setActiveEntry(newEntry);
+                        }
+                    } catch (err) {
+                        console.error('Failed to create initial entry:', err);
                     }
                 }
+            })
+            .catch((err) => {
+                console.error('Failed to fetch entries:', err);
             })
             .finally(() => {
                 setIsLoading(false);

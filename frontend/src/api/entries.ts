@@ -14,24 +14,28 @@ export const getEntries = async (): Promise<Entry[]> => {
 };
 
 export const createEntry = async (title: string) => {
-    const response = await fetch(`${API_BASE_URL}/entries`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({
-            title,
-            date: new Date().toISOString().split('T')[0],
-        }),
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/entries`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({
+                title,
+                date: new Date().toISOString().split('T')[0],
+            }),
+        });
 
-    const resData = await response.json();
-    if (!response.ok) {
-        let errorMessage = resData.message || 'Failed to create entry';
-        if (resData.errors) {
-            errorMessage = Object.values(resData.errors).flat().join(' ');
+        const resData = await response.json();
+        if (!response.ok) {
+            let errorMessage = resData.message || 'Failed to create entry';
+            if (resData.errors) {
+                errorMessage = Object.values(resData.errors).flat().join(' ');
+            }
+            throw new Error(errorMessage);
         }
-        throw new Error(errorMessage);
+        return resData;
+    } catch (error) {
+        throw error;
     }
-    return resData;
 };
 
 export const updateEntry = async (
@@ -40,36 +44,44 @@ export const updateEntry = async (
         participant_ids?: number[];
     },
 ) => {
-    const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
-        method: 'PUT',
-        headers: getHeaders(),
-        body: JSON.stringify(data),
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify(data),
+        });
 
-    const resData = await response.json();
+        const resData = await response.json();
 
-    if (!response.ok) {
-        let errorMessage = resData.message || 'Failed to update entry';
-        if (resData.errors) {
-            errorMessage = Object.values(resData.errors).flat().join(' ');
+        if (!response.ok) {
+            let errorMessage = resData.message || 'Failed to update entry';
+            if (resData.errors) {
+                errorMessage = Object.values(resData.errors).flat().join(' ');
+            }
+            const error = new Error(errorMessage) as ApiError;
+            error.status = response.status;
+            error.errors = resData.errors;
+            throw error;
         }
-        const error = new Error(errorMessage) as ApiError;
-        error.status = response.status;
-        error.errors = resData.errors;
+
+        return resData;
+    } catch (error) {
         throw error;
     }
-
-    return resData;
 };
 
 export const deleteEntry = async (id: number) => {
-    const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
-        method: 'DELETE',
-        headers: getHeaders(),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
-    return data;
+    try {
+        const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
+            method: 'DELETE',
+            headers: getHeaders(),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+        return data;
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const uploadImage = async (file: File): Promise<{ url?: string; message?: string; error?: string }> => {

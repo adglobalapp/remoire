@@ -18,8 +18,12 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
             setBlockedUserIds(new Set());
             return;
         }
-        const blocked = await getBlockedUsers();
-        setBlockedUserIds(new Set(blocked.map((u) => u.id)));
+        try {
+            const blocked = await getBlockedUsers();
+            setBlockedUserIds(new Set(blocked.map((u) => u.id)));
+        } catch (err) {
+            console.error('Failed to refresh blocked users:', err);
+        }
     }, [isAuthenticated]);
 
     useEffect(() => {

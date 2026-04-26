@@ -41,42 +41,58 @@ export const searchUsers = async (query: string): Promise<User[]> => {
 };
 
 export const sendRelationshipRequest = async (targetId: number) => {
-    const response = await fetch(`${API_BASE_URL}/relationships`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({ target_id: targetId }),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
-    return data;
+    try {
+        const response = await fetch(`${API_BASE_URL}/relationships`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ target_id: targetId }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+        return data;
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const acceptRelationshipRequest = async (userId: number) => {
-    const response = await fetch(`${API_BASE_URL}/relationships/${userId}/accept`, {
-        method: 'POST',
-        headers: getHeaders(),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
-    return data;
+    try {
+        const response = await fetch(`${API_BASE_URL}/relationships/${userId}/accept`, {
+            method: 'POST',
+            headers: getHeaders(),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+        return data;
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const deleteRelationship = async (userId: number) => {
-    const response = await fetch(`${API_BASE_URL}/relationships/${userId}`, {
-        method: 'DELETE',
-        headers: getHeaders(),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
-    return data;
+    try {
+        const response = await fetch(`${API_BASE_URL}/relationships/${userId}`, {
+            method: 'DELETE',
+            headers: getHeaders(),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+        return data;
+    } catch (error) {
+        throw error;
+    }
 };
 
 export const blockUser = async (userId: number) => {
-    const response = await fetch(`${API_BASE_URL}/relationships/${userId}/block`, {
-        method: 'POST',
-        headers: getHeaders(),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
-    return data;
+    try {
+        const response = await fetch(`${API_BASE_URL}/relationships/${userId}/block`, {
+            method: 'POST',
+            headers: getHeaders(),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+        return data;
+    } catch (error) {
+        throw error;
+    }
 };

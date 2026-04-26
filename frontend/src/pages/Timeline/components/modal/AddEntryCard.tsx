@@ -90,8 +90,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
             });
 
             if (!entryToEdit && activeTimeline && !activeTimeline.isDefault) {
-                const addRes = await addEntryToTimeline(activeTimeline.id, Number(selectedEntryId));
-                if (addRes?.message) toast.success(addRes.message);
+                await addEntryToTimeline(activeTimeline.id, Number(selectedEntryId));
             } else {
                 if (res?.message) toast.success(res.message);
             }
@@ -114,8 +113,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
 
         setIsDeleting(true);
         try {
-            const res = await removeEntryFromTimeline(activeTimeline.id, entryToEdit.id);
-            if (res?.message) toast.success(res.message);
+            await removeEntryFromTimeline(activeTimeline.id, entryToEdit.id);
             onClose();
         } catch (err: unknown) {
             const error = err as ApiError;

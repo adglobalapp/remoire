@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import * as api from '../api/timelines';
-import { type Timeline, type TimelineContextValue, type TimelineProviderProps } from '../types';
+import { type Timeline, type TimelineContextValue, type TimelineProviderProps, type ApiError } from '../types';
 import { useAuth } from './AuthContext';
 import toast from 'react-hot-toast';
 
@@ -40,8 +40,9 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
                     setTimelines([DEFAULT_TIMELINE]);
                     setActiveTimeline(DEFAULT_TIMELINE);
                 }
-            } catch {
-                toast.error('Failed to load timelines');
+            } catch (err) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to load timelines');
                 setTimelines([DEFAULT_TIMELINE]);
                 setActiveTimeline(DEFAULT_TIMELINE);
             } finally {
@@ -56,14 +57,20 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
     }, []);
 
     const createTimeline = useCallback(async (name: string) => {
-        const newTimeline = await api.createTimeline(name);
-        if (newTimeline) {
-            setTimelines((prev) => {
-                const next = [newTimeline, ...prev.filter((t) => !t.isDefault), ...prev.filter((t) => t.isDefault)];
-                return next;
-            });
-            setActiveTimeline(newTimeline);
-            return newTimeline;
+        try {
+            const newTimeline = await api.createTimeline(name);
+            if (newTimeline) {
+                setTimelines((prev) => {
+                    const next = [newTimeline, ...prev.filter((t) => !t.isDefault), ...prev.filter((t) => t.isDefault)];
+                    return next;
+                });
+                setActiveTimeline(newTimeline);
+                if (newTimeline.message) toast.success(newTimeline.message);
+                return newTimeline;
+            }
+        } catch (err) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to create timeline');
         }
         return null;
     }, []);
@@ -73,16 +80,22 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
             const timeline = timelines.find((t) => t.id === id);
             if (timeline?.isDefault) return;
 
-            const res = await api.deleteTimeline(id);
-            setTimelines((prev) => {
-                const next = prev.filter((t) => t.id !== id);
-                setActiveTimeline((curr) => {
-                    if (curr?.id === id) return next[0] || DEFAULT_TIMELINE;
-                    return curr;
+            try {
+                const res = await api.deleteTimeline(id);
+                setTimelines((prev) => {
+                    const next = prev.filter((t) => t.id !== id);
+                    setActiveTimeline((curr) => {
+                        if (curr?.id === id) return next[0] || DEFAULT_TIMELINE;
+                        return curr;
+                    });
+                    return next;
                 });
-                return next;
-            });
-            return res;
+                if (res?.message) toast.success(res.message);
+                return res;
+            } catch (err) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to delete timeline');
+            }
         },
         [timelines],
     );
@@ -98,9 +111,15 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
             const timeline = timelines.find((t) => t.id === timelineId);
             if (timeline?.isDefault || timeline?.entryIds.includes(entryId)) return;
 
-            const res = await api.addEntryToTimeline(timelineId, entryId);
-            updateTimelineState(timelineId, [...timeline!.entryIds, entryId]);
-            return res;
+            try {
+                const res = await api.addEntryToTimeline(timelineId, entryId);
+                updateTimelineState(timelineId, [...timeline!.entryIds, entryId]);
+                if (res?.message) toast.success(res.message);
+                return res;
+            } catch (err) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to add entry to timeline');
+            }
         },
         [timelines, updateTimelineState],
     );
@@ -110,12 +129,18 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
             const timeline = timelines.find((t) => t.id === timelineId);
             if (timeline?.isDefault || !timeline?.entryIds.includes(entryId)) return;
 
-            const res = await api.removeEntryFromTimeline(timelineId, entryId);
-            updateTimelineState(
-                timelineId,
-                timeline.entryIds.filter((id) => id !== entryId),
-            );
-            return res;
+            try {
+                const res = await api.removeEntryFromTimeline(timelineId, entryId);
+                updateTimelineState(
+                    timelineId,
+                    timeline.entryIds.filter((id) => id !== entryId),
+                );
+                if (res?.message) toast.success(res.message);
+                return res;
+            } catch (err) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to remove entry from timeline');
+            }
         },
         [timelines, updateTimelineState],
     );

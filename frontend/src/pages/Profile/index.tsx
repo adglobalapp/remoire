@@ -33,9 +33,14 @@ const Profile = () => {
 
     const fetchBlocked = useCallback(async (silent = false) => {
         if (!silent) setBlockedLoading(true);
-        const data = await getBlockedUsers();
-        setBlocked(data.map((u) => ({ ...u, relationship_status: 'blocked' })));
-        if (!silent) setBlockedLoading(false);
+        try {
+            const data = await getBlockedUsers();
+            setBlocked(data.map((u) => ({ ...u, relationship_status: 'blocked' })));
+        } catch (err) {
+            console.error('Failed to fetch blocked users:', err);
+        } finally {
+            if (!silent) setBlockedLoading(false);
+        }
     }, []);
 
     useEffect(() => {

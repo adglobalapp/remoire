@@ -47,8 +47,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         if (name) {
             setIsSaving(true);
             try {
-                const res = await createTimeline(name);
-                if (res?.message) toast.success(res.message);
+                await createTimeline(name);
                 setNewName('');
                 setIsCreating(false);
             } catch (err: unknown) {
@@ -72,8 +71,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         if (itemToDelete !== null) {
             setIsDeleting(true);
             try {
-                const res = await deleteTimeline(itemToDelete);
-                if (res?.message) toast.success(res.message);
+                await deleteTimeline(itemToDelete);
             } catch (err: unknown) {
                 const error = err as ApiError;
                 toast.error(error.message || 'Failed to delete timeline.');
