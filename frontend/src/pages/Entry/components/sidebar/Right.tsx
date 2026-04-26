@@ -5,7 +5,7 @@ import { useEntryContext } from '../../../../contexts/EntryContext';
 import { useLocation } from 'react-router-dom';
 import styles from './Right.module.css';
 import { getRelationships } from '../../../../api';
-import { type User, type LeftProps } from '../../../../types';
+import { type User, type LeftProps, type ApiError } from '../../../../types';
 import AddParticipant from '../modal/AddParticipant';
 import LocationPicker from '../modal/LocationPicker';
 import Avatar from '../../../../components/common/Avatar';
