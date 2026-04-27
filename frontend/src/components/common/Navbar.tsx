@@ -38,43 +38,47 @@ const Navbar = () => {
             </div>
 
             <div className={styles.authSection}>
-                {user && (
-                    <div className={styles.userInfo}>
-                        <div className={styles.userProfileTrigger} onClick={() => setProfileMenuOpen(!profileMenuOpen)}>
-                            <Avatar user={user} size={32} />
-                            <span className={styles.userName}>{user.name}</span>
-                        </div>
-
-                        {profileMenuOpen && (
-                            <div className={styles.profileDropdown}>
-                                <div className={styles.dropdownHeader}>
-                                    <span className={styles.dropdownHeaderName}>{user.name}</span>
-                                </div>
-                                <div
-                                    className={styles.dropdownItem}
-                                    onClick={() => {
-                                        navigate('/profile');
-                                        setProfileMenuOpen(false);
-                                    }}
-                                >
-                                    <User size={15} />
-                                    <span>My Profile</span>
-                                </div>
-                                <div className={styles.dropdownSeparator} />
-                                <div
-                                    className={`${styles.dropdownItem} ${styles.signOutItem}`}
-                                    onClick={() => {
-                                        logout();
-                                        setProfileMenuOpen(false);
-                                    }}
-                                >
-                                    <LogOut size={15} />
-                                    <span>Sign Out</span>
-                                </div>
+                <div className={styles.userInfo}>
+                    {user ? (
+                        <>
+                            <div className={styles.userProfileTrigger} onClick={() => setProfileMenuOpen(!profileMenuOpen)}>
+                                <Avatar user={user} size={32} />
+                                <span className={styles.userName}>{user.name}</span>
                             </div>
-                        )}
-                    </div>
-                )}
+
+                            {profileMenuOpen && (
+                                <div className={styles.profileDropdown}>
+                                    <div className={styles.dropdownHeader}>
+                                        <span className={styles.dropdownHeaderName}>{user.name}</span>
+                                    </div>
+                                    <div
+                                        className={styles.dropdownItem}
+                                        onClick={() => {
+                                            navigate('/profile');
+                                            setProfileMenuOpen(false);
+                                        }}
+                                    >
+                                        <User size={15} />
+                                        <span>My Profile</span>
+                                    </div>
+                                    <div className={styles.dropdownSeparator} />
+                                    <div
+                                        className={`${styles.dropdownItem} ${styles.signOutItem}`}
+                                        onClick={() => {
+                                            logout();
+                                            setProfileMenuOpen(false);
+                                        }}
+                                    >
+                                        <LogOut size={15} />
+                                        <span>Sign Out</span>
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <div className={styles.profileSkeleton} />
+                    )}
+                </div>
 
                 <button className={styles.hamburger} onClick={() => setMenuOpen((o) => !o)} aria-label="Toggle menu">
                     {menuOpen ? <X size={20} /> : <Menu size={20} />}

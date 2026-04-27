@@ -8,7 +8,7 @@
     height: 56px;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 50;
     overflow: visible;
 }
 
@@ -79,8 +79,28 @@
     align-items: center;
     gap: 1rem;
     position: relative;
-    min-width: 180px;
+    min-width: 160px;
     justify-content: flex-end;
+}
+
+.profileSkeleton {
+    width: 140px;
+    height: 32px;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 7px;
+    animation: skeletonPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes skeletonPulse {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 0.5;
+    }
 }
 
 .userProfileTrigger {
@@ -97,15 +117,6 @@
     color: var(--color-burgundy);
 }
 
-.avatar {
-    flex-shrink: 0;
-}
-
-.avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
 
 .userName {
     font-size: 1.4rem;
@@ -217,11 +228,6 @@
     }
 }
 
-.authButtons {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
 
 .hamburger {
     display: none;
@@ -349,13 +355,5 @@
 
     .mobileMenu {
         display: flex;
-    }
-
-    .userBadge {
-        display: none;
-    }
-
-    .logoutBtn {
-        display: none;
     }
 }

@@ -378,12 +378,6 @@
     border-color: rgba(255, 255, 255, 0.4);
 }
 
-.fixedGroup {
-    display: flex;
-    align-items: center;
-    gap: 0.1rem;
-    flex-shrink: 0;
-}
 
 .hiddenInput {
     display: none;

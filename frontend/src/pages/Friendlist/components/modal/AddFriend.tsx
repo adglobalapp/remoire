@@ -1,3 +1,4 @@
+import ReactDOM from 'react-dom';
 import { useState, useEffect, useCallback } from 'react';
 import { X, Search, UserPlus, Check, Clock, AlertCircle, Loader2 } from 'lucide-react';
 import classNames from 'classnames';
@@ -80,7 +81,7 @@ const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
         return null;
     };
 
-    return (
+    return ReactDOM.createPortal(
         <div className="global-modal-overlay" onClick={onClose}>
             <div className="global-modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
@@ -161,7 +162,8 @@ const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
                     )}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.getElementById('modal-root')!,
     );
 };
 

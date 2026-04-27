@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import * as api from '../api/timelines';
 import { type Timeline, type TimelineContextValue, type TimelineProviderProps, type ApiError } from '../types';
-import { useAuth } from './AuthContext';
 import toast from 'react-hot-toast';
 
 const DEFAULT_TIMELINE: Timeline = {
@@ -18,131 +17,88 @@ export const TimelineProvider = ({ children }: TimelineProviderProps) => {
     const [activeTimeline, setActiveTimeline] = useState<Timeline | null>(DEFAULT_TIMELINE);
     const [isLoading, setIsLoading] = useState(true);
 
-    const { token } = useAuth();
+    const refreshTimelines = useCallback(async (newActiveId?: number) => {
+        try {
+            const data = await api.getTimelines();
+            setTimelines(data);
+            setActiveTimeline((curr) => {
+                const targetId = newActiveId !== undefined ? newActiveId : curr?.id;
+                return data.find((t) => t.id === targetId) || data[0];
+            });
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to refresh timelines');
+        }
+    }, []);
 
     useEffect(() => {
-        if (!token) {
-            setTimelines([DEFAULT_TIMELINE]);
-            setActiveTimeline(DEFAULT_TIMELINE);
-            setIsLoading(false);
-            return;
-        }
-
-        const fetchTimelines = async () => {
-            setIsLoading(true);
-            try {
-                const data = await api.getTimelines();
-                if (data && data.length > 0) {
-                    const sorted = [...data].sort((a, b) => (a.isDefault ? 1 : b.isDefault ? -1 : 0));
-                    setTimelines(sorted);
-                    setActiveTimeline(sorted[0]);
-                } else {
-                    setTimelines([DEFAULT_TIMELINE]);
-                    setActiveTimeline(DEFAULT_TIMELINE);
-                }
-            } catch (err) {
-                const error = err as ApiError;
-                toast.error(error.message || 'Failed to load timelines');
-                setTimelines([DEFAULT_TIMELINE]);
-                setActiveTimeline(DEFAULT_TIMELINE);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchTimelines();
-    }, [token]);
+        setIsLoading(true);
+        refreshTimelines().finally(() => setIsLoading(false));
+    }, [refreshTimelines]);
 
     const selectTimeline = useCallback((timeline: Timeline) => {
         setActiveTimeline(timeline);
     }, []);
 
-    const createTimeline = useCallback(async (name: string) => {
-        try {
-            const newTimeline = await api.createTimeline(name);
-            if (newTimeline) {
-                setTimelines((prev) => {
-                    const next = [newTimeline, ...prev.filter((t) => !t.isDefault), ...prev.filter((t) => t.isDefault)];
-                    return next;
-                });
-                setActiveTimeline(newTimeline);
+    const createTimeline = useCallback(
+        async (name: string) => {
+            try {
+                const newTimeline = await api.createTimeline(name);
+                await refreshTimelines(newTimeline.id);
                 if (newTimeline.message) toast.success(newTimeline.message);
                 return newTimeline;
+            } catch (err: unknown) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to create timeline');
+                return null;
             }
-        } catch (err) {
-            const error = err as ApiError;
-            toast.error(error.message || 'Failed to create timeline');
-        }
-        return null;
-    }, []);
+        },
+        [refreshTimelines],
+    );
 
     const deleteTimeline = useCallback(
         async (id: number) => {
-            const timeline = timelines.find((t) => t.id === id);
-            if (timeline?.isDefault) return;
-
             try {
                 const res = await api.deleteTimeline(id);
-                setTimelines((prev) => {
-                    const next = prev.filter((t) => t.id !== id);
-                    setActiveTimeline((curr) => {
-                        if (curr?.id === id) return next[0] || DEFAULT_TIMELINE;
-                        return curr;
-                    });
-                    return next;
-                });
+                await refreshTimelines();
                 if (res?.message) toast.success(res.message);
                 return res;
-            } catch (err) {
+            } catch (err: unknown) {
                 const error = err as ApiError;
                 toast.error(error.message || 'Failed to delete timeline');
             }
         },
-        [timelines],
+        [refreshTimelines],
     );
-
-    const updateTimelineState = useCallback((id: number, entryIds: number[]) => {
-        const update = (t: Timeline) => (t.id === id ? { ...t, entryIds } : t);
-        setTimelines((prev) => prev.map(update));
-        setActiveTimeline((curr) => (curr?.id === id ? { ...curr, entryIds } : curr));
-    }, []);
 
     const addEntryToTimeline = useCallback(
         async (timelineId: number, entryId: number) => {
-            const timeline = timelines.find((t) => t.id === timelineId);
-            if (timeline?.isDefault || timeline?.entryIds.includes(entryId)) return;
-
             try {
                 const res = await api.addEntryToTimeline(timelineId, entryId);
-                updateTimelineState(timelineId, [...timeline!.entryIds, entryId]);
+                await refreshTimelines();
                 if (res?.message) toast.success(res.message);
                 return res;
-            } catch (err) {
+            } catch (err: unknown) {
                 const error = err as ApiError;
                 toast.error(error.message || 'Failed to add entry to timeline');
             }
         },
-        [timelines, updateTimelineState],
+        [refreshTimelines],
     );
 
     const removeEntryFromTimeline = useCallback(
         async (timelineId: number, entryId: number) => {
-            const timeline = timelines.find((t) => t.id === timelineId);
-            if (timeline?.isDefault || !timeline?.entryIds.includes(entryId)) return;
-
             try {
                 const res = await api.removeEntryFromTimeline(timelineId, entryId);
-                updateTimelineState(
-                    timelineId,
-                    timeline.entryIds.filter((id) => id !== entryId),
-                );
+                await refreshTimelines();
                 if (res?.message) toast.success(res.message);
                 return res;
-            } catch (err) {
+            } catch (err: unknown) {
                 const error = err as ApiError;
                 toast.error(error.message || 'Failed to remove entry from timeline');
             }
         },
-        [timelines, updateTimelineState],
+        [refreshTimelines],
     );
 
     return (

@@ -15,23 +15,17 @@ const EntryPage = () => {
             <Navbar />
 
             <main className="main-layout">
-                {isLoading ? (
-                    <Loader centered />
-                ) : (
-                    <>
-                        <div className="sidebar-left">
-                            <LeftSidebar isOpen={leftOpen} onToggle={toggleLeft} />
-                        </div>
+                <div className="sidebar-left">
+                    <LeftSidebar isOpen={leftOpen} onToggle={toggleLeft} />
+                </div>
 
-                        <section className="content-area-full">
-                            <Canvas key={activeEntry?.id ?? 'none'} />
-                        </section>
+                <section className="content-area-full">
+                    {isLoading ? <Loader centered /> : <Canvas key={activeEntry?.id ?? 'none'} />}
+                </section>
 
-                        <div className="sidebar-right">
-                            <RightSidebar isOpen={rightOpen} onToggle={toggleRight} />
-                        </div>
-                    </>
-                )}
+                <div className="sidebar-right">
+                    <RightSidebar isOpen={rightOpen} onToggle={toggleRight} />
+                </div>
             </main>
         </div>
     );

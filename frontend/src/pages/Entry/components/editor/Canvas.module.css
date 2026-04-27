@@ -11,10 +11,6 @@
     -webkit-user-select: text;
 }
 
-.noSelect {
-    user-select: none;
-    -webkit-user-select: none;
-}
 
 .isDragging {
     cursor: grabbing !important;

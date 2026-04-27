@@ -28,6 +28,12 @@
     opacity: 1;
 }
 
+.actionButton:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background-color: transparent;
+}
+
 .colorIndicator {
     position: absolute;
     bottom: 4px;

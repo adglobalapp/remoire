@@ -348,7 +348,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                 />
             )}
         </>,
-        document.body,
+        document.getElementById('modal-root')!,
     );
 };
 

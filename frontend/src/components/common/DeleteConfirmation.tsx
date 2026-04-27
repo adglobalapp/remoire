@@ -46,7 +46,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
                 </div>
             </div>
         </div>,
-        document.body,
+        document.getElementById('modal-root')!,
     );
 };
 

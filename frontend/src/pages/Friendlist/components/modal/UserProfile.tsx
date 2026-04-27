@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { X, Calendar, Mail, User as UserIcon, Clock, UserX, UserMinus } from 'lucide-react';
 import styles from './UserProfile.module.css';
 import { formatDate, formatRelativeDate } from '../../../../utils/dateUtils';
@@ -41,7 +42,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
         setIsUnblocking(false);
     };
 
-    return (
+    return ReactDOM.createPortal(
         <div className="global-modal-overlay" onClick={onClose}>
             <div className="global-modal-content" onClick={(e) => e.stopPropagation()}>
                 <button className="global-modal-close-btn" onClick={onClose}>
@@ -136,7 +137,8 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
                     onCancel={() => setShowBlockConfirm(false)}
                 />
             )}
-        </div>
+        </div>,
+        document.getElementById('modal-root')!,
     );
 };
 

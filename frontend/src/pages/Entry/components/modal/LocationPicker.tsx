@@ -1,3 +1,4 @@
+import ReactDOM from 'react-dom';
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import { X, Search, MapPin, Check, AlertCircle, Loader2 } from 'lucide-react';
@@ -46,14 +47,17 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
     const [isSaving, setIsSaving] = useState(false);
 
-    const handleSearch = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setFieldErrors({});
-        if (!searchQuery.trim()) return;
+    const performSearch = async (query: string) => {
+        if (!query.trim()) {
+            setSearchResults([]);
+            return;
+        }
 
         setIsSearching(true);
+        setFieldErrors({});
+
         try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
             const data = (await response.json()) as NominatimResult[];
             if (data.length === 0) {
                 setFieldErrors({ search: ['No results found for this location.'] });
@@ -65,6 +69,23 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
         } finally {
             setIsSearching(false);
         }
+    };
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchQuery) {
+                performSearch(searchQuery);
+            } else {
+                setSearchResults([]);
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    const handleSearch = async (e: React.FormEvent) => {
+        e.preventDefault();
+        performSearch(searchQuery);
     };
 
     const selectResult = (result: NominatimResult) => {
@@ -121,7 +142,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
         return null;
     };
 
-    return (
+    return ReactDOM.createPortal(
         <div className="global-modal-overlay" onClick={onClose}>
             <div className={`global-modal-content ${styles.modalContent}`} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
@@ -142,23 +163,23 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
+
+                                {searchResults.length > 0 && (
+                                    <div className={styles.searchResults}>
+                                        {searchResults.map((result) => (
+                                            <div key={result.place_id} className={styles.resultItem} onClick={() => selectResult(result)}>
+                                                <MapPin size={16} className={styles.resultIcon} />
+                                                <span className={styles.resultText}>{result.display_name}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                             <button type="submit" className={`btn btn-dark ${styles.searchBtn}`} disabled={isSearching}>
-                                {isSearching ? '...' : <Search size={18} />}
+                                <Search size={18} />
                             </button>
                         </form>
                         {renderFieldError('search')}
-
-                        {searchResults.length > 0 && (
-                            <div className={styles.searchResults}>
-                                {searchResults.map((result) => (
-                                    <div key={result.place_id} className={styles.resultItem} onClick={() => selectResult(result)}>
-                                        <MapPin size={16} />
-                                        <span>{result.display_name}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
                     </div>
 
                     <div className={styles.mapContainer}>
@@ -198,7 +219,8 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.getElementById('modal-root')!,
     );
 };
 

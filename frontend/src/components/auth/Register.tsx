@@ -1,3 +1,4 @@
+import ReactDOM from 'react-dom';
 import React, { useState } from 'react';
 import { X, UserPlus, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -53,7 +54,7 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
         );
     };
 
-    return (
+    return ReactDOM.createPortal(
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <button className={styles.closeBtn} onClick={onClose} aria-label="Close modal">
@@ -141,7 +142,8 @@ const Register: React.FC<RegisterProps> = ({ onClose, onSwitchToLogin }) => {
                     </p>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.getElementById('modal-root')!,
     );
 };
 

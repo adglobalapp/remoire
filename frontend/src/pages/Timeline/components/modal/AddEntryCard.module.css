@@ -9,7 +9,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 100;
     animation: fadeIn 0.2s ease-out;
 }
 
@@ -145,7 +144,7 @@
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    z-index: 30;
+    z-index: 5;
     max-height: 250px;
     overflow-y: auto;
     animation: fadeIn 0.15s ease-out;
@@ -204,6 +203,7 @@
     text-align: center;
     opacity: 0.5;
 }
+
 
 .colorPalette {
     display: flex;
@@ -313,6 +313,8 @@
     color: var(--color-error);
     font-weight: 500;
 }
+
+
 
 .modalFooter {
     display: flex;

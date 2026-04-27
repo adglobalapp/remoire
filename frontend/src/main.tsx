@@ -8,8 +8,15 @@ import '@fontsource/gudea/400.css';
 import '@fontsource/gudea/700.css';
 import '@fontsource/kaushan-script/400.css';
 
+import { AuthProvider } from './contexts/AuthContext';
+import { UserProfileProvider } from './contexts/UserProfileContext';
+
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <App />
+        <AuthProvider>
+            <UserProfileProvider>
+                <App />
+            </UserProfileProvider>
+        </AuthProvider>
     </StrictMode>,
 );

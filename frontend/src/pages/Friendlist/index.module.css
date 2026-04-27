@@ -203,9 +203,7 @@
     margin-right: 4px;
 }
 
-.pendingStatus {
-    opacity: 0.6;
-}
+
 
 @media (max-width: 600px) {
     .container {

@@ -167,7 +167,7 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
                 </div>
             </div>
         </div>,
-        document.body,
+        document.getElementById('modal-root')!,
     );
 };
 

@@ -12,7 +12,11 @@ class TimelineController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $timelines = $user->timelines()->with('entries:id')->get();
+        $timelines = $user->timelines()
+            ->with('entries:id')
+            ->orderBy('is_default', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         if ($timelines->isEmpty()) {
             $default = $user->timelines()->create([

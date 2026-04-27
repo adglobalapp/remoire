@@ -1,3 +1,4 @@
+import ReactDOM from 'react-dom';
 import React, { useState, useEffect } from 'react';
 import { Trash2, Bold, Italic, Underline, Heading1, Heading2, ListChecks, Type, Pin, X, Loader2 } from 'lucide-react';
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -57,7 +58,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
 
     if (!editor) return null;
 
-    return (
+    return ReactDOM.createPortal(
         <div className="global-modal-overlay" onClick={onClose}>
             <div
                 className={`${styles.modalContent} global-modal-content`}
@@ -186,7 +187,8 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.getElementById('modal-root')!,
     );
 };
 

@@ -51,10 +51,6 @@
     font-family: var(--font-body);
 }
 
-.iconColor {
-    color: var(--color-burgundy);
-    opacity: 0.8;
-}
 
 .locationDisplay {
     display: flex;
@@ -256,50 +252,6 @@
     pointer-events: none;
 }
 
-.friendSelectContainer {
-    margin-top: 15px;
-    padding: 12px;
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 8px;
-    border: 1px dashed rgba(0, 0, 0, 0.1);
-}
-
-.sectionDivider {
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    opacity: 0.5;
-    margin-bottom: 10px;
-    font-weight: 500;
-}
-
-.friendSelectScroll {
-    max-height: 150px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.friendSelectItem {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.friendSelectItem:hover {
-    background: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.friendSelectItem span {
-    font-size: 1.3rem;
-    font-family: var(--font-body);
-}
 
 .fullWidth {
     width: 100%;

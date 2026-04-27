@@ -1,3 +1,4 @@
+import ReactDOM from 'react-dom';
 import { X, UserPlus, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import styles from './AddParticipant.module.css';
@@ -20,7 +21,7 @@ const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectUser, 
         }
     };
 
-    return (
+    return ReactDOM.createPortal(
         <div className="global-modal-overlay" onClick={onClose}>
             <div className="global-modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
@@ -79,7 +80,8 @@ const AddParticipant: React.FC<AddParticipantProps> = ({ onClose, onSelectUser, 
                     )}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.getElementById('modal-root')!,
     );
 };
 

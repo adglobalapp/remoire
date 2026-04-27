@@ -9,7 +9,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 10000;
     animation: fadeIn 0.2s ease-out;
 }
 
@@ -124,14 +123,6 @@
     box-shadow: 0 0 0 4px rgba(116, 33, 33, 0.1);
 }
 
-.errorMessage {
-    color: var(--color-error);
-    font-size: 1.2rem;
-    margin-top: 1px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
 
 .submitBtn {
     width: 100%;
@@ -166,10 +157,6 @@
     cursor: not-allowed;
 }
 
-.submitBtn :global(.loading-icon) {
-    color: var(--color-light-beige) !important;
-    opacity: 1 !important;
-}
 
 .modalFooter {
     text-align: center;

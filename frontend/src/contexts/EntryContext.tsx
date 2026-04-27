@@ -3,7 +3,6 @@ import toast from 'react-hot-toast';
 import { getEntries, createEntry as apiCreateEntry, updateEntry as apiUpdateEntry, deleteEntry as apiDeleteEntry } from '../api/entries';
 import { type Entry, type EntryContextValue, type EntryProviderProps, type ApiError } from '../types';
 import { useAutoSave } from '../hooks/useAutoSave';
-import { useAuth } from './AuthContext';
 
 export const EntryContext = createContext<EntryContextValue | null>(null);
 
@@ -13,17 +12,7 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
     const [isLoading, setIsLoading] = useState(true);
     const { saveEntry } = useAutoSave(setEntries, setActiveEntry);
 
-    const { token } = useAuth();
-
     useEffect(() => {
-        if (!token) {
-            setEntries([]);
-            setActiveEntry(null);
-            setIsLoading(false);
-            return;
-        }
-
-        setIsLoading(true);
         getEntries()
             .then(async (data) => {
                 if (data && data.length > 0) {
@@ -48,7 +37,7 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
             .finally(() => {
                 setIsLoading(false);
             });
-    }, [token]);
+    }, []);
 
     const selectEntry = useCallback((entry: Entry) => {
         setActiveEntry(entry);
@@ -71,10 +60,9 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
             const res = await apiDeleteEntry(id);
             setEntries((prev) => {
                 const newList = prev.filter((e) => e.id !== id);
-                setActiveEntry((curr) => {
-                    if (curr?.id === id) return newList.length > 0 ? newList[0] : null;
-                    return curr;
-                });
+                if (activeEntry?.id === id) {
+                    setActiveEntry(newList[0] || null);
+                }
                 return newList;
             });
             if (res.message) toast.success(res.message);
@@ -82,7 +70,7 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
             const error = err as ApiError;
             toast.error(error.message || 'Failed to delete entry.');
         }
-    }, []);
+    }, [activeEntry]);
 
     const updateEntry = useCallback(
         async (id: number, data: Partial<Entry>) => {
@@ -108,7 +96,7 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
                 throw error;
             }
         },
-        [entries],
+        [activeEntry],
     );
 
     return (

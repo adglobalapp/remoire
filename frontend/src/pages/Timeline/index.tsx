@@ -7,26 +7,18 @@ import { useResponsiveSidebar } from '../../hooks/useResponsiveSidebar';
 
 const TimelinePage = () => {
     const { leftOpen: isLeftOpen, toggleLeft } = useResponsiveSidebar();
-    const { isLoading, activeTimeline } = useTimelineContext();
+    const { isLoading } = useTimelineContext();
 
     return (
         <div className="page-container">
             <Navbar />
 
             <main className="main-layout">
-                {isLoading && !activeTimeline ? (
-                    <Loader centered />
-                ) : (
-                    <div className="display-contents" data-reloading={isLoading ? '' : undefined}>
-                        <div className="sidebar-left">
-                            <Sidebar isOpen={isLeftOpen} onToggle={toggleLeft} />
-                        </div>
+                <div className="sidebar-left">
+                    <Sidebar isOpen={isLeftOpen} onToggle={toggleLeft} />
+                </div>
 
-                        <section className="content-area-full">
-                            <Canvas />
-                        </section>
-                    </div>
-                )}
+                <section className="content-area-full">{isLoading ? <Loader centered /> : <Canvas />}</section>
             </main>
         </div>
     );
