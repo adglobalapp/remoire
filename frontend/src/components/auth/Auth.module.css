@@ -123,7 +123,6 @@
     box-shadow: 0 0 0 4px rgba(116, 33, 33, 0.1);
 }
 
-
 .submitBtn {
     width: 100%;
     padding: 14px;
@@ -156,7 +155,6 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
-
 
 .modalFooter {
     text-align: center;

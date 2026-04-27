@@ -51,7 +51,6 @@
     font-family: var(--font-body);
 }
 
-
 .locationDisplay {
     display: flex;
     flex-direction: column;
@@ -251,7 +250,6 @@
     opacity: 0;
     pointer-events: none;
 }
-
 
 .fullWidth {
     width: 100%;

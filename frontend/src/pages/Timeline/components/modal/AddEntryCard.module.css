@@ -204,7 +204,6 @@
     opacity: 0.5;
 }
 
-
 .colorPalette {
     display: flex;
     gap: 12px;
@@ -313,8 +312,6 @@
     color: var(--color-error);
     font-weight: 500;
 }
-
-
 
 .modalFooter {
     display: flex;

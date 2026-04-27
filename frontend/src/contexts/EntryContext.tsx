@@ -55,22 +55,25 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
         }
     }, []);
 
-    const deleteEntry = useCallback(async (id: number) => {
-        try {
-            const res = await apiDeleteEntry(id);
-            setEntries((prev) => {
-                const newList = prev.filter((e) => e.id !== id);
-                if (activeEntry?.id === id) {
-                    setActiveEntry(newList[0] || null);
-                }
-                return newList;
-            });
-            if (res.message) toast.success(res.message);
-        } catch (err: unknown) {
-            const error = err as ApiError;
-            toast.error(error.message || 'Failed to delete entry.');
-        }
-    }, [activeEntry]);
+    const deleteEntry = useCallback(
+        async (id: number) => {
+            try {
+                const res = await apiDeleteEntry(id);
+                setEntries((prev) => {
+                    const newList = prev.filter((e) => e.id !== id);
+                    if (activeEntry?.id === id) {
+                        setActiveEntry(newList[0] || null);
+                    }
+                    return newList;
+                });
+                if (res.message) toast.success(res.message);
+            } catch (err: unknown) {
+                const error = err as ApiError;
+                toast.error(error.message || 'Failed to delete entry.');
+            }
+        },
+        [activeEntry],
+    );
 
     const updateEntry = useCallback(
         async (id: number, data: Partial<Entry>) => {
