@@ -1,6 +1,6 @@
 import Navbar from '../../components/common/Navbar';
-import LeftSidebar from './components/sidebar/Left';
-import RightSidebar from './components/sidebar/Right';
+import LeftSidebar from './components/sidebar/left/Left';
+import RightSidebar from './components/sidebar/right/Right';
 import Canvas from './components/editor/Canvas';
 import Loader from '../../components/common/Loader';
 import { useEntryContext } from '../../contexts/EntryContext';
@@ -8,7 +8,7 @@ import { useResponsiveSidebar } from '../../hooks/useResponsiveSidebar';
 
 const EntryPage = () => {
     const { activeEntry, isLoading } = useEntryContext();
-    const { leftOpen, rightOpen, toggleLeft, toggleRight } = useResponsiveSidebar();
+    const { leftOpen, rightOpen, toggleLeft, toggleRight } = useResponsiveSidebar(activeEntry?.id);
 
     return (
         <div className="page-container">

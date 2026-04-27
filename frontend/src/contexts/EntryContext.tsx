@@ -10,7 +10,7 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
     const [entries, setEntries] = useState<Entry[]>([]);
     const [activeEntry, setActiveEntry] = useState<Entry | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const { saveEntry } = useAutoSave(setEntries, setActiveEntry);
+    const { dispatchSave } = useAutoSave(setEntries, setActiveEntry);
 
     useEffect(() => {
         getEntries()
@@ -77,11 +77,6 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
 
     const updateEntry = useCallback(
         async (id: number, data: Partial<Entry>) => {
-            const original = entries.find((e) => e.id === id);
-
-            setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, ...data } : e)));
-            setActiveEntry((prev) => (prev?.id === id ? { ...prev, ...data } : prev));
-
             try {
                 const updated = await apiUpdateEntry(id, data);
                 if (updated) {
@@ -92,14 +87,10 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
             } catch (err: unknown) {
                 const error = err as ApiError;
                 toast.error(error.message || 'Failed to save changes.');
-                if (original) {
-                    setEntries((prev) => prev.map((e) => (e.id === id ? original : e)));
-                    setActiveEntry((prev) => (prev?.id === id ? original : prev));
-                }
                 throw error;
             }
         },
-        [activeEntry],
+        [setActiveEntry, setEntries],
     );
 
     return (
@@ -111,7 +102,7 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
                 selectEntry,
                 createEntry,
                 deleteEntry,
-                saveEntry,
+                dispatchSave,
                 updateEntry,
             }}
         >

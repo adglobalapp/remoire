@@ -7,52 +7,45 @@ export const useAutoSave = (
     setEntries: React.Dispatch<React.SetStateAction<Entry[]>>,
     setActiveEntry: React.Dispatch<React.SetStateAction<Entry | null>>,
 ) => {
-    const savingRef = useRef(false);
-    const pendingSavesRef = useRef<Map<number, { title: string; content: string }>>(new Map());
+    const isSaving = useRef(false);
+    const processQueue = useRef<Map<number, { title: string; content: string }>>(new Map());
 
-    const processQueue = useCallback(
-        async function process() {
-            if (savingRef.current || pendingSavesRef.current.size === 0) return;
+    const autoSave = useCallback(async function nextSave() {
+        if (isSaving.current || processQueue.current.size === 0) return;
 
-            savingRef.current = true;
-            const entry = pendingSavesRef.current.entries().next().value;
-            if (!entry) {
-                savingRef.current = false;
-                return;
-            }
+        isSaving.current = true;
+        const entry = processQueue.current.entries().next().value;
+        if (!entry) {
+            isSaving.current = false;
+            return;
+        }
 
-            const [id, data] = entry;
-            pendingSavesRef.current.delete(id);
+        const [id, data] = entry;
+        processQueue.current.delete(id);
+
+        try {
+            await apiUpdateEntry(id, data);
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to save changes.', { id: 'save-error' });
+        } finally {
+            isSaving.current = false;
+            nextSave();
+        }
+    }, []);
+
+    const dispatchSave = useCallback(
+        (id: number, title: string, content: string) => {
+            const data = { title, content };
+            processQueue.current.set(id, data);
 
             setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, ...data } : e)));
             setActiveEntry((prev) => (prev?.id === id ? { ...prev, ...data } : prev));
 
-            try {
-                const updated = await apiUpdateEntry(id, data);
-                if (updated) {
-                    setEntries((prev) => prev.map((e) => (e.id === id ? updated : e)));
-                    setActiveEntry((prev) => (prev?.id === id ? updated : prev));
-                } else {
-                    toast.error('Failed to save changes.', { id: 'save-error' });
-                }
-            } catch (err: unknown) {
-                const error = err as ApiError;
-                toast.error(error.message || 'Failed to auto-save changes.', { id: 'save-error' });
-            } finally {
-                savingRef.current = false;
-                process();
-            }
+            autoSave();
         },
-        [setEntries, setActiveEntry],
+        [autoSave, setEntries, setActiveEntry],
     );
 
-    const saveEntry = useCallback(
-        (id: number, title: string, content: string) => {
-            pendingSavesRef.current.set(id, { title, content });
-            processQueue();
-        },
-        [processQueue],
-    );
-
-    return { saveEntry };
+    return { dispatchSave, isSaving: isSaving.current };
 };

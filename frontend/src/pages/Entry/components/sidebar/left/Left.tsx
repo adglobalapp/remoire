@@ -1,43 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Trash2, Plus, Search, PanelLeft, X, Loader2 } from 'lucide-react';
-import DeleteConfirmation from '../../../../components/common/DeleteConfirmation';
-import { useEntryContext } from '../../../../contexts/EntryContext';
-import { formatDateTime } from '../../../../utils/dateUtils';
-import { useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Plus, PanelLeft, X, Loader2 } from 'lucide-react';
+import DeleteConfirmation from '../../../../../components/common/DeleteConfirmation';
+import { useEntryContext } from '../../../../../contexts/EntryContext';
 import styles from './Left.module.css';
-import { type LeftProps } from '../../../../types';
+import { type LeftProps } from '../../../../../types';
+import EntryItem from './components/EntryItem';
+import Filter from './components/Filter';
 
 const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const { entries, activeEntry, selectEntry, createEntry, deleteEntry } = useEntryContext();
-    const [activeFilter, setActiveFilter] = useState<string>('all');
+    const [activeFilter, setActiveFilter] = useState<'all' | 'today' | 'this-month' | 'this-year'>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [itemToDelete, setItemToDelete] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
-    const { pathname } = useLocation();
-    const lastPage = useRef(pathname);
-    const lastId = useRef(activeEntry?.id);
     const mobileOpen = propOpen || false;
     const toggle = onToggle || (() => {});
-
-    useEffect(() => {
-        const isLargeScreen = window.innerWidth > 1400;
-        if (isLargeScreen) return;
-
-        const pageChanged = pathname !== lastPage.current;
-        const entryChanged = activeEntry?.id !== lastId.current;
-
-        if (pageChanged || entryChanged) {
-            if (onToggle && propOpen) {
-                onToggle();
-            }
-        }
-    }, [pathname, activeEntry?.id, onToggle, propOpen]);
-
-    useEffect(() => {
-        lastPage.current = pathname;
-        lastId.current = activeEntry?.id;
-    }, [pathname, activeEntry?.id]);
 
     const filteredEntries = entries.filter((entry) => {
         const matchesSearch = (entry.title || '').toLowerCase().includes(searchQuery.toLowerCase());
@@ -79,9 +57,6 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
         setIsCreating(true);
         try {
             await createEntry();
-            if (window.innerWidth <= 1400 && onToggle && propOpen) {
-                onToggle();
-            }
         } finally {
             setIsCreating(false);
         }
@@ -94,7 +69,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                 onClick={toggle}
                 aria-label={mobileOpen ? 'Close sidebar' : 'Open sidebar'}
             >
-                {<PanelLeft size={20} />}
+                <PanelLeft size={20} />
             </button>
 
             <aside className="sidebar-container">
@@ -107,18 +82,13 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
 
                 <div className="sidebar-list">
                     {filteredEntries.map((entry) => (
-                        <div
-                            key={entry.id}
-                            className={`sidebar-item ${activeEntry?.id === entry.id ? 'active' : ''}`}
-                            onClick={() => selectEntry(entry)}
-                        >
-                            <div className="sidebar-item-info">
-                                <span className="sidebar-item-title">{entry.title || 'Untitled'}</span>
-                                <span className="sidebar-item-meta">{formatDateTime(entry.created_at)}</span>
-                            </div>
-                            <button className="sidebar-delete-btn" onClick={(e) => handleDelete(e, entry.id)}>
-                                <Trash2 size={16} />
-                            </button>
+                        <div key={entry.id} className={styles.sidebarItemAnimate}>
+                            <EntryItem
+                                entry={entry}
+                                isActive={activeEntry?.id === entry.id}
+                                onSelect={selectEntry}
+                                onDelete={handleDelete}
+                            />
                         </div>
                     ))}
 
@@ -137,27 +107,12 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                             </>
                         )}
                     </button>
-                    <div className="sidebar-search-box">
-                        <input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-                        <Search size={16} className="sidebar-search-icon" />
-                    </div>
-                    <div className={styles.filterRow}>
-                        {(['all', 'today', 'this-month', 'this-year'] as const).map((filter) => (
-                            <span
-                                key={filter}
-                                className={`${styles.filterItem} ${activeFilter === filter ? styles.active : ''}`}
-                                onClick={() => setActiveFilter(filter)}
-                            >
-                                {filter === 'all'
-                                    ? 'All'
-                                    : filter === 'today'
-                                      ? 'Today'
-                                      : filter === 'this-month'
-                                        ? 'This month'
-                                        : 'This year'}
-                            </span>
-                        ))}
-                    </div>
+                    <Filter
+                        searchQuery={searchQuery}
+                        setSearchQuery={setSearchQuery}
+                        activeFilter={activeFilter}
+                        setActiveFilter={setActiveFilter}
+                    />
                 </div>
 
                 {itemToDelete !== null && (

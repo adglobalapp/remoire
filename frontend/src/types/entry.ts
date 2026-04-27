@@ -8,7 +8,7 @@ export interface EntryContextValue {
     selectEntry: (entry: Entry) => void;
     createEntry: () => Promise<void>;
     deleteEntry: (id: number) => Promise<void>;
-    saveEntry: (id: number, title: string, content: string) => void;
+    dispatchSave: (id: number, title: string, content: string) => void;
     updateEntry: (id: number, data: Partial<Entry> & { participant_ids?: number[] }) => Promise<Entry & { message?: string }>;
 }
 

@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
-export const useResponsiveSidebar = (breakpoint = 1400) => {
+export const useResponsiveSidebar = (activeEntryId?: number, breakpoint = 1400) => {
     const isLargeScreen = typeof window !== 'undefined' && window.innerWidth > breakpoint;
 
     const [leftOpen, setLeftOpen] = useState(isLargeScreen);
     const [rightOpen, setRightOpen] = useState(isLargeScreen);
+    const lastEntryId = useRef(activeEntryId);
 
     useEffect(() => {
         const handleResize = () => {
@@ -16,6 +17,20 @@ export const useResponsiveSidebar = (breakpoint = 1400) => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, [breakpoint]);
+
+    useEffect(() => {
+        const isMobile = window.innerWidth <= breakpoint;
+        if (!isMobile) return;
+
+        const entryChanged = activeEntryId !== lastEntryId.current;
+
+        if (entryChanged) {
+            setLeftOpen(false);
+            setRightOpen(false);
+        }
+
+        lastEntryId.current = activeEntryId;
+    }, [activeEntryId, breakpoint]);
 
     const toggleLeft = () => {
         const isMobile = window.innerWidth <= breakpoint;

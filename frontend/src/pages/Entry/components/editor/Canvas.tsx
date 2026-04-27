@@ -18,7 +18,7 @@ import { type Transaction } from '@tiptap/pm/state';
 import styles from './Canvas.module.css';
 
 const Canvas = () => {
-    const { activeEntry, saveEntry } = useEntryContext();
+    const { activeEntry, dispatchSave } = useEntryContext();
 
     const { transform, setTransform, isDragging, containerRef, handleMouseDown, handleTouchStart } = useCanvasNavigation({
         minScale: 0.4,
@@ -96,7 +96,6 @@ const Canvas = () => {
         return findFirstText(json) || 'Untitled';
     };
 
-    const { updateEntry } = useEntryContext();
     useEffect(() => {
         if (!editor || initialEntryId === null) return;
         const handleUpdate = ({ transaction }: { transaction: Transaction }) => {
@@ -105,21 +104,17 @@ const Canvas = () => {
             const contentJSON = editor.getJSON();
             const currentTitle = extractTitleFromJSON(contentJSON as TiptapNode);
 
-            if (currentTitle !== activeEntry?.title) {
-                updateEntry(initialEntryId, { title: currentTitle });
-            }
-
             const serialized = JSON.stringify({
                 contentJSON,
                 pageSettings: pageSettingsRef.current,
             });
-            saveEntry(initialEntryId, currentTitle, serialized);
+            dispatchSave(initialEntryId, currentTitle, serialized);
         };
         editor.on('update', handleUpdate);
         return () => {
             editor.off('update', handleUpdate);
         };
-    }, [editor, saveEntry, initialEntryId, activeEntry?.title, updateEntry]);
+    }, [editor, dispatchSave, initialEntryId]);
 
     useEffect(() => {
         if (!editor || !activeEntry || (loadedEntryIdRef.current === activeEntry.id && lastContentRef.current === activeEntry.content))
@@ -204,7 +199,7 @@ const Canvas = () => {
                 contentJSON,
                 pageSettings: newSettings,
             });
-            saveEntry(initialEntryId, currentTitle, serialized);
+            dispatchSave(initialEntryId, currentTitle, serialized);
         }
     };
 

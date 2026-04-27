@@ -27,6 +27,20 @@ export interface EntryCardProps {
     index?: number;
 }
 
+export interface EntryItemProps {
+    entry: Entry;
+    isActive: boolean;
+    onSelect: (entry: Entry) => void;
+    onDelete: (e: React.MouseEvent, id: number) => void;
+}
+
+export interface FilterProps {
+    searchQuery: string;
+    setSearchQuery: (query: string) => void;
+    activeFilter: 'all' | 'today' | 'this-month' | 'this-year';
+    setActiveFilter: (filter: 'all' | 'today' | 'this-month' | 'this-year') => void;
+}
+
 export interface AddEntryCardProps {
     onClose: () => void;
     entryToEdit?: Entry;
