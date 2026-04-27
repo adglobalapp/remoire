@@ -1,0 +1,105 @@
+.standaloneList {
+    margin-top: 10px;
+    width: 100%;
+}
+
+.listHeader {
+    background: var(--color-burgundy);
+    padding: 10px 24px;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    color: var(--color-light-beige);
+    font-weight: 400;
+    font-family: var(--font-ui);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.listContainer {
+    background: var(--color-light-beige);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    border-top: none;
+}
+
+.listRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    transition: background 0.2s;
+}
+
+.listRow:last-child {
+    border-bottom: none;
+}
+
+.listRow:hover {
+    background: rgba(84, 29, 48, 0.02);
+}
+
+.listUser {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.listUser span {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--color-dark-brown);
+    font-family: var(--font-ui), serif;
+}
+
+.badgeButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0px 14px;
+    border-radius: 50px;
+    font-size: 1.2rem !important;
+    font-weight: 400;
+    transition: all 0.2s;
+    border: 1px solid rgba(84, 29, 48, 0.2);
+    background: rgba(84, 29, 48, 0.04);
+    color: var(--color-burgundy);
+    white-space: nowrap;
+    height: 30px;
+    line-height: 1;
+    cursor: pointer;
+    font-family: var(--font-ui);
+}
+
+.badgeButton:hover {
+    background: var(--color-burgundy);
+    color: white;
+    border-color: var(--color-burgundy);
+}
+
+.loadingWrapper {
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+}
+
+.emptyPadded {
+    padding: 40px;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.dimmed {
+    opacity: 0.3;
+}
+
+@media (max-width: 700px) {
+    .listRow {
+        padding: 10px 16px;
+    }
+}

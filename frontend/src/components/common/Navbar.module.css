@@ -83,24 +83,9 @@
     justify-content: flex-end;
 }
 
-.profileSkeleton {
+.userInfoPlaceholder {
     width: 140px;
     height: 32px;
-    background-color: rgba(0, 0, 0, 0.03);
-    border-radius: 7px;
-    animation: skeletonPulse 1.5s infinite ease-in-out;
-}
-
-@keyframes skeletonPulse {
-    0% {
-        opacity: 0.5;
-    }
-    50% {
-        opacity: 0.8;
-    }
-    100% {
-        opacity: 0.5;
-    }
 }
 
 .userProfileTrigger {

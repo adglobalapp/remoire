@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
 import { useState, useEffect, useCallback } from 'react';
-import { X, Search, UserPlus, Check, Clock, AlertCircle, Loader2 } from 'lucide-react';
+import { X, Search, UserPlus, Check, Clock, Loader2 } from 'lucide-react';
 import classNames from 'classnames';
 import styles from './AddFriend.module.css';
 import { type User as UserType, type ApiError } from '../../../../types';
@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { type AddConnectionProps } from '../../../../types';
 import Avatar from '../../../../components/common/Avatar';
 import { useUserProfile } from '../../../../contexts/UserProfileContext';
+import FieldError from '../../../../components/common/FieldError';
 
 const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
     const [query, setQuery] = useState('');
@@ -65,22 +66,6 @@ const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
         }
     };
 
-    const renderFieldError = (fieldName: string) => {
-        const errors = fieldErrors[fieldName];
-        if (errors && errors.length > 0) {
-            return (
-                <div className={`field-errors-container ${styles.fieldErrorsFixed}`}>
-                    {errors.map((msg, idx) => (
-                        <span key={idx} className="field-error-text">
-                            <AlertCircle size={16} /> {msg}
-                        </span>
-                    ))}
-                </div>
-            );
-        }
-        return null;
-    };
-
     return ReactDOM.createPortal(
         <div className="global-modal-overlay" onClick={onClose}>
             <div className="global-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -104,7 +89,7 @@ const AddFriend: React.FC<AddConnectionProps> = ({ onClose, onRefresh }) => {
                             autoFocus
                         />
                     </div>
-                    {renderFieldError('query') || renderFieldError('search') || renderFieldError('friend_code')}
+                    <FieldError errors={fieldErrors.query || fieldErrors.search || fieldErrors.friend_code} />
                 </div>
 
                 <div className={styles.resultsList}>

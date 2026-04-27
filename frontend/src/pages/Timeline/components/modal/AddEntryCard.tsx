@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Upload, Palette, ChevronDown, Plus, Trash2, AlertCircle, Loader2 } from 'lucide-react';
+import { X, Upload, Palette, ChevronDown, Plus, Trash2, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadImage } from '../../../../api';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
 import DeleteConfirmation from '../../../../components/common/DeleteConfirmation';
+import FieldError from '../../../../components/common/FieldError';
 import { type AddEntryCardProps, type ApiError } from '../../../../types';
 import { PRESET_COLORS } from '../../../../utils/constants';
 import styles from './AddEntryCard.module.css';
@@ -124,22 +125,6 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
         }
     };
 
-    const renderFieldError = (fieldName: string) => {
-        const errors = fieldErrors[fieldName];
-        if (errors && errors.length > 0) {
-            return (
-                <div className="field-errors-container">
-                    {errors.map((msg, idx) => (
-                        <span key={idx} className="field-error-text">
-                            <AlertCircle size={16} /> {msg}
-                        </span>
-                    ))}
-                </div>
-            );
-        }
-        return null;
-    };
-
     return createPortal(
         <>
             <div
@@ -175,7 +160,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                                 )}
                                 <ChevronDown size={18} className={`${styles.chevron} ${isDropdownOpen ? styles.chevronOpen : ''}`} />
                             </div>
-                            {renderFieldError('entry_id')}
+                            <FieldError errors={fieldErrors.entry_id} />
 
                             {isDropdownOpen && (
                                 <div className={styles.dropdownMenu}>
@@ -244,7 +229,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                                 />
                             </button>
                         </div>
-                        {renderFieldError('color')}
+                        <FieldError errors={fieldErrors.color} />
                     </div>
 
                     <div className={styles.formGroup}>
@@ -292,8 +277,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                             </label>
                         )}
 
-                        {renderFieldError('image_url')}
-                        {uploadError && renderFieldError('image_url')}
+                        <FieldError errors={[...(uploadError ? [uploadError] : []), ...(fieldErrors.image_url || [])]} />
                         <p className={styles.helpText}>Leave empty to use main image from content automatically.</p>
                     </div>
 

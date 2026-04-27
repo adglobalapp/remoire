@@ -140,8 +140,10 @@ export interface AvatarProps {
 export interface UserProfileContextType {
     showProfile: (user: User) => void;
     blockedUserIds: Set<number>;
+    blockedUsers: User[];
+    isLoadingBlocked: boolean;
     isBlocked: (userId: number) => boolean;
-    refreshBlockedUsers: () => Promise<void>;
+    refreshBlockedUsers: (silent?: boolean) => Promise<void>;
     blockUser: (userId: number) => Promise<boolean>;
     unblockUser: (userId: number) => Promise<boolean>;
 }

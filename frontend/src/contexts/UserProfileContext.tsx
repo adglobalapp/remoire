@@ -11,23 +11,34 @@ export const UserProfileContext = createContext<UserProfileContextType | undefin
 export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [blockedUserIds, setBlockedUserIds] = useState<Set<number>>(new Set());
+    const [blockedUsers, setBlockedUsers] = useState<User[]>([]);
+    const [isLoadingBlocked, setIsLoadingBlocked] = useState(false);
     const { isAuthenticated } = useAuth();
 
-    const refreshBlockedUsers = useCallback(async () => {
-        if (!isAuthenticated) {
-            setBlockedUserIds(new Set());
-            return;
-        }
-        try {
-            const blocked = await getBlockedUsers();
-            setBlockedUserIds(new Set(blocked.map((u) => u.id)));
-        } catch (err) {
-            console.error('Failed to refresh blocked users:', err);
-        }
-    }, [isAuthenticated]);
+    const refreshBlockedUsers = useCallback(
+        async (silent = false) => {
+            if (!isAuthenticated) {
+                setBlockedUserIds(new Set());
+                setBlockedUsers([]);
+                return;
+            }
+
+            if (!silent) setIsLoadingBlocked(true);
+            try {
+                const blocked = await getBlockedUsers();
+                setBlockedUsers(blocked.map((u) => ({ ...u, relationship_status: 'blocked' })));
+                setBlockedUserIds(new Set(blocked.map((u) => u.id)));
+            } catch (err) {
+                console.error('Failed to refresh blocked users:', err);
+            } finally {
+                if (!silent) setIsLoadingBlocked(false);
+            }
+        },
+        [isAuthenticated],
+    );
 
     useEffect(() => {
-        refreshBlockedUsers();
+        refreshBlockedUsers(false);
     }, [refreshBlockedUsers]);
 
     const isBlocked = (userId: number) => blockedUserIds.has(userId);
@@ -35,8 +46,8 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
     const blockUser = async (userId: number) => {
         try {
             const res = await apiBlockUser(userId);
+            await refreshBlockedUsers(true);
             if (res?.message) toast.success(res.message);
-            refreshBlockedUsers();
             return true;
         } catch (err: unknown) {
             const error = err as ApiError;
@@ -48,8 +59,8 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
     const unblockUser = async (userId: number) => {
         try {
             const res = await apiUnblockUser(userId);
+            await refreshBlockedUsers(true);
             if (res?.message) toast.success(res.message);
-            refreshBlockedUsers();
             return true;
         } catch (err: unknown) {
             const error = err as ApiError;
@@ -75,6 +86,8 @@ export const UserProfileProvider: React.FC<{ children: ReactNode }> = ({ childre
             value={{
                 showProfile: handleShowProfile,
                 blockedUserIds,
+                blockedUsers,
+                isLoadingBlocked,
                 isBlocked,
                 refreshBlockedUsers,
                 blockUser,

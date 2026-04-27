@@ -76,7 +76,7 @@ const Navbar = () => {
                             )}
                         </>
                     ) : (
-                        <div className={styles.profileSkeleton} />
+                        <div className={styles.userInfoPlaceholder} />
                     )}
                 </div>
 

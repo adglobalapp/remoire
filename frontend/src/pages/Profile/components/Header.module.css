@@ -1,0 +1,166 @@
+.profileHeader {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    justify-content: space-between;
+}
+
+.avatarWrapper {
+    position: relative;
+    flex-shrink: 0;
+    width: 140px;
+    height: 140px;
+}
+
+.avatarLarge {
+    transition: background-color 0.2s ease;
+}
+
+.editAvatarOverlay {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: var(--color-burgundy);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    cursor: pointer;
+}
+
+.disabled {
+    cursor: default;
+    opacity: 0.5;
+}
+
+.deleteAvatarBtn {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    background: #dc2626;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.deleteAvatarBtn:hover {
+    background: #b91c1c;
+}
+
+.headerMain {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.headerMain h1 {
+    font-size: 2.8rem;
+    margin: 0;
+    color: var(--color-dark-brown);
+    line-height: 1;
+    font-family: var(--font-ui), serif;
+    font-weight: 400;
+}
+
+.headerMain p {
+    font-size: 1.6rem;
+    margin: 0;
+    color: var(--color-dark-brown);
+    opacity: 0.6;
+    font-family: var(--font-ui), serif;
+    font-weight: 400;
+}
+
+.headerStats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    min-width: 180px;
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+}
+
+.statLabel {
+    font-size: 1.1rem;
+    color: var(--color-dark-brown);
+    opacity: 0.5;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 400;
+    font-family: var(--font-ui), serif;
+}
+
+.statValue {
+    font-size: 1.6rem;
+    color: var(--color-dark-brown);
+    font-family: var(--font-ui), serif;
+    font-weight: 400;
+}
+
+.friendCode {
+    color: var(--color-burgundy);
+}
+
+.copyBtn {
+    background: transparent;
+    border: none;
+    color: var(--color-burgundy);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.copyBtn:hover {
+    background: rgba(84, 29, 48, 0.05);
+}
+
+.hiddenFileInput {
+    display: none;
+}
+
+.statFlexContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@media (max-width: 700px) {
+    .profileHeader {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 20px;
+    }
+
+    .headerMain h1 {
+        font-size: 2.2rem;
+    }
+
+    .headerStats {
+        align-items: center;
+    }
+}

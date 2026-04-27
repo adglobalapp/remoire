@@ -1,8 +1,9 @@
 import ReactDOM from 'react-dom';
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
-import { X, Search, MapPin, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { X, Search, MapPin, Check, Loader2 } from 'lucide-react';
 import type { LocationPickerProps, NominatimResult } from '../../../../types';
+import FieldError from '../../../../components/common/FieldError';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import styles from './LocationPicker.module.css';
@@ -126,22 +127,6 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
         }
     };
 
-    const renderFieldError = (fieldName: string) => {
-        const errors = fieldErrors[fieldName];
-        if (errors && errors.length > 0) {
-            return (
-                <div className={`field-errors-container ${styles.fieldErrorsContainer}`}>
-                    {errors.map((msg, idx) => (
-                        <span key={idx} className={`field-error-text ${styles.fieldErrorText}`}>
-                            <AlertCircle size={16} /> {msg}
-                        </span>
-                    ))}
-                </div>
-            );
-        }
-        return null;
-    };
-
     return ReactDOM.createPortal(
         <div className="global-modal-overlay" onClick={onClose}>
             <div className={`global-modal-content ${styles.modalContent}`} onClick={(e) => e.stopPropagation()}>
@@ -179,7 +164,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
                                 <Search size={18} />
                             </button>
                         </form>
-                        {renderFieldError('search')}
+                        <FieldError errors={fieldErrors.search} />
                     </div>
 
                     <div className={styles.mapContainer}>

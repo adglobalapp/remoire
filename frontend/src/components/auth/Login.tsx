@@ -1,9 +1,10 @@
 import ReactDOM from 'react-dom';
 import React, { useState } from 'react';
-import { X, LogIn, Loader2, AlertCircle } from 'lucide-react';
+import { X, LogIn, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Auth.module.css';
 import { type LoginProps, type ApiError } from '../../types';
+import FieldError from '../common/FieldError';
 
 const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister }) => {
     const { login } = useAuth();
@@ -32,22 +33,6 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister }) => {
         }
     };
 
-    const renderFieldError = (fieldName: string) => {
-        const errors = fieldErrors[fieldName];
-        if (!errors || errors.length === 0) return null;
-        const messages = errors.filter((msg) => msg && msg.trim());
-        if (messages.length === 0) return null;
-        return (
-            <div className="field-errors-container">
-                {messages.map((msg, idx) => (
-                    <span key={idx} className="field-error-text">
-                        <AlertCircle size={16} /> {msg}
-                    </span>
-                ))}
-            </div>
-        );
-    };
-
     return ReactDOM.createPortal(
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -71,7 +56,7 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister }) => {
                             className={fieldErrors.email ? 'input-error' : ''}
                             placeholder="Enter your email"
                         />
-                        {renderFieldError('email')}
+                        <FieldError errors={fieldErrors.email} />
                     </div>
                     <div className={styles.formGroup}>
                         <label htmlFor="password">Password</label>
@@ -83,7 +68,7 @@ const Login: React.FC<LoginProps> = ({ onClose, onSwitchToRegister }) => {
                             className={fieldErrors.password ? 'input-error' : ''}
                             placeholder="••••••••"
                         />
-                        {renderFieldError('password')}
+                        <FieldError errors={fieldErrors.password} />
                     </div>
 
                     <button type="submit" className={styles.submitBtn} disabled={isLoading}>
