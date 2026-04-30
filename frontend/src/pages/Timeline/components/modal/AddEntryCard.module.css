@@ -85,119 +85,39 @@
     color: inherit;
 }
 
-.selectTrigger {
+.selectInput {
     width: 100%;
-    padding: 8px 14px;
+    padding: 6px 14px;
+    padding-right: 40px;
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 8px;
     background: white;
     font-size: 1.4rem;
+    font-family: var(--font-ui), serif;
     color: var(--color-dark-brown);
     cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: border-color 0.2s;
-    user-select: none;
-    position: relative;
+    transition: all 0.2s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%232a1e22' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 18px;
+    line-height: 1.1;
 }
 
-.selectTrigger:hover {
+.selectInput:hover {
     border-color: rgba(0, 0, 0, 0.3);
 }
 
-.selectedEntryRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding-right: 10px;
+.selectInput:focus {
+    outline: none;
+    border-color: var(--color-burgundy);
+    box-shadow: 0 0 0 3px rgba(84, 29, 48, 0.1);
 }
 
-.selectedDate {
-    font-size: 1.2rem;
-    opacity: 0.4;
-    margin-left: 12px;
-}
-
-.placeholder {
-    opacity: 0.5;
-}
-
-.chevron {
-    flex-shrink: 0;
-    transition: transform 0.2s;
-    opacity: 0.6;
-}
-
-.chevronOpen {
-    transform: rotate(180deg);
-}
-
-.dropdownMenu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    margin-top: 4px;
-    background: white;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    z-index: 5;
-    max-height: 250px;
-    overflow-y: auto;
-    animation: fadeIn 0.15s ease-out;
-}
-
-.entryListItem {
-    padding: 6px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    transition: background 0.2s;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+.selectInput option {
     font-size: 1.4rem;
-}
-
-.entryListItem:last-child {
-    border-bottom: none;
-}
-
-.entryListItem:hover {
-    background: rgba(0, 0, 0, 0.02);
-}
-
-.entryListItemActive {
-    background: rgba(var(--color-burgundy-rgb), 0.05) !important;
-    border-left: 3px solid var(--color-burgundy);
-}
-
-.entryInfoLeft {
-    display: flex;
-    flex-direction: column;
-}
-
-.entryTitle {
-    font-weight: 500;
-    color: var(--color-dark-brown);
-}
-
-.entryInfoRight {
-    text-align: right;
-}
-
-.entryDate {
-    font-size: 1.2rem;
-    color: var(--color-dark-brown);
-    opacity: 0.4;
-}
-
-.emptyState {
-    padding: 20px;
-    text-align: center;
-    opacity: 0.5;
+    padding: 0 !important;
 }
 
 .colorPalette {

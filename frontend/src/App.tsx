@@ -7,6 +7,7 @@ import FriendlistPage from './pages/Friendlist';
 import NotesPage from './pages/Notes';
 import MapsPage from './pages/Maps';
 import ProfilePage from './pages/Profile';
+import MailboxPage from './pages/Mailbox';
 import { EntryProvider } from './contexts/EntryContext';
 import { TimelineProvider } from './contexts/TimelineContext';
 import { useAuth } from './contexts/AuthContext';
@@ -57,6 +58,7 @@ function App() {
                         <Route path="/notes" element={<NotesPage />} />
                         <Route path="/maps" element={<MapsPage />} />
                         <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/mailbox" element={<MailboxPage />} />
                         <Route path="*" element={<Navigate to="/entries" replace />} />
                     </Route>
                 ) : (

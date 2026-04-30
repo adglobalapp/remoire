@@ -1,0 +1,182 @@
+.mainContent {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    min-height: calc(100vh - 70px);
+    position: relative;
+    background-color: var(--color-dark-beige);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    animation: fadeIn 0.4s ease-out;
+    width: 100%;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 2.4rem !important;
+    font-weight: 400;
+    color: var(--color-dark-brown);
+    margin: 0;
+}
+
+.mailboxList {
+    background: var(--color-light-beige);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    width: 100%;
+    animation: listFadeUp 0.45s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+.sectionTitle {
+    background: var(--color-burgundy);
+    padding: 10px 24px;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    color: var(--color-light-beige);
+    font-weight: 400;
+    font-family: var(--font-ui);
+}
+
+.notificationRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    transition: background 0.2s;
+    position: relative;
+}
+
+.notificationRow:last-child {
+    border-bottom: none;
+}
+
+.notificationRow:hover {
+    background: rgba(84, 29, 48, 0.03);
+}
+
+.notifMain {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+}
+
+.unread .notifIcon {
+    background-color: var(--color-burgundy);
+    color: var(--color-light-beige);
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--color-dark-brown);
+    transition: color 0.2s;
+}
+
+.date {
+    font-size: 1.3rem;
+    color: var(--color-dark-brown);
+    opacity: 0.6;
+}
+
+.viewBtn {
+    background: transparent;
+    border: none;
+    color: var(--color-burgundy);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    opacity: 0.5;
+}
+
+.viewBtn:hover {
+    opacity: 1;
+    color: #3d0d1d;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.notifIcon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: rgba(84, 29, 48, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-burgundy);
+    flex-shrink: 0;
+}
+
+@keyframes listFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 600px) {
+    .container {
+        margin: 20px auto;
+        padding: 0 12px;
+    }
+
+    .header h1 {
+        font-size: 2rem !important;
+    }
+
+    .notificationRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 16px;
+    }
+
+    .actions {
+        width: 100%;
+        padding-left: 60px;
+    }
+}

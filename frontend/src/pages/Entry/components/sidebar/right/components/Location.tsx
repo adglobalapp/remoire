@@ -12,7 +12,7 @@ const Location = () => {
     const { activeEntry, updateEntry } = useEntryContext();
     const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
     const [showLocationConfirm, setShowLocationConfirm] = useState(false);
-    const [isRemovingLocation, setIsRemovingLocation] = useState(false);
+    const [isConfirming, setIsConfirming] = useState(false);
 
     const handleLocationSelect = async (location: { name: string; lat: number; lng: number }) => {
         if (activeEntry) {
@@ -32,7 +32,7 @@ const Location = () => {
 
     const handleRemoveLocation = async () => {
         if (activeEntry) {
-            setIsRemovingLocation(true);
+            setIsConfirming(true);
             try {
                 const res = await updateEntry(activeEntry.id, {
                     location_name: null,
@@ -44,7 +44,7 @@ const Location = () => {
                 const error = err as ApiError;
                 toast.error(error.message || 'Failed to remove location');
             } finally {
-                setIsRemovingLocation(false);
+                setIsConfirming(false);
                 setShowLocationConfirm(false);
             }
         }
@@ -111,7 +111,7 @@ const Location = () => {
                     message="Are you sure you want to remove the location from this entry?"
                     confirmText="Remove"
                     cancelText="Cancel"
-                    isLoading={isRemovingLocation}
+                    isLoading={isConfirming}
                     loadingText="Removing..."
                     onConfirm={handleRemoveLocation}
                     onCancel={() => setShowLocationConfirm(false)}

@@ -47,3 +47,17 @@ export interface Note {
     updated_at: string;
     message?: string;
 }
+
+export interface Notification {
+    id: number;
+    user_id: number;
+    type: 'friend_request' | 'anniversary';
+    data: {
+        requester_name?: string;
+        entry_id?: number;
+        entry_title?: string;
+        years?: number;
+    };
+    read_at: string | null;
+    created_at: string;
+}

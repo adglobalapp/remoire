@@ -18,7 +18,7 @@ const NotesPage = () => {
     const [selectedNote, setSelectedNote] = useState<NoteType | null>(null);
     const [showAddModal, setShowAddModal] = useState(false);
     const [noteToDelete, setNoteToDelete] = useState<number | null>(null);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [isConfirming, setIsConfirming] = useState(false);
 
     const fetchNotes = useCallback(async () => {
         if (!isAuthenticated) return;
@@ -69,7 +69,7 @@ const NotesPage = () => {
 
     const handleDeleteNote = async () => {
         if (!noteToDelete) return;
-        setIsDeleting(true);
+        setIsConfirming(true);
         try {
             const res = await deleteNote(noteToDelete);
             setNotes((prev) => prev.filter((n) => n.id !== noteToDelete));
@@ -80,7 +80,7 @@ const NotesPage = () => {
             const error = err as ApiError;
             toast.error(error.message || 'Failed to delete note');
         } finally {
-            setIsDeleting(false);
+            setIsConfirming(false);
         }
     };
 
@@ -140,7 +140,7 @@ const NotesPage = () => {
                             </span>
                         }
                         confirmText="Delete"
-                        isLoading={isDeleting}
+                        isLoading={isConfirming}
                         loadingText="Deleting..."
                         onConfirm={handleDeleteNote}
                         onCancel={() => setNoteToDelete(null)}

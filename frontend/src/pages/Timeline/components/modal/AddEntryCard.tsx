@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Upload, Palette, ChevronDown, Plus, Trash2, Loader2 } from 'lucide-react';
+import { X, Upload, Palette, Plus, Trash2, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { uploadImage } from '../../../../api';
 import { useEntryContext } from '../../../../contexts/EntryContext';
@@ -19,35 +19,21 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
     const [color, setColor] = useState<string>(entryToEdit?.color || '');
     const [imageUrl, setImageUrl] = useState<string>(entryToEdit?.image_url || '');
     const [isLoading, setIsLoading] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [isConfirming, setIsConfirming] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
     const [customColor, setCustomColor] = useState<string>(
         PRESET_COLORS.includes(entryToEdit?.color || '') ? '' : entryToEdit?.color || '',
     );
-    const dropdownRef = useRef<HTMLDivElement>(null);
     const colorPickerRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsDropdownOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
 
     const availableEntries = entries.filter((e) => {
         if (!activeTimeline) return false;
         if (activeTimeline.isDefault) return true;
         return !activeTimeline.entryIds.includes(e.id);
     });
-
-    const selectedEntry = entries.find((e) => e.id === selectedEntryId);
 
     const handleEntrySelect = (id: number) => {
         setSelectedEntryId(id);
@@ -59,7 +45,6 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
             setCustomColor(isPreset ? '' : entryColor);
             setImageUrl(entry.image_url || '');
         }
-        setIsDropdownOpen(false);
         setFieldErrors({});
     };
 
@@ -87,7 +72,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
         try {
             const res = await updateEntry(Number(selectedEntryId), {
                 color: handleColorSave(),
-                image_url: imageUrl || undefined,
+                image_url: imageUrl || null,
             });
 
             if (!entryToEdit && activeTimeline && !activeTimeline.isDefault) {
@@ -112,7 +97,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
     const handleConfirmDelete = async () => {
         if (!entryToEdit || !activeTimeline || activeTimeline.isDefault) return;
 
-        setIsDeleting(true);
+        setIsConfirming(true);
         try {
             await removeEntryFromTimeline(activeTimeline.id, entryToEdit.id);
             onClose();
@@ -120,7 +105,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
             const error = err as ApiError;
             toast.error(error.message || 'Failed to remove entry.');
         } finally {
-            setIsDeleting(false);
+            setIsConfirming(false);
             setIsConfirmOpen(false);
         }
     };
@@ -142,50 +127,24 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                     </div>
 
                     {!entryToEdit && (
-                        <div className={styles.formGroup} ref={dropdownRef}>
-                            <label>Select Entry</label>
-                            <div
-                                className={`${styles.selectTrigger} ${fieldErrors.entry_id ? 'input-error' : ''}`}
-                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        <div className={styles.formGroup}>
+                            <label htmlFor="entry-select">Select Entry</label>
+                            <select
+                                id="entry-select"
+                                className={`${styles.selectInput} ${fieldErrors.entry_id ? 'input-error' : ''}`}
+                                value={selectedEntryId}
+                                onChange={(e) => handleEntrySelect(Number(e.target.value))}
                             >
-                                {selectedEntry ? (
-                                    <div className={styles.selectedEntryRow}>
-                                        <span className={styles.selectedTitle}>{selectedEntry.title || 'Untitled'}</span>
-                                        <span className={styles.selectedDate}>
-                                            {new Date(selectedEntry.date || selectedEntry.created_at).toLocaleDateString('hu-HU')}
-                                        </span>
-                                    </div>
-                                ) : (
-                                    <span className={styles.placeholder}>-- Choose an entry --</span>
-                                )}
-                                <ChevronDown size={18} className={`${styles.chevron} ${isDropdownOpen ? styles.chevronOpen : ''}`} />
-                            </div>
+                                <option value="" disabled>
+                                    -- Choose an entry --
+                                </option>
+                                {availableEntries.map((e) => (
+                                    <option key={e.id} value={e.id}>
+                                        {e.title || 'Untitled'}
+                                    </option>
+                                ))}
+                            </select>
                             <FieldError errors={fieldErrors.entry_id} />
-
-                            {isDropdownOpen && (
-                                <div className={styles.dropdownMenu}>
-                                    {availableEntries.length === 0 ? (
-                                        <p className={styles.emptyState}>No more entries available.</p>
-                                    ) : (
-                                        availableEntries.map((e) => (
-                                            <div
-                                                key={e.id}
-                                                className={`${styles.entryListItem} ${selectedEntryId === e.id ? styles.entryListItemActive : ''}`}
-                                                onClick={() => handleEntrySelect(e.id)}
-                                            >
-                                                <div className={styles.entryInfoLeft}>
-                                                    <span className={styles.entryTitle}>{e.title || 'Untitled'}</span>
-                                                </div>
-                                                <div className={styles.entryInfoRight}>
-                                                    <span className={styles.entryDate}>
-                                                        {new Date(e.date || e.created_at).toLocaleDateString('hu-HU')}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            )}
                         </div>
                     )}
 
@@ -287,7 +246,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                                 type="button"
                                 className={`btn ${styles.deleteBtn}`}
                                 onClick={() => setIsConfirmOpen(true)}
-                                disabled={isLoading || isDeleting || isUploading || activeTimeline.isDefault}
+                                disabled={isLoading || isConfirming || isUploading || activeTimeline.isDefault}
                                 title={activeTimeline.isDefault ? 'Cannot remove from default timeline' : undefined}
                             >
                                 <Trash2 size={16} />
@@ -300,7 +259,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                         <button
                             type="button"
                             className={`btn ${styles.saveBtn}`}
-                            disabled={!selectedEntryId || isLoading || isDeleting || isUploading}
+                            disabled={!selectedEntryId || isLoading || isConfirming || isUploading}
                             onClick={handleSave}
                         >
                             {isLoading ? (
@@ -325,7 +284,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                         </span>
                     }
                     confirmText="Remove"
-                    isLoading={isDeleting}
+                    isLoading={isConfirming}
                     loadingText="Removing..."
                     onConfirm={handleConfirmDelete}
                     onCancel={() => setIsConfirmOpen(false)}

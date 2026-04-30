@@ -14,7 +14,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
     const { blockUser, unblockUser } = useUserProfile();
     const [showBlockConfirm, setShowBlockConfirm] = useState(false);
     const [isUnblocking, setIsUnblocking] = useState(false);
-    const [isBlocking, setIsBlocking] = useState(false);
+    const [isConfirming, setIsConfirming] = useState(false);
 
     const isSelf = authUser?.id === user.id;
     const relationshipStatus = user.relationship_status || 'none';
@@ -24,9 +24,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
     };
 
     const executeBlock = async () => {
-        setIsBlocking(true);
+        setIsConfirming(true);
         const success = await blockUser(user.id);
-        setIsBlocking(false);
+        setIsConfirming(false);
         if (success) {
             onClose();
         }
@@ -131,7 +131,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
                         </span>
                     }
                     confirmText="Block User"
-                    isLoading={isBlocking}
+                    isLoading={isConfirming}
                     loadingText="Blocking..."
                     onConfirm={executeBlock}
                     onCancel={() => setShowBlockConfirm(false)}

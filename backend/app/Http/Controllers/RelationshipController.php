@@ -20,8 +20,8 @@ class RelationshipController extends Controller
     {
         $user = Auth::user();
 
-        $pending = $user->pendingFriendRequests()->get();
-        $sent = $user->sentFriendRequests()->get();
+        $pending = $user->pendingFriendRequests()->orderBy('relationships.created_at', 'desc')->get();
+        $sent = $user->sentFriendRequests()->orderBy('relationships.created_at', 'desc')->get();
 
         return response()->json([
             'pending' => $pending,
@@ -46,7 +46,7 @@ class RelationshipController extends Controller
 
         $users = User::where(function ($q) use ($query) {
             $q->where('name', 'like', "%{$query}%")
-                ->orWhere('friend_code', $query);
+                ->orWhere('friend_code', 'like', "%{$query}%");
         })
             ->where('id', '!=', $currentUser->id)
             ->whereNotIn('id', $blockedUserIds)
@@ -105,6 +105,15 @@ class RelationshipController extends Controller
             'status' => 'pending',
         ]);
 
+        \App\Models\Notification::create([
+            'user_id' => $targetId,
+            'type' => 'friend_request',
+            'data' => [
+                'requester_id' => $user->id,
+                'requester_name' => $user->name,
+            ],
+        ]);
+
         return response()->json(['message' => 'Request sent'], 200);
     }
 
@@ -122,6 +131,14 @@ class RelationshipController extends Controller
         }
 
         $relationship->update(['status' => 'accepted']);
+
+        \App\Models\Notification::where('user_id', $currentUser->id)
+            ->where('type', 'friend_request')
+            ->where(function ($q) use ($user) {
+                $q->where('data->requester_id', $user->id)
+                    ->orWhere('data->requester_name', $user->name);
+            })
+            ->update(['read_at' => now()]);
 
         return response()->json(['message' => 'Request accepted'], 200);
     }

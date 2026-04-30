@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Entry;
 use App\Models\Note;
+use App\Models\Notification;
 use App\Models\Relationship;
 use App\Models\Timeline;
 use App\Models\User;
@@ -14,8 +15,16 @@ use Illuminate\Support\Facades\Hash;
 class MockDataSeeder extends Seeder
 {
     private const PRESET_COLORS = [
-        '#f8a5c2', '#fab387', '#cba6f7', '#89dceb', '#f9e2af',
-        '#a6e3a1', '#f38ba8', '#94e2d5', '#89b4fa', '#f5e0dc',
+        '#f8a5c2',
+        '#fab387',
+        '#cba6f7',
+        '#89dceb',
+        '#f9e2af',
+        '#a6e3a1',
+        '#f38ba8',
+        '#94e2d5',
+        '#89b4fa',
+        '#f5e0dc',
     ];
 
     /**
@@ -175,5 +184,37 @@ class MockDataSeeder extends Seeder
         foreach ($notesData as $note) {
             Note::create(array_merge($note, ['user_id' => $mainUser->id]));
         }
+
+        Notification::create([
+            'user_id' => $mainUser->id,
+            'type' => 'friend_request',
+            'data' => [
+                'requester_name' => 'John Doe',
+            ],
+            'read_at' => null,
+            'created_at' => now()->subHours(2),
+        ]);
+
+        Notification::create([
+            'user_id' => $mainUser->id,
+            'type' => 'anniversary',
+            'data' => [
+                'entry_id' => 1,
+                'entry_title' => 'First day of summer',
+                'years' => 2,
+            ],
+            'read_at' => null,
+            'created_at' => now()->subDays(1),
+        ]);
+
+        Notification::create([
+            'user_id' => $mainUser->id,
+            'type' => 'friend_request',
+            'data' => [
+                'requester_name' => 'Jane Smith',
+            ],
+            'read_at' => now(),
+            'created_at' => now()->subDays(2),
+        ]);
     }
 }

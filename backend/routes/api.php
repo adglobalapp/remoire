@@ -45,4 +45,9 @@ Route::middleware(['auth:sanctum', 'last_seen'])->group(function () {
     Route::put('/user/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword']);
     Route::get('/user/blocked', [\App\Http\Controllers\ProfileController::class, 'blockedUsers']);
     Route::delete('/user/blocked/{user}', [\App\Http\Controllers\ProfileController::class, 'unblock']);
+
+    // Notification routes
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index']);
+    Route::put('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead']);
+    Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy']);
 });

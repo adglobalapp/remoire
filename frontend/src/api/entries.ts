@@ -3,11 +3,11 @@ import { API_BASE_URL, getHeaders } from './client';
 
 export const getEntries = async (): Promise<Entry[]> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/entries`, {
+        const res = await fetch(`${API_BASE_URL}/entries`, {
             headers: getHeaders(),
         });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || `Error: ${res.status}`);
         return data;
     } catch (error) {
         throw error;
@@ -16,7 +16,7 @@ export const getEntries = async (): Promise<Entry[]> => {
 
 export const createEntry = async (title: string) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/entries`, {
+        const res = await fetch(`${API_BASE_URL}/entries`, {
             method: 'POST',
             headers: getHeaders(),
             body: JSON.stringify({
@@ -25,10 +25,10 @@ export const createEntry = async (title: string) => {
             }),
         });
 
-        const data = await response.json();
-        if (!response.ok) {
+        const data = await res.json();
+        if (!res.ok) {
             const error = new Error(data.message || 'Failed to create entry') as ApiError;
-            error.status = response.status;
+            error.status = res.status;
             error.errors = data.errors;
             throw error;
         }
@@ -45,17 +45,17 @@ export const updateEntry = async (
     },
 ) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/entries/${id}`, {
             method: 'PUT',
             headers: getHeaders(),
             body: JSON.stringify(payload),
         });
 
-        const data = await response.json();
+        const data = await res.json();
 
-        if (!response.ok) {
+        if (!res.ok) {
             const error = new Error(data.message || 'Failed to update entry') as ApiError;
-            error.status = response.status;
+            error.status = res.status;
             error.errors = data.errors;
             throw error;
         }
@@ -68,12 +68,12 @@ export const updateEntry = async (
 
 export const deleteEntry = async (id: number) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/entries/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/entries/${id}`, {
             method: 'DELETE',
             headers: getHeaders(),
         });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || `Error: ${res.status}`);
         return data;
     } catch (error) {
         throw error;
@@ -84,17 +84,17 @@ export const uploadImage = async (file: File): Promise<{ url?: string; message?:
     try {
         const formData = new FormData();
         formData.append('image', file);
-        const response = await fetch(`${API_BASE_URL}/upload`, {
+        const res = await fetch(`${API_BASE_URL}/upload`, {
             method: 'POST',
             headers: getHeaders(true),
             body: formData,
         });
 
-        const data = await response.json();
+        const data = await res.json();
 
-        if (!response.ok) {
-            const error = new Error(data.message || `Error: ${response.status}`) as ApiError;
-            error.status = response.status;
+        if (!res.ok) {
+            const error = new Error(data.message || `Error: ${res.status}`) as ApiError;
+            error.status = res.status;
             error.errors = data.errors;
             throw error;
         }

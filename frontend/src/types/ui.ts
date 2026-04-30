@@ -147,3 +147,7 @@ export interface UserProfileContextType {
     blockUser: (userId: number) => Promise<boolean>;
     unblockUser: (userId: number) => Promise<boolean>;
 }
+
+export interface FieldErrorProps {
+    errors?: string[];
+}

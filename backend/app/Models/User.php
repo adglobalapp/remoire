@@ -99,4 +99,43 @@ class User extends Authenticatable
     {
         return $this->hasMany(Note::class);
     }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function checkAnniversaries()
+    {
+        try {
+            $anniversaries = $this->entries()
+                ->whereMonth('date', now()->month)
+                ->whereDay('date', now()->day)
+                ->whereYear('date', '<', now()->year)
+                ->get();
+
+            foreach ($anniversaries as $entry) {
+                $exists = Notification::where('user_id', $this->id)
+                    ->where('type', 'anniversary')
+                    ->where('data->entry_id', $entry->id)
+                    ->whereDate('created_at', now()->toDateString())
+                    ->exists();
+
+                if (! $exists) {
+                    $years = now()->year - \Carbon\Carbon::parse($entry->date)->year;
+                    Notification::create([
+                        'user_id' => $this->id,
+                        'type' => 'anniversary',
+                        'data' => [
+                            'entry_id' => $entry->id,
+                            'entry_title' => $entry->title,
+                            'years' => $years,
+                        ],
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Anniversary check failed: '.$e->getMessage());
+        }
+    }
 }

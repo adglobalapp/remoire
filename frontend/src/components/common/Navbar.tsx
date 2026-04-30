@@ -1,15 +1,26 @@
-import { useState } from 'react';
-import { BookMarked, Users, Map, StickyNote, NotebookText, TrendingUp, LogOut, User, Menu, X } from 'lucide-react';
+import { BookMarked, Users, Map, StickyNote, NotebookText, TrendingUp, LogOut, User, Menu, X, Mail } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import styles from './Navbar.module.css';
 import { useAuth } from '../../contexts/AuthContext';
 import Avatar from './Avatar';
+import { getNotifications } from '../../api/notifications';
+import { type Notification } from '../../types';
+import { useEffect, useState } from 'react';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
+
+    useEffect(() => {
+        if (user || profileMenuOpen) {
+            getNotifications().then(setNotifications).catch(console.error);
+        }
+    }, [user, profileMenuOpen]);
+
+    const unreadCount = notifications.filter((n) => !n.read_at).length;
 
     return (
         <nav className={styles.navbar}>
@@ -60,6 +71,19 @@ const Navbar = () => {
                                     >
                                         <User size={15} />
                                         <span>My Profile</span>
+                                    </div>
+                                    <div
+                                        className={styles.dropdownItem}
+                                        onClick={() => {
+                                            navigate('/mailbox');
+                                            setProfileMenuOpen(false);
+                                        }}
+                                    >
+                                        <div className={styles.dropdownIconWrapper}>
+                                            <Mail size={15} />
+                                            {unreadCount > 0 && <div className={styles.dropdownUnreadDot} />}
+                                        </div>
+                                        <span>Mailbox</span>
                                     </div>
                                     <div className={styles.dropdownSeparator} />
                                     <div

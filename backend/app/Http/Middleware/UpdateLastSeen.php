@@ -19,7 +19,11 @@ class UpdateLastSeen
             $user = auth()->user();
 
             if (! $user->last_seen_at || ! $user->last_seen_at->isToday()) {
-                $user->update(['last_seen_at' => now()]);
+                $lockKey = 'anniversary_check_lock_'.$user->id;
+                if (\Illuminate\Support\Facades\Cache::add($lockKey, true, 60)) {
+                    $user->checkAnniversaries();
+                    $user->update(['last_seen_at' => now()]);
+                }
             }
         }
 

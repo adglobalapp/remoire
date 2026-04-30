@@ -58,8 +58,8 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
         setFieldErrors({});
 
         try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
-            const data = (await response.json()) as NominatimResult[];
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+            const data = (await res.json()) as NominatimResult[];
             if (data.length === 0) {
                 setFieldErrors({ search: ['No results found for this location.'] });
             }
@@ -104,8 +104,8 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onClose, onSelect, init
         setFieldErrors({});
 
         try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`);
-            const data = await response.json();
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`);
+            const data = await res.json();
             setLocationName(data.display_name || `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`);
         } catch {
             setLocationName(`${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`);

@@ -14,7 +14,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const [isSaving, setIsSaving] = useState(false);
     const [newName, setNewName] = useState('');
     const [itemToDelete, setItemToDelete] = useState<number | null>(null);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [isConfirming, setIsConfirming] = useState(false);
     const { pathname } = useLocation();
     const lastPage = useRef(pathname);
     const lastId = useRef(activeTimeline?.id);
@@ -69,14 +69,14 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
 
     const confirmDelete = async () => {
         if (itemToDelete !== null) {
-            setIsDeleting(true);
+            setIsConfirming(true);
             try {
                 await deleteTimeline(itemToDelete);
             } catch (err: unknown) {
                 const error = err as ApiError;
                 toast.error(error.message || 'Failed to delete timeline.');
             } finally {
-                setIsDeleting(false);
+                setIsConfirming(false);
                 setItemToDelete(null);
             }
         }
@@ -137,13 +137,6 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                                 placeholder="Timeline name..."
                                 value={newName}
                                 onChange={(e) => setNewName(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleCreate();
-                                    if (e.key === 'Escape') {
-                                        setIsCreating(false);
-                                        setNewName('');
-                                    }
-                                }}
                             />
                             <button className={styles.confirmBtn} onClick={handleCreate} disabled={isSaving}>
                                 {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
@@ -170,7 +163,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                             </span>
                         }
                         confirmText="Delete"
-                        isLoading={isDeleting}
+                        isLoading={isConfirming}
                         loadingText="Deleting..."
                         onConfirm={confirmDelete}
                         onCancel={() => setItemToDelete(null)}

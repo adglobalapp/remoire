@@ -1,9 +1,7 @@
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
 
-interface FieldErrorProps {
-    errors?: string[];
-}
+import { type FieldErrorProps } from '../../types';
 
 const FieldError: React.FC<FieldErrorProps> = ({ errors }) => {
     if (!errors || errors.length === 0) return null;

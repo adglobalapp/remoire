@@ -12,7 +12,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const [activeFilter, setActiveFilter] = useState<'all' | 'today' | 'this-month' | 'this-year'>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [itemToDelete, setItemToDelete] = useState<number | null>(null);
-    const [isDeleting, setIsDeleting] = useState(false);
+    const [isConfirming, setIsConfirming] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const mobileOpen = propOpen || false;
     const toggle = onToggle || (() => {});
@@ -43,11 +43,11 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
 
     const confirmDelete = async () => {
         if (itemToDelete !== null) {
-            setIsDeleting(true);
+            setIsConfirming(true);
             try {
                 await deleteEntry(itemToDelete);
             } finally {
-                setIsDeleting(false);
+                setIsConfirming(false);
                 setItemToDelete(null);
             }
         }
@@ -126,7 +126,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                             </span>
                         }
                         confirmText="Delete"
-                        isLoading={isDeleting}
+                        isLoading={isConfirming}
                         loadingText="Deleting..."
                         onConfirm={confirmDelete}
                         onCancel={() => setItemToDelete(null)}
