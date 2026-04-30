@@ -18,23 +18,17 @@ const NotesPage = () => {
     const [noteToDelete, setNoteToDelete] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
-    const sortNotes = (data: NoteType[]) => {
-        return [...data].sort((a, b) => {
-            if (a.is_pinned && !b.is_pinned) return -1;
-            if (!a.is_pinned && b.is_pinned) return 1;
-            return b.id - a.id;
-        });
-    };
-
     const fetchNotes = useCallback(async () => {
         setIsLoading(true);
-        const data = await getNotes();
-        if (data) {
-            setNotes(sortNotes(data));
-        } else {
-            toast.error('Failed to load notes');
+        try {
+            const data = await getNotes();
+            setNotes(data);
+        } catch (err: unknown) {
+            const error = err as ApiError;
+            toast.error(error.message || 'Failed to load notes');
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     }, []);
 
     useEffect(() => {
@@ -45,10 +39,10 @@ const NotesPage = () => {
         if (selectedNote) {
             try {
                 const updated = await updateNote(selectedNote.id, data);
-                setNotes((prev) => sortNotes(prev.map((n) => (n.id === updated.id ? updated : n))));
                 if (updated?.message) toast.success(updated.message);
                 setSelectedNote(null);
                 setShowAddModal(false);
+                fetchNotes();
             } catch (err: unknown) {
                 const error = err as ApiError;
                 toast.error(error.message || 'Failed to update note');
@@ -56,10 +50,10 @@ const NotesPage = () => {
         } else {
             try {
                 const created = await createNote(data);
-                setNotes((prev) => sortNotes([created, ...prev]));
                 if (created?.message) toast.success(created.message);
                 setSelectedNote(null);
                 setShowAddModal(false);
+                fetchNotes();
             } catch (err: unknown) {
                 const error = err as ApiError;
                 toast.error(error.message || 'Failed to create note');
@@ -91,7 +85,7 @@ const NotesPage = () => {
                 {isLoading && notes.length === 0 ? (
                     <Loader centered />
                 ) : (
-                    <div className={styles.container} data-reloading={isLoading ? '' : undefined}>
+                    <div className={styles.container}>
                         <header className={styles.header}>
                             <h1>Notes</h1>
                             <div className={styles.actionButtons}>

@@ -7,10 +7,10 @@ export const getRelationships = async (): Promise<User[]> => {
             headers: getHeaders(),
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
         return data;
-    } catch {
-        return [];
+    } catch (error) {
+        throw error;
     }
 };
 
@@ -23,10 +23,10 @@ export const getRelationshipRequests = async (): Promise<{
             headers: getHeaders(),
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
         return data;
-    } catch {
-        return { pending: [], sent: [] };
+    } catch (error) {
+        throw error;
     }
 };
 
@@ -36,10 +36,10 @@ export const searchUsers = async (query: string): Promise<User[]> => {
             headers: getHeaders(),
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
         return data;
-    } catch {
-        return [];
+    } catch (error) {
+        throw error;
     }
 };
 

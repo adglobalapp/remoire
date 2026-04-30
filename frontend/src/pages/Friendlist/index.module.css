@@ -141,10 +141,6 @@
     position: relative;
 }
 
-.listMargin {
-    margin-bottom: 30px;
-}
-
 .badgeButton {
     display: inline-flex;
     align-items: center;

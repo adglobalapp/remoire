@@ -152,6 +152,17 @@
     margin-bottom: 0.6rem;
 }
 
+:global(.ProseMirror p[data-placeholder]::before) {
+    content: attr(data-placeholder);
+    float: left;
+    color: var(--color-dark-brown);
+    opacity: 0.5;
+    font-style: italic;
+    font-weight: 400;
+    pointer-events: none;
+    height: 0;
+}
+
 :global(.ProseMirror ul[data-type='taskList']) {
     list-style: none;
     padding: 0;

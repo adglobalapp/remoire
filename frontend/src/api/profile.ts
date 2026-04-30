@@ -47,10 +47,10 @@ export const getBlockedUsers = async (): Promise<User[]> => {
             headers: getHeaders(),
         });
         const data = await response.json();
-        if (!response.ok) return [];
+        if (!response.ok) throw new Error(data.message || `Error: ${response.status}`);
         return data;
-    } catch {
-        return [];
+    } catch (error) {
+        throw error;
     }
 };
 

@@ -150,10 +150,6 @@
     animation: fadeIn 0.15s ease-out;
 }
 
-.entryListContainer {
-    display: none;
-}
-
 .entryListItem {
     padding: 6px 16px;
     display: flex;
@@ -304,13 +300,6 @@
     background-color: var(--color-light-brown);
     opacity: 0.5;
     cursor: not-allowed;
-}
-
-.errorText {
-    margin: 0;
-    font-size: 1rem;
-    color: var(--color-error);
-    font-weight: 500;
 }
 
 .modalFooter {

@@ -141,7 +141,7 @@ const FriendlistPage = () => {
                 {isLoading && friends.length === 0 && pendingRequests.length === 0 ? (
                     <Loader centered />
                 ) : (
-                    <div className={styles.container} data-reloading={isLoading ? '' : undefined}>
+                    <div className={styles.container}>
                         <header className={styles.header}>
                             <h1>Friends</h1>
                             <div className={styles.actionButtons}>

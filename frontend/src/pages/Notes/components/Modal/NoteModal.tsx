@@ -5,6 +5,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
+import Placeholder from '@tiptap/extension-placeholder';
 import { type NoteModalProps } from '../../../../types';
 import { PRESET_COLORS } from '../../../../utils/constants';
 import styles from './NoteModal.module.css';
@@ -23,14 +24,15 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
                 heading: { levels: [1, 2] },
             }),
             TaskList,
-            TaskItem.configure({
-                nested: true,
+            TaskItem,
+            Placeholder.configure({
+                placeholder: 'Write your note here...',
             }),
         ],
-        content: '<p></p>',
+        content: '',
         editorProps: {
             attributes: {
-                class: 'prose-editor focus:outline-none',
+                class: 'focus:outline-none',
             },
         },
         onUpdate: () => setSelectionCount((s) => s + 1),
@@ -40,7 +42,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
     useEffect(() => {
         if (!editor || !note) return;
 
-        const content = (note?.content as string) || '<p></p>';
+        const content = (note?.content as string) || '';
         editor.commands.setContent(content);
     }, [note, editor]);
 

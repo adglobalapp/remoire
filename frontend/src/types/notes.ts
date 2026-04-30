@@ -12,8 +12,3 @@ export interface NoteModalProps {
     onSave: (data: Partial<Note>) => Promise<void>;
     onDelete?: (id: number) => void;
 }
-
-export interface ChecklistItem {
-    completed: boolean;
-    text: string;
-}
