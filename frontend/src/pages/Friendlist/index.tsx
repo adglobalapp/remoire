@@ -9,6 +9,7 @@ import List from './components/list/List';
 import AddFriend from './components/modal/AddFriend';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import DeleteConfirmation from '../../components/common/DeleteConfirmation';
+import { useAuth } from '../../contexts/AuthContext';
 import toast from 'react-hot-toast';
 
 const FriendlistPage = () => {
@@ -21,6 +22,7 @@ const FriendlistPage = () => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [isConfirming, setIsConfirming] = useState(false);
     const { showProfile, blockedUserIds, blockUser } = useUserProfile();
+    const { isAuthenticated } = useAuth();
 
     const [confirmAction, setConfirmAction] = useState<{
         type: 'delete' | 'block';
@@ -30,6 +32,8 @@ const FriendlistPage = () => {
     } | null>(null);
 
     const fetchData = useCallback(async () => {
+        if (!isAuthenticated) return;
+
         setIsLoading(true);
         try {
             const [friendsData, requestsData] = await Promise.all([getRelationships(), getRelationshipRequests()]);
@@ -38,11 +42,13 @@ const FriendlistPage = () => {
             setSentRequests(requestsData.sent);
         } catch (err: unknown) {
             const error = err as ApiError;
-            toast.error(error.message || 'Failed to load friends');
+            if (error.status !== 401) {
+                toast.error(error.message || 'Failed to load friends');
+            }
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [isAuthenticated]);
 
     useEffect(() => {
         fetchData();

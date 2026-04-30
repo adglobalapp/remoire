@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import * as api from '../api/timelines';
 import { type Timeline, type TimelineContextValue, type TimelineProviderProps, type ApiError } from '../types';
+import { useAuth } from './AuthContext';
 import toast from 'react-hot-toast';
 
 const DEFAULT_TIMELINE: Timeline = {
@@ -13,23 +14,31 @@ const DEFAULT_TIMELINE: Timeline = {
 export const TimelineContext = createContext<TimelineContextValue | null>(null);
 
 export const TimelineProvider = ({ children }: TimelineProviderProps) => {
+    const { isAuthenticated } = useAuth();
     const [timelines, setTimelines] = useState<Timeline[]>([DEFAULT_TIMELINE]);
     const [activeTimeline, setActiveTimeline] = useState<Timeline | null>(DEFAULT_TIMELINE);
     const [isLoading, setIsLoading] = useState(true);
 
-    const refreshTimelines = useCallback(async (newActiveId?: number) => {
-        try {
-            const data = await api.getTimelines();
-            setTimelines(data);
-            setActiveTimeline((curr) => {
-                const targetId = newActiveId !== undefined ? newActiveId : curr?.id;
-                return data.find((t) => t.id === targetId) || data[0];
-            });
-        } catch (err: unknown) {
-            const error = err as ApiError;
-            toast.error(error.message || 'Failed to refresh timelines');
-        }
-    }, []);
+    const refreshTimelines = useCallback(
+        async (newActiveId?: number) => {
+            if (!isAuthenticated) return;
+
+            try {
+                const data = await api.getTimelines();
+                setTimelines(data);
+                setActiveTimeline((curr) => {
+                    const targetId = newActiveId !== undefined ? newActiveId : curr?.id;
+                    return data.find((t) => t.id === targetId) || data[0];
+                });
+            } catch (err: unknown) {
+                const error = err as ApiError;
+                if (error.status !== 401) {
+                    toast.error(error.message || 'Failed to refresh timelines');
+                }
+            }
+        },
+        [isAuthenticated],
+    );
 
     useEffect(() => {
         setIsLoading(true);

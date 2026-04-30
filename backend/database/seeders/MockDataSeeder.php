@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Hash;
 
 class MockDataSeeder extends Seeder
 {
+    private const PRESET_COLORS = [
+        '#f8a5c2', '#fab387', '#cba6f7', '#89dceb', '#f9e2af',
+        '#a6e3a1', '#f38ba8', '#94e2d5', '#89b4fa', '#f5e0dc',
+    ];
+
     /**
      * Run the database seeds.
      */
@@ -134,19 +139,28 @@ class MockDataSeeder extends Seeder
             }
         }
 
-        for ($i = 0; $i < 40; $i++) {
-            $createdAt = Carbon::now()->subDays(rand(0, 730));
-            $entry = Entry::factory()->create([
-                'user_id' => $mainUser->id,
-                'location_name' => 'Budapest, Hungary',
-                'created_at' => $createdAt,
-                'updated_at' => $createdAt,
-            ]);
-            $entry->update([
-                'latitude' => 47.4979 + fake()->randomFloat(4, -0.05, 0.05),
-                'longitude' => 19.0402 + fake()->randomFloat(4, -0.05, 0.05),
-            ]);
-            $entry->timelines()->syncWithoutDetaching([$defaultTimeline->id]);
+        $powerUsers = $acceptedFriends->random(5);
+        foreach ($powerUsers as $pu) {
+            for ($j = 0; $j < 5; $j++) {
+                $createdAt = Carbon::now()->subDays(rand(0, 365));
+                $entry = Entry::factory()->create([
+                    'user_id' => $pu->id,
+                    'title' => 'Shared: '.fake()->sentence(3),
+                    'created_at' => $createdAt,
+                    'updated_at' => $createdAt,
+                    'latitude' => fake()->latitude(),
+                    'longitude' => fake()->longitude(),
+                    'location_name' => fake()->city().', '.fake()->country(),
+                    'color' => self::PRESET_COLORS[rand(0, count(self::PRESET_COLORS) - 1)],
+                ]);
+
+                $entry->participants()->attach($mainUser->id);
+
+                if (fake()->boolean(30)) {
+                    $otherFriends = $acceptedFriends->where('id', '!=', $pu->id)->where('id', '!=', $mainUser->id)->random(rand(1, 2));
+                    $entry->participants()->attach($otherFriends->pluck('id'));
+                }
+            }
         }
 
         $notesData = [

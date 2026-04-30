@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { getEntries, createEntry as apiCreateEntry, updateEntry as apiUpdateEntry, deleteEntry as apiDeleteEntry } from '../api/entries';
+import { useAuth } from './AuthContext';
 import { type Entry, type EntryContextValue, type EntryProviderProps, type ApiError } from '../types';
 import { useAutoSave } from '../hooks/useAutoSave';
 
@@ -10,9 +11,12 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
     const [entries, setEntries] = useState<Entry[]>([]);
     const [activeEntry, setActiveEntry] = useState<Entry | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const { isAuthenticated } = useAuth();
     const { dispatchSave } = useAutoSave(setEntries, setActiveEntry);
 
     useEffect(() => {
+        if (!isAuthenticated) return;
+
         getEntries()
             .then(async (data) => {
                 if (data && data.length > 0) {
@@ -31,13 +35,17 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
                     }
                 }
             })
-            .catch((err) => {
+            .catch((err: unknown) => {
+                const error = err as ApiError;
+                if (error.status !== 401) {
+                    toast.error(error.message || 'Failed to fetch entries');
+                }
                 console.error('Failed to fetch entries:', err);
             })
             .finally(() => {
                 setIsLoading(false);
             });
-    }, []);
+    }, [isAuthenticated]);
 
     const selectEntry = useCallback((entry: Entry) => {
         setActiveEntry(entry);

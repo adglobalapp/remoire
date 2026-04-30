@@ -36,7 +36,7 @@ const Header = () => {
                 if (profileRes.message) toast.success(profileRes.message);
             }
         } catch (err) {
-            toast.error((err as Error).message || 'Failed to upload image');
+            toast.error((err as Error).message || 'Failed to upload image', { id: 'upload-error' });
         } finally {
             setIsUploading(false);
         }
@@ -55,7 +55,7 @@ const Header = () => {
             setUser(profileRes.user);
             if (profileRes.message) toast.success(profileRes.message);
         } catch (err) {
-            toast.error((err as Error).message || 'Failed to remove avatar');
+            toast.error((err as Error).message || 'Failed to remove avatar', { id: 'upload-error' });
         } finally {
             setIsUploading(false);
         }

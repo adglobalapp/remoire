@@ -37,6 +37,10 @@
     animation-delay: calc(var(--delay, 0) * 100ms);
 }
 
+.listMargin {
+    margin-bottom: 30px;
+}
+
 @keyframes friendListFadeUp {
     from {
         opacity: 0;

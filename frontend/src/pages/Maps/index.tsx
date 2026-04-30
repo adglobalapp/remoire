@@ -85,7 +85,6 @@ const MapsPage = () => {
                                             <div className={styles.popupContent}>
                                                 <div className={styles.popupHeader}>
                                                     <h4 className={styles.popupTitle}>{entry.title || 'Untitled'}</h4>
-                                                    {!isOwn && <span className={styles.sharedBadge}>Shared</span>}
                                                 </div>
 
                                                 <div className={styles.popupMeta}>
@@ -105,12 +104,20 @@ const MapsPage = () => {
                                                     )}
                                                 </div>
 
-                                                <button
-                                                    className={`btn btn-primary btn-sm ${styles.viewBtn}`}
-                                                    onClick={() => handleViewEntry(entry)}
-                                                >
-                                                    <Eye size={17} /> View Entry
-                                                </button>
+                                                <div className={styles.popupFooter}>
+                                                    {isOwn ? (
+                                                        <button
+                                                            className={`btn btn-primary btn-sm ${styles.viewBtn}`}
+                                                            onClick={() => handleViewEntry(entry)}
+                                                        >
+                                                            <Eye size={17} /> View Entry
+                                                        </button>
+                                                    ) : (
+                                                        <div className={styles.sharedWrapper}>
+                                                            <span className={styles.sharedBadge}>Shared with you</span>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                         </Popup>
                                     </Marker>

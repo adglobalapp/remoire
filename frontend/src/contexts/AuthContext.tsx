@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     setUser(userData);
                 } catch (err: unknown) {
                     const error = err as ApiError;
-                    toast.error(error.message || 'Authentication failed', { id: 'auth-fail' });
+                    toast.error(error.message || 'Authentication failed', { id: 'auth-error' });
                     if (error.status === 401) {
                         logout();
                     }

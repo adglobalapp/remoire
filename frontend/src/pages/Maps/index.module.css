@@ -28,6 +28,12 @@
     background-color: var(--color-light-beige);
 }
 
+.popup :global(.leaflet-popup-close-button) {
+    padding: 8px 24px 0 0 !important;
+    color: var(--color-dark-brown) !important;
+    font-size: 1.1rem !important;
+}
+
 .popupContent {
     padding: 16px;
     display: flex;
@@ -55,7 +61,7 @@
 .sharedBadge {
     background-color: var(--color-dark-beige);
     color: var(--color-dark-brown);
-    font-size: 0.8rem;
+    font-size: 1rem;
     padding: 2px 8px;
     border-radius: 4px;
     text-transform: uppercase;
@@ -63,6 +69,16 @@
     font-family: var(--font-ui);
     font-weight: 500;
     opacity: 0.9;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.sharedWrapper {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
 }
 
 .popupMeta {
@@ -88,10 +104,20 @@
 }
 
 .viewBtn {
-    align-self: center;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     font-size: 1rem;
     padding: 2px 12px;
     margin-top: 4px;
+}
+
+.popupFooter {
+    display: flex;
+    margin-top: 4px;
+    width: 100%;
 }
 
 .statsOverlay {
@@ -118,6 +144,7 @@
     font-weight: 400 !important;
     color: var(--color-burgundy);
 }
+
 :global(.leaflet-control-zoom) :global(.leaflet-control-zoom-in),
 :global(.leaflet-control-zoom) :global(.leaflet-control-zoom-out) {
     background-color: white !important;
@@ -129,6 +156,7 @@
 :global(.leaflet-control-zoom) :global(.leaflet-control-zoom-out):hover {
     background-color: var(--color-dark-beige) !important;
 }
+
 .customMarker {
     background: transparent;
     border: none;
@@ -182,10 +210,20 @@
 }
 
 .viewBtn {
-    align-self: center;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     font-size: 1rem;
     padding: 2px 12px;
     margin-top: 4px;
+}
+
+.popupFooter {
+    display: flex;
+    margin-top: 4px;
+    width: 100%;
 }
 
 .statsOverlay {
@@ -221,6 +259,7 @@
     color: var(--color-dark-brown);
     opacity: 0.7;
 }
+
 :global(.leaflet-control-zoom) :global(.leaflet-control-zoom-in),
 :global(.leaflet-control-zoom) :global(.leaflet-control-zoom-out) {
     background-color: white !important;
@@ -232,6 +271,7 @@
 :global(.leaflet-control-zoom) :global(.leaflet-control-zoom-out):hover {
     background-color: var(--color-dark-beige) !important;
 }
+
 .customMarker {
     background: transparent;
     border: none;
@@ -261,6 +301,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
 .customCluster {
     background: transparent;
     border: none;

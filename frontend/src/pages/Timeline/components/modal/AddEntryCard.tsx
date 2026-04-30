@@ -266,7 +266,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                                                 toast.success(result.message || 'Image uploaded');
                                             } else if (result.error) {
                                                 setUploadError(result.error);
-                                                toast.error(`Upload error: ${result.error}`);
+                                                toast.error(`Upload error: ${result.error}`, { id: 'upload-error' });
                                             }
                                             setIsUploading(false);
                                         }

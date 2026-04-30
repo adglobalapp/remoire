@@ -4,6 +4,7 @@ import Loader from '../../components/common/Loader';
 import toast from 'react-hot-toast';
 import Navbar from '../../components/common/Navbar';
 import styles from './index.module.css';
+import { useAuth } from '../../contexts/AuthContext';
 import { type Note as NoteType, type ApiError } from '../../types';
 import { getNotes, createNote, updateNote, deleteNote } from '../../api';
 import Note from './components/Note/Note';
@@ -11,6 +12,7 @@ import NoteModal from './components/Modal/NoteModal';
 import DeleteConfirmation from '../../components/common/DeleteConfirmation';
 
 const NotesPage = () => {
+    const { isAuthenticated } = useAuth();
     const [notes, setNotes] = useState<NoteType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedNote, setSelectedNote] = useState<NoteType | null>(null);
@@ -19,17 +21,21 @@ const NotesPage = () => {
     const [isDeleting, setIsDeleting] = useState(false);
 
     const fetchNotes = useCallback(async () => {
+        if (!isAuthenticated) return;
+
         setIsLoading(true);
         try {
             const data = await getNotes();
             setNotes(data);
         } catch (err: unknown) {
             const error = err as ApiError;
-            toast.error(error.message || 'Failed to load notes');
+            if (error.status !== 401) {
+                toast.error(error.message || 'Failed to load notes');
+            }
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    }, [isAuthenticated]);
 
     useEffect(() => {
         fetchNotes();
