@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Trash2, Bold, Italic, Underline, Heading1, Heading2, ListChecks, Type, Pin, X, Loader2 } from 'lucide-react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -17,6 +17,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
     const [isSaving, setIsSaving] = useState(false);
 
     const [, setSelectionCount] = useState(0);
+    const isMouseDownOnOverlay = useRef(false);
 
     const editor = useEditor({
         extensions: [
@@ -58,10 +59,23 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
         setIsSaving(false);
     };
 
+    const handleOverlayMouseDown = (e: React.MouseEvent) => {
+        if (e.target === e.currentTarget) {
+            isMouseDownOnOverlay.current = true;
+        }
+    };
+
+    const handleOverlayMouseUp = (e: React.MouseEvent) => {
+        if (e.target === e.currentTarget && isMouseDownOnOverlay.current) {
+            onClose();
+        }
+        isMouseDownOnOverlay.current = false;
+    };
+
     if (!editor) return null;
 
     return ReactDOM.createPortal(
-        <div className="global-modal-overlay" onClick={onClose}>
+        <div className="global-modal-overlay" onMouseDown={handleOverlayMouseDown} onMouseUp={handleOverlayMouseUp}>
             <div
                 className={`${styles.modalContent} global-modal-content`}
                 onClick={(e) => e.stopPropagation()}

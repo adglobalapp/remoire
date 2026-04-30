@@ -22,7 +22,7 @@ const Note: React.FC<NoteProps> = ({ note, onClick, index = 0 }) => {
 
             {note.is_pinned && (
                 <div className={styles.pinIcon} title="Pinned Note">
-                    <Pin />
+                    <Pin size={14} fill="currentColor" />
                 </div>
             )}
         </div>

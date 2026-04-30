@@ -50,10 +50,8 @@
     color: var(--color-dark-brown);
     opacity: 0.5;
     width: 38px;
-
     height: 38px;
     padding: 0 !important;
-
     border-radius: 50%;
     transition: all 0.2s;
     display: flex;
@@ -152,7 +150,8 @@
     margin-bottom: 0.6rem;
 }
 
-:global(.ProseMirror p[data-placeholder]::before) {
+:global(.ProseMirror p.is-editor-empty:first-child::before),
+:global(.ProseMirror p.is-empty:first-child::before) {
     content: attr(data-placeholder);
     float: left;
     color: var(--color-dark-brown);

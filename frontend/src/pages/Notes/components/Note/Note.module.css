@@ -155,14 +155,6 @@
     justify-content: center;
 }
 
-.pinIcon svg {
-    width: 14px;
-    height: 14px;
-    fill: #000000;
-    stroke: var(--color-dark-brown, #000000);
-    stroke-width: 2.5px;
-}
-
 @media (max-width: 600px) {
     .noteCard {
         aspect-ratio: unset;
