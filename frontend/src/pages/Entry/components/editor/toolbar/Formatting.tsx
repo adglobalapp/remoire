@@ -14,6 +14,7 @@ export const History = ({ editor, isDragMode }: FormattingProps) => (
         >
             <Undo size={18} />
         </button>
+
         <button
             type="button"
             onClick={() => editor.chain().redo().run()}
@@ -39,6 +40,7 @@ export const TextFormatting = ({ editor, isDragMode }: FormattingProps) => (
         >
             <Bold size={18} />
         </button>
+
         <button
             type="button"
             onClick={() => editor.chain().toggleItalic().run()}
@@ -50,6 +52,7 @@ export const TextFormatting = ({ editor, isDragMode }: FormattingProps) => (
         >
             <Italic size={18} />
         </button>
+
         <button
             type="button"
             onClick={() => editor.chain().toggleUnderline().run()}
@@ -77,6 +80,7 @@ export const Alignment = ({ editor, isDragMode }: FormattingProps) => (
         >
             <AlignLeft size={18} />
         </button>
+
         <button
             type="button"
             disabled={isDragMode}
@@ -88,6 +92,7 @@ export const Alignment = ({ editor, isDragMode }: FormattingProps) => (
         >
             <AlignCenter size={18} />
         </button>
+
         <button
             type="button"
             disabled={isDragMode}
@@ -99,6 +104,7 @@ export const Alignment = ({ editor, isDragMode }: FormattingProps) => (
         >
             <AlignRight size={18} />
         </button>
+
         <button
             type="button"
             disabled={isDragMode}
@@ -128,6 +134,7 @@ export const Lists = ({ editor, isDragMode }: FormattingProps) => (
         >
             <List size={18} />
         </button>
+
         <button
             type="button"
             disabled={isDragMode}

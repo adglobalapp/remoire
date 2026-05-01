@@ -25,6 +25,18 @@ const mockTimelineContextValue: TimelineContextValue = {
     removeEntryFromTimeline: vi.fn(),
 };
 
+vi.mock('../contexts/AuthContext', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('../contexts/AuthContext')>();
+    return {
+        ...actual,
+        useAuth: () => ({
+            isAuthenticated: true,
+            user: { id: 1, name: 'Test' },
+            isLoading: false,
+        }),
+    };
+});
+
 describe('TimelinePage', () => {
     it('renders correctly', () => {
         render(

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Book, History, StickyNote, Sparkles, Users, MapPin } from 'lucide-react';
 import styles from './index.module.css';
 import Avatar from '../../components/common/Avatar';
@@ -7,8 +7,8 @@ import Login from '../../components/auth/Login';
 import Register from '../../components/auth/Register';
 
 const LandingPage: React.FC = () => {
-    const [showLogin, setShowLogin] = React.useState(false);
-    const [showRegister, setShowRegister] = React.useState(false);
+    const [showLogin, setShowLogin] = useState(false);
+    const [showRegister, setShowRegister] = useState(false);
 
     return (
         <div className={styles.landingContainer}>
@@ -60,7 +60,6 @@ const LandingPage: React.FC = () => {
 
             <section className={styles.showcase}>
                 <FeatureCard
-                    index={0}
                     icon={Book}
                     title="Personal Journal"
                     content="Keep a digital diary of your days. Whether it's a deep reflection or a quick highlight, record the moments that shape your story."
@@ -77,7 +76,6 @@ const LandingPage: React.FC = () => {
                 </FeatureCard>
 
                 <FeatureCard
-                    index={1}
                     icon={History}
                     title="Living Timelines"
                     content="See your memories unfold on an interactive canvas. Connect different chapters of your life and see how your journey evolves over months and years."
@@ -95,7 +93,6 @@ const LandingPage: React.FC = () => {
                 </FeatureCard>
 
                 <FeatureCard
-                    index={2}
                     icon={StickyNote}
                     title="Quick Thoughts"
                     content="For those small sparks of inspiration and random ideas that don't need a full entry. Pin them down instantly so you never lose a thought."
@@ -108,7 +105,6 @@ const LandingPage: React.FC = () => {
                 </FeatureCard>
 
                 <FeatureCard
-                    index={3}
                     icon={Users}
                     title="Share the Journey"
                     content="Stay connected with your inner circle. Share your favorite spots and latest updates, and keep up with what your friends are discovering too."

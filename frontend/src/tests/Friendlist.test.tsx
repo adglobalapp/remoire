@@ -15,6 +15,17 @@ vi.mock('../api', () => ({
     sendRelationshipRequest: vi.fn(),
 }));
 
+vi.mock('../contexts/AuthContext', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('../contexts/AuthContext')>();
+    return {
+        ...actual,
+        useAuth: () => ({
+            isAuthenticated: true,
+            user: { id: 1, name: 'Test User' },
+        }),
+    };
+});
+
 vi.mock('../components/common/Navbar', () => ({
     default: () => <div data-testid="navbar">Navbar</div>,
 }));
@@ -33,6 +44,8 @@ vi.mock('react-hot-toast', () => ({
 const mockUserProfileContextValue: UserProfileContextType = {
     showProfile: vi.fn(),
     blockedUserIds: new Set(),
+    blockedUsers: [],
+    isLoadingBlocked: false,
     isBlocked: vi.fn().mockReturnValue(false),
     refreshBlockedUsers: vi.fn(),
     blockUser: vi.fn(),

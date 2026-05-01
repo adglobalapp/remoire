@@ -12,16 +12,15 @@ const rgbToHex = (color: string) => {
     if (color.startsWith('#')) return color;
     const match = color.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?\)$/);
     if (!match) return color;
-    const r = parseInt(match[1]);
-    const g = parseInt(match[2]);
-    const b = parseInt(match[3]);
+    const [r, g, b] = [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])];
     return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
 };
 
 const ColorPalette = ({ editor, isDragMode, onColorPickerToggle }: ColorPaletteProps) => {
     const [currentColor, setCurrentColor] = useState('#493627');
-    const [recentColors, setRecentColors] = useState<string[]>([]);
+    const [documentColors, setDocumentColors] = useState<string[]>([]);
     const [showPalette, setShowPalette] = useState(false);
+    const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
 
     const isPickingColorRef = useRef(false);
     const paletteRef = useRef<HTMLDivElement>(null);
@@ -31,55 +30,28 @@ const ColorPalette = ({ editor, isDragMode, onColorPickerToggle }: ColorPaletteP
     useEffect(() => {
         if (!editor) return;
 
-        const updateRecentColors = () => {
+        const updateDocumentColors = () => {
             const colors = new Set<string>();
             editor.state.doc.descendants((node) => {
-                if (node.marks) {
-                    node.marks.forEach((mark) => {
-                        if (mark.type.name === 'textStyle' && mark.attrs.color) {
-                            colors.add(mark.attrs.color.toLowerCase());
-                        }
-                    });
-                }
+                node.marks?.forEach((mark) => {
+                    if (mark.type.name === 'textStyle' && mark.attrs.color) colors.add(mark.attrs.color.toLowerCase());
+                });
                 return true;
             });
-            const combined = Array.from(colors).reverse();
-            setRecentColors(
-                combined.filter((c) => !PRESET_COLORS.includes(c.toUpperCase()) && !PRESET_COLORS.includes(c.toLowerCase())).slice(0, 10),
+            setDocumentColors(
+                Array.from(colors)
+                    .reverse()
+                    .filter((c) => !PRESET_COLORS.some((p) => p.toLowerCase() === c.toLowerCase()))
+                    .slice(0, 10),
             );
         };
 
         const updateState = (props?: { transaction?: Transaction }) => {
             if (isPickingColorRef.current) return;
 
-            try {
-                const { empty } = editor.state.selection;
-                let color = null;
-
-                if (empty) {
-                    const marks = editor.state.selection.$from.marks();
-                    const colorMark = marks.find((m) => m.type.name === 'textStyle' && m.attrs.color);
-                    if (colorMark) {
-                        color = colorMark.attrs.color;
-                    }
-                } else {
-                    color = editor.getAttributes('textStyle').color;
-                }
-
-                if (color) {
-                    setCurrentColor(color);
-                } else {
-                    const style = window.getComputedStyle(editor.view.dom);
-                    setCurrentColor(rgbToHex(style.color));
-                }
-
-                const isPreview = props?.transaction?.getMeta('isColorPreview');
-                if (!isPreview) {
-                    updateRecentColors();
-                }
-            } catch (err) {
-                console.error('Toolbar color update error:', err);
-            }
+            const color = editor.getAttributes('textStyle').color || rgbToHex(window.getComputedStyle(editor.view.dom).color);
+            setCurrentColor(color);
+            if (!props?.transaction?.getMeta('isColorPreview')) updateDocumentColors();
         };
 
         const handleFocus = () => {
@@ -87,37 +59,20 @@ const ColorPalette = ({ editor, isDragMode, onColorPickerToggle }: ColorPaletteP
             onColorPickerToggle?.(false);
         };
 
-        editor.on('selectionUpdate', updateState);
-        editor.on('transaction', updateState);
-        editor.on('focus', handleFocus);
-
+        editor.on('selectionUpdate', updateState).on('transaction', updateState).on('focus', handleFocus);
         return () => {
-            editor.off('selectionUpdate', updateState);
-            editor.off('transaction', updateState);
-            editor.off('focus', handleFocus);
+            editor.off('selectionUpdate', updateState).off('transaction', updateState).off('focus', handleFocus);
         };
     }, [editor, onColorPickerToggle]);
-
-    const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
-
-    useEffect(() => {
-        if (showPalette && paletteRef.current) {
-            setAnchorRect(paletteRef.current.getBoundingClientRect());
-        }
-    }, [showPalette]);
 
     useEffect(() => {
         if (!showPalette) return;
 
-        const handleResize = () => {
-            if (paletteRef.current) {
-                setAnchorRect(paletteRef.current.getBoundingClientRect());
-            }
-        };
+        const updatePos = () => paletteRef.current && setAnchorRect(paletteRef.current.getBoundingClientRect());
+        updatePos();
 
         const handleGlobalClick = (e: MouseEvent) => {
-            const target = e.target as HTMLElement;
-            if (paletteRef.current && !paletteRef.current.contains(target)) {
+            if (paletteRef.current && !paletteRef.current.contains(e.target as HTMLElement)) {
                 setShowPalette(false);
                 isPickingColorRef.current = false;
                 onColorPickerToggle?.(false);
@@ -125,34 +80,79 @@ const ColorPalette = ({ editor, isDragMode, onColorPickerToggle }: ColorPaletteP
         };
 
         document.addEventListener('mousedown', handleGlobalClick);
-        window.addEventListener('resize', handleResize);
+        window.addEventListener('resize', updatePos);
         return () => {
             document.removeEventListener('mousedown', handleGlobalClick);
-            window.removeEventListener('resize', handleResize);
+            window.removeEventListener('resize', updatePos);
         };
     }, [showPalette, onColorPickerToggle]);
 
     const applyColor = (color: string) => {
         setCurrentColor(color);
-        editor.chain().setColor(color).run();
+        editor.chain().setColor(color).setTextSelection(editor.state.selection.to).blur().run();
         setShowPalette(false);
         isPickingColorRef.current = false;
         onColorPickerToggle?.(false);
     };
+
+    const updateColorPreview = (val: string, isFinal = false) => {
+        setCurrentColor(val);
+        const now = Date.now();
+        if (isFinal || now - lastPreviewTimeRef.current > 32) {
+            lastPreviewTimeRef.current = now;
+            const { from, to } = editor.state.selection;
+            const tr = editor.state.tr.setMeta('addToHistory', false).setMeta('isColorPreview', !isFinal);
+            const markType = editor.schema.marks.textStyle;
+
+            editor.state.doc.nodesBetween(from, to, (node, pos) => {
+                if (!node.isText) return;
+
+                const existingMark = node.marks.find((m) => m.type === markType);
+                tr.addMark(
+                    Math.max(from, pos),
+                    Math.min(to, pos + node.nodeSize),
+                    markType.create({ ...existingMark?.attrs, color: isFinal ? val : val }),
+                );
+            });
+            editor.view.dispatch(tr);
+            if (isFinal) {
+                editor.chain().setColor(val).setTextSelection(to).blur().run();
+                originalColorRef.current = null;
+                isPickingColorRef.current = false;
+                onColorPickerToggle?.(false);
+            }
+        }
+    };
+
+    const renderColorGrid = (label: string, colors: string[]) =>
+        colors.length > 0 && (
+            <div className={styles.paletteSection}>
+                <div className={styles.paletteLabel}>{label}</div>
+                <div className={styles.colorGrid}>
+                    {colors.map((color) => (
+                        <button
+                            key={color}
+                            type="button"
+                            className={styles.colorSquare}
+                            style={{ backgroundColor: color }}
+                            onClick={() => applyColor(color)}
+                        />
+                    ))}
+                </div>
+            </div>
+        );
 
     return (
         <div className={styles.paletteContainer} ref={paletteRef}>
             <button
                 type="button"
                 disabled={isDragMode}
-                className={classNames(styles.actionButton, {
-                    [styles.isActive]: showPalette,
-                })}
+                title="Color Palette"
+                className={classNames(styles.actionButton, { [styles.isActive]: showPalette })}
                 onClick={(e) => {
                     e.stopPropagation();
                     setShowPalette(!showPalette);
                 }}
-                title="Color Palette"
             >
                 <Palette size={18} />
                 <div className={styles.colorIndicator} style={{ backgroundColor: currentColor }} />
@@ -172,43 +172,12 @@ const ColorPalette = ({ editor, isDragMode, onColorPickerToggle }: ColorPaletteP
                             zIndex: 10000,
                         }}
                     >
-                        {recentColors.length > 0 && (
-                            <>
-                                <div className={styles.paletteSection}>
-                                    <div className={styles.paletteLabel}>Document colors</div>
-                                    <div className={styles.colorGrid}>
-                                        {recentColors.map((color) => (
-                                            <button
-                                                key={color}
-                                                type="button"
-                                                className={styles.colorSquare}
-                                                style={{ backgroundColor: color }}
-                                                onClick={() => applyColor(color)}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                                <div className={styles.paletteDivider} />
-                            </>
-                        )}
+                        {renderColorGrid('Document colors', documentColors)}
 
-                        <div className={styles.paletteSection}>
-                            <div className={styles.paletteLabel}>Preset Colors</div>
-                            <div className={styles.colorGrid}>
-                                {PRESET_COLORS.map((color) => (
-                                    <button
-                                        key={color}
-                                        type="button"
-                                        className={styles.colorSquare}
-                                        style={{ backgroundColor: color }}
-                                        onClick={() => applyColor(color)}
-                                    />
-                                ))}
-                            </div>
-                        </div>
+                        {documentColors.length > 0 && <div className={styles.paletteDivider} />}
 
+                        {renderColorGrid('Preset Colors', PRESET_COLORS)}
                         <div className={styles.paletteDivider} />
-
                         <div className={styles.customColorSection}>
                             <div className={styles.paletteLabel}>Custom Color</div>
                             <div className={styles.colorInputWrapper}>
@@ -220,61 +189,15 @@ const ColorPalette = ({ editor, isDragMode, onColorPickerToggle }: ColorPaletteP
                                         isPickingColorRef.current = true;
                                         originalColorRef.current = editor.getAttributes('textStyle').color || '#493627';
                                         onColorPickerToggle?.(true);
+                                        editor.commands.blur();
                                     }}
-                                    onInput={(e) => {
-                                        const val = (e.currentTarget as HTMLInputElement).value;
-                                        setCurrentColor(val);
-                                        const now = Date.now();
-                                        if (now - lastPreviewTimeRef.current > 32) {
-                                            lastPreviewTimeRef.current = now;
-                                            const { from, to } = editor.state.selection;
-                                            const tr = editor.state.tr.setMeta('addToHistory', false).setMeta('isColorPreview', true);
-                                            const markType = editor.schema.marks.textStyle;
-                                            editor.state.doc.nodesBetween(from, to, (node, pos) => {
-                                                if (!node.isText) return;
-                                                const existingMark = node.marks.find((m) => m.type === markType);
-                                                const newAttrs = existingMark ? { ...existingMark.attrs, color: val } : { color: val };
-                                                tr.addMark(
-                                                    Math.max(from, pos),
-                                                    Math.min(to, pos + node.nodeSize),
-                                                    markType.create(newAttrs),
-                                                );
-                                            });
-                                            editor.view.dispatch(tr);
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        const val = (e.currentTarget as HTMLInputElement).value;
-                                        if (originalColorRef.current !== null) {
-                                            const { from, to } = editor.state.selection;
-                                            const tr = editor.state.tr.setMeta('addToHistory', false);
-                                            const markType = editor.schema.marks.textStyle;
-                                            editor.state.doc.nodesBetween(from, to, (node, pos) => {
-                                                if (!node.isText) return;
-                                                const existingMark = node.marks.find((m) => m.type === markType);
-                                                const newAttrs = existingMark
-                                                    ? {
-                                                          ...existingMark.attrs,
-                                                          color: originalColorRef.current,
-                                                      }
-                                                    : { color: originalColorRef.current };
-                                                tr.addMark(
-                                                    Math.max(from, pos),
-                                                    Math.min(to, pos + node.nodeSize),
-                                                    markType.create(newAttrs),
-                                                );
-                                            });
-                                            editor.view.dispatch(tr);
-                                        }
-                                        editor.chain().setColor(val).run();
-                                        originalColorRef.current = null;
-                                        isPickingColorRef.current = false;
-                                        onColorPickerToggle?.(false);
-                                    }}
+                                    onInput={(e) => updateColorPreview(e.currentTarget.value)}
+                                    onChange={(e) => updateColorPreview(e.currentTarget.value, true)}
                                     onClick={() => {
                                         isPickingColorRef.current = true;
                                         originalColorRef.current = editor.getAttributes('textStyle').color || '#493627';
                                         onColorPickerToggle?.(true);
+                                        editor.commands.blur();
                                     }}
                                 />
                                 <span className={styles.colorHex}>{currentColor.toUpperCase()}</span>

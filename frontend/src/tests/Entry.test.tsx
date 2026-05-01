@@ -7,15 +7,31 @@ import { type EntryContextValue } from '../types';
 vi.mock('../components/common/Navbar', () => ({
     default: () => <div data-testid="navbar">Navbar</div>,
 }));
-vi.mock('../pages/Entry/components/sidebar/Left', () => ({
+vi.mock('../pages/Entry/components/sidebar/left/Left', () => ({
     default: () => <div data-testid="sidebar-left">Left</div>,
 }));
-vi.mock('../pages/Entry/components/sidebar/Right', () => ({
+vi.mock('../pages/Entry/components/sidebar/right/Right', () => ({
     default: () => <div data-testid="sidebar-right">Right</div>,
 }));
 vi.mock('../pages/Entry/components/editor/Canvas', () => ({
     default: () => <div data-testid="canvas">Canvas</div>,
 }));
+
+vi.mock('../contexts/AuthContext', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('../contexts/AuthContext')>();
+    return {
+        ...actual,
+        useAuth: () => ({ isAuthenticated: true, user: { id: 1 } }),
+    };
+});
+
+vi.mock('../contexts/UserProfileContext', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('../contexts/UserProfileContext')>();
+    return {
+        ...actual,
+        useUserProfile: () => ({ blockedUserIds: new Set() }),
+    };
+});
 
 const mockEntryContextValue: EntryContextValue = {
     entries: [],
@@ -43,7 +59,6 @@ describe('EntryPage', () => {
                 <EntryPage />
             </EntryContext.Provider>,
         );
-
         expect(screen.getByTestId('navbar')).toBeInTheDocument();
         expect(screen.getByTestId('sidebar-left')).toBeInTheDocument();
         expect(screen.getByTestId('sidebar-right')).toBeInTheDocument();

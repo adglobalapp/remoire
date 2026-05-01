@@ -42,7 +42,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     };
 
     const confirmDelete = async () => {
-        if (itemToDelete !== null) {
+        if (itemToDelete) {
             setIsConfirming(true);
             try {
                 await deleteEntry(itemToDelete);
@@ -115,7 +115,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                     />
                 </div>
 
-                {itemToDelete !== null && (
+                {itemToDelete && (
                     <DeleteConfirmation
                         title="Delete Entry"
                         message={

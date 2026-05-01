@@ -68,7 +68,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     };
 
     const confirmDelete = async () => {
-        if (itemToDelete !== null) {
+        if (itemToDelete) {
             setIsConfirming(true);
             try {
                 await deleteTimeline(itemToDelete);
@@ -153,7 +153,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                     </div>
                 </div>
 
-                {itemToDelete !== null && (
+                {itemToDelete && (
                     <DeleteConfirmation
                         title="Delete Timeline"
                         message={

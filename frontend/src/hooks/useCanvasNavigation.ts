@@ -72,7 +72,7 @@ export const useCanvasNavigation = (options: Options = {}) => {
                 const dy = e.touches[0].clientY - e.touches[1].clientY;
                 const distance = Math.sqrt(dx * dx + dy * dy);
 
-                if (lastTouchDistanceRef.current !== null && containerRef.current) {
+                if (lastTouchDistanceRef.current && containerRef.current) {
                     const rect = containerRef.current.getBoundingClientRect();
                     const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
                     const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;

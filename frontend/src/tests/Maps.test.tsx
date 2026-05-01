@@ -2,10 +2,15 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import MapsPage from '../pages/Maps/index';
 import { EntryContext } from '../contexts/EntryContext';
-import { AuthContext } from '../contexts/AuthContext';
 import { BrowserRouter } from 'react-router-dom';
 import { type ReactNode } from 'react';
-import { type AuthContextType, type EntryContextValue, type Entry, type User } from '../types';
+import { type EntryContextValue, type Entry, type User } from '../types';
+
+vi.mock('leaflet', () => ({
+    default: {
+        divIcon: vi.fn().mockReturnValue({}),
+    },
+}));
 
 vi.mock('react-leaflet', () => ({
     MapContainer: ({ children }: { children: ReactNode }) => <div data-testid="map-container">{children}</div>,
@@ -22,10 +27,17 @@ vi.mock('../components/common/Navbar', () => ({
     default: () => <div data-testid="navbar">Navbar</div>,
 }));
 
-const mockAuthContextValue: Partial<AuthContextType> = {
-    user: { id: 1, name: 'John', email: 'john@example.com', friend_code: 'J1', created_at: '' } as User,
-    isAuthenticated: true,
-};
+vi.mock('../contexts/AuthContext', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('../contexts/AuthContext')>();
+    return {
+        ...actual,
+        useAuth: () => ({
+            user: { id: 1, name: 'John', email: 'john@example.com', friend_code: 'J1', created_at: '' } as User,
+            isAuthenticated: true,
+            isLoading: false,
+        }),
+    };
+});
 
 const mockEntryContextValue: Partial<EntryContextValue> = {
     entries: [
@@ -47,11 +59,9 @@ describe('MapsPage', () => {
     it('renders map with markers', () => {
         render(
             <BrowserRouter>
-                <AuthContext.Provider value={mockAuthContextValue as AuthContextType}>
-                    <EntryContext.Provider value={mockEntryContextValue as EntryContextValue}>
-                        <MapsPage />
-                    </EntryContext.Provider>
-                </AuthContext.Provider>
+                <EntryContext.Provider value={mockEntryContextValue as EntryContextValue}>
+                    <MapsPage />
+                </EntryContext.Provider>
             </BrowserRouter>,
         );
 

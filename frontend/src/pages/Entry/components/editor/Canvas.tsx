@@ -192,7 +192,7 @@ const Canvas = () => {
     const handlePageSettingsChange = (newSettings: PageSettings) => {
         setPageSettings(newSettings);
         pageSettingsRef.current = newSettings;
-        if (initialEntryId !== null && editor) {
+        if (initialEntryId && editor) {
             const contentJSON = editor.getJSON();
             const currentTitle = extractTitleFromJSON(contentJSON);
             const serialized = JSON.stringify({

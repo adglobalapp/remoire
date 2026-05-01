@@ -8,7 +8,7 @@ import { formatDate } from '../../../../utils/dateUtils';
 import { getExcerpt, getImageUrl } from '../../../../utils/contentUtils';
 import Avatar from '../../../../components/common/Avatar';
 
-const EntryCard = ({ entry, side, index = 0 }: EntryCardProps) => {
+const EntryCard = ({ entry, side, idx = 0 }: EntryCardProps) => {
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
 
@@ -23,7 +23,7 @@ const EntryCard = ({ entry, side, index = 0 }: EntryCardProps) => {
     return (
         <div
             className={`${styles.nodeWrapper} ${side === 'right' ? styles.right : styles.left}`}
-            style={{ animationDelay: `${0.3 + index * 0.15}s` }}
+            style={{ animationDelay: `${0.3 + idx * 0.15}s` }}
         >
             <div className={styles.cardContainer}>
                 <div

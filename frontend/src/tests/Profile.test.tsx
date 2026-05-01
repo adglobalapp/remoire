@@ -1,16 +1,41 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Profile from '../pages/Profile/index';
-import { AuthContext } from '../contexts/AuthContext';
 import { UserProfileContext } from '../contexts/UserProfileContext';
+import { BrowserRouter } from 'react-router-dom';
 import * as profileApi from '../api/profile';
-import { type User, type AuthContextType, type UserProfileContextType } from '../types';
+import { type User, type UserProfileContextType } from '../types';
 
 vi.mock('../api/profile', () => ({
     updateProfile: vi.fn(),
     updatePassword: vi.fn(),
     getBlockedUsers: vi.fn().mockResolvedValue([]),
 }));
+
+vi.mock('../components/common/Navbar', () => ({
+    default: () => <div data-testid="navbar">Navbar</div>,
+}));
+
+const mockAuthResult = {
+    isAuthenticated: true,
+    user: {
+        id: 1,
+        name: 'John Doe',
+        email: 'john@example.com',
+        friend_code: 'JD123',
+        bio: 'Hello world',
+    },
+    isLoading: false,
+    setUser: vi.fn(),
+};
+
+vi.mock('../contexts/AuthContext', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('../contexts/AuthContext')>();
+    return {
+        ...actual,
+        useAuth: () => mockAuthResult,
+    };
+});
 
 const mockUser: User = {
     id: 1,
@@ -21,16 +46,11 @@ const mockUser: User = {
     created_at: '',
 };
 
-const mockAuthContextValue: Partial<AuthContextType> = {
-    user: mockUser,
-    setUser: vi.fn(),
-    isAuthenticated: true,
-    isLoading: false,
-};
-
 const mockUserProfileContextValue: UserProfileContextType = {
     showProfile: vi.fn(),
     blockedUserIds: new Set(),
+    blockedUsers: [],
+    isLoadingBlocked: false,
     isBlocked: vi.fn().mockReturnValue(false),
     unblockUser: vi.fn(),
     refreshBlockedUsers: vi.fn(),
@@ -44,13 +64,14 @@ describe('Profile Page', () => {
 
     it('renders user details correctly', async () => {
         render(
-            <AuthContext.Provider value={mockAuthContextValue as AuthContextType}>
+            <BrowserRouter>
                 <UserProfileContext.Provider value={mockUserProfileContextValue}>
                     <Profile />
                 </UserProfileContext.Provider>
-            </AuthContext.Provider>,
+            </BrowserRouter>,
         );
 
+        screen.debug();
         expect(await screen.findByText('John Doe')).toBeInTheDocument();
         expect(screen.getByText('john@example.com')).toBeInTheDocument();
         expect(screen.getByText('JD123')).toBeInTheDocument();
@@ -65,17 +86,17 @@ describe('Profile Page', () => {
         });
 
         render(
-            <AuthContext.Provider value={mockAuthContextValue as AuthContextType}>
+            <BrowserRouter>
                 <UserProfileContext.Provider value={mockUserProfileContextValue}>
                     <Profile />
                 </UserProfileContext.Provider>
-            </AuthContext.Provider>,
+            </BrowserRouter>,
         );
 
         await screen.findByText('John Doe');
         await screen.findByText(/No blocked users/i);
 
-        fireEvent.change(screen.getByLabelText(/What should we call you/i), {
+        fireEvent.change(screen.getByDisplayValue('John Doe'), {
             target: { value: 'New Name' },
         });
         fireEvent.click(screen.getByRole('button', { name: /Save/i }));
@@ -92,11 +113,11 @@ describe('Profile Page', () => {
         vi.mocked(profileApi.updatePassword).mockResolvedValue(true);
 
         render(
-            <AuthContext.Provider value={mockAuthContextValue as AuthContextType}>
+            <BrowserRouter>
                 <UserProfileContext.Provider value={mockUserProfileContextValue}>
                     <Profile />
                 </UserProfileContext.Provider>
-            </AuthContext.Provider>,
+            </BrowserRouter>,
         );
 
         await screen.findByText('John Doe');

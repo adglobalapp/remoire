@@ -56,6 +56,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 4px;
+}
+
+.modalBody {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .modalHeader h2 {

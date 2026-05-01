@@ -16,6 +16,17 @@ vi.mock('../components/common/Navbar', () => ({
     default: () => <div data-testid="navbar">Navbar</div>,
 }));
 
+vi.mock('../contexts/AuthContext', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('../contexts/AuthContext')>();
+    return {
+        ...actual,
+        useAuth: () => ({
+            isAuthenticated: true,
+            user: { id: 1, name: 'Test User' },
+        }),
+    };
+});
+
 describe('NotesPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();

@@ -86,21 +86,16 @@ const Canvas = () => {
             >
                 {visibleEntries.length > 0 && (
                     <div className={styles.timelineWrapper}>
-                        {}
                         <div className={styles.centerLine} />
 
-                        {}
-                        {visibleEntries.map((entry, index) => {
-                            const side: 'left' | 'right' = index % 2 === 0 ? 'left' : 'right';
-                            return (
-                                <EntryCard key={`${activeTimeline?.id || 'default'}-${entry.id}`} entry={entry} side={side} index={index} />
-                            );
+                        {visibleEntries.map((entry, idx) => {
+                            const side: 'left' | 'right' = idx % 2 === 0 ? 'left' : 'right';
+                            return <EntryCard key={`${activeTimeline?.id || 'default'}-${entry.id}`} entry={entry} side={side} idx={idx} />;
                         })}
                     </div>
                 )}
             </div>
 
-            {}
             {activeTimeline && (
                 <button
                     onClick={() => setIsAddModalOpen(true)}

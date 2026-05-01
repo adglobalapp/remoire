@@ -107,8 +107,8 @@ const NotesPage = () => {
                             </div>
                         ) : (
                             <div className={styles.notesGrid}>
-                                {notes.map((note, i) => (
-                                    <Note key={note.id} note={note} index={i} onClick={() => setSelectedNote(note)} />
+                                {notes.map((note, idx) => (
+                                    <Note key={note.id} note={note} index={idx} onClick={() => setSelectedNote(note)} />
                                 ))}
                             </div>
                         )}

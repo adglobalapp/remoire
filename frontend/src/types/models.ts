@@ -54,7 +54,6 @@ export interface Notification {
     type: 'friend_request' | 'anniversary';
     data: {
         requester_name?: string;
-        entry_id?: number;
         entry_title?: string;
         years?: number;
     };

@@ -13,6 +13,7 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
     cursor: pointer;
     border-top: 4px solid var(--accent-color, var(--color-pink));
+    animation: float 7s ease-in-out infinite;
 }
 
 .card:hover {
@@ -46,14 +47,6 @@
 .mockContainer {
     margin-top: auto;
     width: 100%;
-}
-
-.even {
-    animation: float 7s ease-in-out infinite;
-}
-
-.odd {
-    animation: float 7s ease-in-out infinite reverse;
 }
 
 @keyframes float {

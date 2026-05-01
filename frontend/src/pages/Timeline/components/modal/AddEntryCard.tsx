@@ -6,7 +6,6 @@ import { uploadImage } from '../../../../api';
 import { useEntryContext } from '../../../../contexts/EntryContext';
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
 import DeleteConfirmation from '../../../../components/common/DeleteConfirmation';
-import FieldError from '../../../../components/common/FieldError';
 import { type AddEntryCardProps, type ApiError } from '../../../../types';
 import { PRESET_COLORS } from '../../../../utils/constants';
 import styles from './AddEntryCard.module.css';
@@ -22,8 +21,6 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
     const [isConfirming, setIsConfirming] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
-    const [uploadError, setUploadError] = useState<string | null>(null);
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
     const [customColor, setCustomColor] = useState<string>(
         PRESET_COLORS.includes(entryToEdit?.color || '') ? '' : entryToEdit?.color || '',
     );
@@ -37,7 +34,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
 
     const handleEntrySelect = (id: number) => {
         setSelectedEntryId(id);
-        const entry = entries.find((ent) => ent.id === id);
+        const entry = entries.find((e) => e.id === id);
         if (entry) {
             const entryColor = entry.color || '';
             const isPreset = PRESET_COLORS.includes(entryColor);
@@ -45,33 +42,19 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
             setCustomColor(isPreset ? '' : entryColor);
             setImageUrl(entry.image_url || '');
         }
-        setFieldErrors({});
     };
 
     const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value;
-        setCustomColor(val);
+        setCustomColor(e.target.value);
         setColor('');
-        if (fieldErrors.color) {
-            setFieldErrors((prev) => {
-                const newErrors = { ...prev };
-                delete newErrors.color;
-                return newErrors;
-            });
-        }
-    };
-
-    const handleColorSave = () => {
-        return color || customColor || null;
     };
 
     const handleSave = async () => {
         if (!selectedEntryId) return;
         setIsLoading(true);
-        setFieldErrors({});
         try {
             const res = await updateEntry(Number(selectedEntryId), {
-                color: handleColorSave(),
+                color: color || customColor || null,
                 image_url: imageUrl || null,
             });
 
@@ -84,11 +67,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
             onClose();
         } catch (err: unknown) {
             const error = err as ApiError;
-            if (error.status === 422 && error.errors) {
-                setFieldErrors(error.errors);
-            } else {
-                toast.error(error.message || 'Failed to save.');
-            }
+            toast.error(error.message || 'Failed to save.');
         } finally {
             setIsLoading(false);
         }
@@ -126,118 +105,104 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                         </button>
                     </div>
 
-                    {!entryToEdit && (
-                        <div className={styles.formGroup}>
-                            <label htmlFor="entry-select">Select Entry</label>
-                            <select
-                                id="entry-select"
-                                className={`${styles.selectInput} ${fieldErrors.entry_id ? 'input-error' : ''}`}
-                                value={selectedEntryId}
-                                onChange={(e) => handleEntrySelect(Number(e.target.value))}
-                            >
-                                <option value="" disabled>
-                                    -- Choose an entry --
-                                </option>
-                                {availableEntries.map((e) => (
-                                    <option key={e.id} value={e.id}>
-                                        {e.title || 'Untitled'}
+                    <div className={styles.modalBody}>
+                        {!entryToEdit && (
+                            <div className={styles.formGroup}>
+                                <label htmlFor="entry-select">Select Entry</label>
+                                <select
+                                    id="entry-select"
+                                    className={styles.selectInput}
+                                    value={selectedEntryId}
+                                    onChange={(e) => handleEntrySelect(Number(e.target.value))}
+                                >
+                                    <option value="" disabled>
+                                        Choose an entry
                                     </option>
-                                ))}
-                            </select>
-                            <FieldError errors={fieldErrors.entry_id} />
-                        </div>
-                    )}
-
-                    <div className={styles.formGroup}>
-                        <label>
-                            <Palette size={16} className={styles.iconInfo} /> Entry Accent Color
-                        </label>
-                        <div className={`${styles.colorPalette} ${fieldErrors.color ? 'input-error' : ''}`}>
-                            {PRESET_COLORS.map((c) => (
-                                <button
-                                    key={c}
-                                    type="button"
-                                    className={`${styles.colorBtn} ${color === c ? styles.colorBtnActive : ''}`}
-                                    style={{ backgroundColor: c }}
-                                    onClick={() => {
-                                        setColor(c === color ? '' : c);
-                                        setCustomColor('');
-                                        setFieldErrors((prev) => {
-                                            const newErrors = { ...prev };
-                                            delete newErrors.color;
-                                            return newErrors;
-                                        });
-                                    }}
-                                />
-                            ))}
-
-                            <button
-                                type="button"
-                                className={`${styles.colorBtn} ${styles.customColorBtn} ${customColor ? styles.colorBtnActive : ''}`}
-                                style={{ backgroundColor: customColor || 'transparent' }}
-                                onClick={() => colorPickerRef.current?.click()}
-                                title="Custom Color"
-                            >
-                                {!customColor && <Plus size={16} />}
-                                <input
-                                    ref={colorPickerRef}
-                                    type="color"
-                                    value={customColor || '#742121'}
-                                    onChange={handleCustomColorChange}
-                                    className={styles.hiddenColorInput}
-                                />
-                            </button>
-                        </div>
-                        <FieldError errors={fieldErrors.color} />
-                    </div>
-
-                    <div className={styles.formGroup}>
-                        <label>
-                            <Upload size={16} className={styles.iconInfo} /> Cover Image
-                        </label>
-
-                        {imageUrl ? (
-                            <div className={styles.imagePreviewContainer}>
-                                <img src={imageUrl} alt="Cover" className={styles.previewThumbnail} />
-                                <button type="button" className="btn btn-secondary" onClick={() => setImageUrl('')}>
-                                    Remove
-                                </button>
+                                    {availableEntries.map((e) => (
+                                        <option key={e.id} value={e.id}>
+                                            {e.title || 'Untitled'}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
-                        ) : (
-                            <label className={`btn btn-secondary ${styles.uploadLabel} ${fieldErrors.image_url ? 'input-error' : ''}`}>
-                                <span>{isUploading ? 'Uploading...' : 'Choose Image...'}</span>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={async (e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) {
-                                            setIsUploading(true);
-                                            setUploadError(null);
-                                            setFieldErrors((prev) => {
-                                                const newErrors = { ...prev };
-                                                delete newErrors.image_url;
-                                                return newErrors;
-                                            });
-                                            const result = await uploadImage(file);
-                                            if (result.url) {
-                                                setImageUrl(result.url);
-                                                toast.success(result.message || 'Image uploaded');
-                                            } else if (result.error) {
-                                                setUploadError(result.error);
-                                                toast.error(`Upload error: ${result.error}`, { id: 'upload-error' });
-                                            }
-                                            setIsUploading(false);
-                                        }
-                                    }}
-                                    className={styles.hiddenInput}
-                                    disabled={isUploading}
-                                />
-                            </label>
                         )}
 
-                        <FieldError errors={[...(uploadError ? [uploadError] : []), ...(fieldErrors.image_url || [])]} />
-                        <p className={styles.helpText}>Leave empty to use main image from content automatically.</p>
+                        <div className={styles.formGroup}>
+                            <label>
+                                <Palette size={16} className={styles.iconInfo} /> Entry Accent Color
+                            </label>
+                            <div className={styles.colorPalette}>
+                                {PRESET_COLORS.map((c) => (
+                                    <button
+                                        key={c}
+                                        type="button"
+                                        className={`${styles.colorBtn} ${color === c ? styles.colorBtnActive : ''}`}
+                                        style={{ backgroundColor: c }}
+                                        onClick={() => {
+                                            setColor(c === color ? '' : c);
+                                            setCustomColor('');
+                                        }}
+                                    />
+                                ))}
+
+                                <button
+                                    type="button"
+                                    className={`${styles.colorBtn} ${styles.customColorBtn} ${customColor ? styles.colorBtnActive : ''}`}
+                                    style={{ backgroundColor: customColor || 'transparent' }}
+                                    onClick={() => colorPickerRef.current?.click()}
+                                    title="Custom Color"
+                                >
+                                    {!customColor && <Plus size={16} />}
+                                    <input
+                                        ref={colorPickerRef}
+                                        type="color"
+                                        value={customColor || '#742121'}
+                                        onChange={handleCustomColorChange}
+                                        className={styles.hiddenColorInput}
+                                    />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>
+                                <Upload size={16} className={styles.iconInfo} /> Cover Image
+                            </label>
+
+                            {imageUrl ? (
+                                <div className={styles.imagePreviewContainer}>
+                                    <img src={imageUrl} alt="Cover" className={styles.previewThumbnail} />
+                                    <button type="button" className="btn btn-secondary" onClick={() => setImageUrl('')}>
+                                        Remove
+                                    </button>
+                                </div>
+                            ) : (
+                                <label className={`btn btn-secondary ${styles.uploadLabel}`}>
+                                    <span>{isUploading ? 'Uploading...' : 'Choose Image...'}</span>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                setIsUploading(true);
+                                                const result = await uploadImage(file);
+                                                if (result.url) {
+                                                    setImageUrl(result.url);
+                                                    toast.success(result.message || 'Image uploaded');
+                                                } else if (result.error) {
+                                                    toast.error(`Upload error: ${result.error}`, { id: 'upload-error' });
+                                                }
+                                                setIsUploading(false);
+                                            }
+                                        }}
+                                        className={styles.hiddenInput}
+                                        disabled={isUploading}
+                                    />
+                                </label>
+                            )}
+                            <p className={styles.helpText}>Leave empty to use main image from content automatically.</p>
+                        </div>
                     </div>
 
                     <div className={styles.modalFooter}>

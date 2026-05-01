@@ -125,7 +125,11 @@ const MailboxPage = () => {
                                                     <Eye size={18} />
                                                 </button>
                                             )}
-                                            <button className="sidebar-delete-btn" onClick={() => handleDeleteClick(n.id)} title="Delete">
+                                            <button
+                                                className="sidebar-delete-btn"
+                                                onClick={() => handleDeleteClick(n.id)}
+                                                title="Delete notification"
+                                            >
                                                 <Trash2 size={18} />
                                             </button>
                                         </div>

@@ -1,10 +1,20 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import LandingPage from '../pages/Landing/index';
-import { AuthProvider } from '../contexts/AuthContext';
+
+vi.mock('../contexts/AuthContext', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('../contexts/AuthContext')>();
+    return {
+        ...actual,
+        useAuth: () => ({
+            isAuthenticated: false,
+            isLoading: false,
+        }),
+    };
+});
 
 const renderWithProviders = (ui: React.ReactElement) => {
-    return render(<AuthProvider>{ui}</AuthProvider>);
+    return render(ui);
 };
 
 describe('LandingPage', () => {

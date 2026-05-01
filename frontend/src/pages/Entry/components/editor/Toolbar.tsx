@@ -24,6 +24,7 @@ const Toolbar = ({
 
     useEffect(() => {
         if (!editor) return;
+
         const updateState = () => forceUpdate({});
         editor.on('selectionUpdate', updateState);
         editor.on('transaction', updateState);
@@ -46,15 +47,8 @@ const Toolbar = ({
         checkScroll();
         window.addEventListener('resize', checkScroll);
 
-        let observer: ResizeObserver;
-        if (scrollContainerRef.current) {
-            observer = new ResizeObserver(() => checkScroll());
-            observer.observe(scrollContainerRef.current);
-        }
-
         return () => {
             window.removeEventListener('resize', checkScroll);
-            if (observer) observer.disconnect();
         };
     }, [editor]);
 
@@ -90,29 +84,15 @@ const Toolbar = ({
             onPointerDown={(e) => {
                 const target = e.target as HTMLElement;
 
-                if (target.tagName === 'INPUT' || target.tagName === 'SELECT' || target.closest('select') || target.closest('input')) {
-                    if (window.innerWidth <= 800) {
-                        editor.commands.blur();
-                    }
-                    return;
-                }
-
+                const isMobile = window.innerWidth <= 800;
+                const isInput = !!target.closest('input, select');
                 const isButton = target.closest('button');
-                const isPopupTrigger =
-                    isButton &&
-                    (isButton.closest('[title="Color Palette"]') ||
-                        isButton.closest('[title="Page Settings"]') ||
-                        isButton.closest('[title="Drag Tool"]') ||
-                        isButton.closest('[title="Upload Image"]'));
+                const isPopup = isButton?.matches(
+                    '[title="Color Palette"], [title="Page Settings"], [title="Drag Tool"], [title="Upload Image"]',
+                );
 
-                if (window.innerWidth <= 800) {
-                    if (isButton) {
-                        editor.commands.blur();
-                        if (isPopupTrigger) return;
-                    } else {
-                        return;
-                    }
-                }
+                if (isMobile && (isInput || isButton)) editor.commands.blur();
+                if (isInput || (isMobile && (isPopup || !isButton))) return;
 
                 e.preventDefault();
             }}
@@ -163,11 +143,7 @@ const Toolbar = ({
 
                 <div className={styles.divider} />
 
-                <PageSettings
-                    isDragMode={isDragMode}
-                    pageSettings={pageSettings}
-                    onPageSettingsChange={onPageSettingsChange || (() => {})}
-                />
+                <PageSettings isDragMode={isDragMode} pageSettings={pageSettings} onPageSettingsChange={onPageSettingsChange} />
 
                 <div className={styles.divider} />
 

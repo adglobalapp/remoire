@@ -2,7 +2,7 @@ import { Node, mergeAttributes, type CommandProps } from '@tiptap/core';
 import { ReactNodeViewRenderer, NodeViewWrapper, type NodeViewProps } from '@tiptap/react';
 import { useRef, useEffect, useCallback } from 'react';
 import { Trash2 } from 'lucide-react';
-import Moveable, { type OnDrag, type OnDragEnd, type OnResize, type OnResizeEnd, type OnRotate, type OnRotateEnd } from 'react-moveable';
+import Moveable, { type OnDrag, type OnResize, type OnRotate, type OnDragEnd, type OnResizeEnd, type OnRotateEnd } from 'react-moveable';
 import classNames from 'classnames';
 import { useCanvasScale } from '../../../../../contexts/CanvasScaleContext';
 import styles from './ResizableImage.module.css';
@@ -23,61 +23,32 @@ const ImageNodeView = (props: NodeViewProps) => {
     const moveableRef = useRef<Moveable>(null);
     const canvasScale = useCanvasScale();
 
-    const handleDrag = useCallback(
-        ({ target, beforeTranslate }: OnDrag) => {
-            target.style.transform = `translate(${beforeTranslate[0]}px, ${beforeTranslate[1]}px) rotate(${rotation ?? 0}deg)`;
-        },
-        [rotation],
-    );
-
-    const handleDragEnd = useCallback(
-        ({ lastEvent }: OnDragEnd) => {
-            if (lastEvent) {
-                updateAttributes({
-                    x: lastEvent.beforeTranslate[0],
-                    y: lastEvent.beforeTranslate[1],
-                });
-            }
-        },
-        [updateAttributes],
-    );
-
-    const handleResize = useCallback(
-        ({ target, width, height, drag }: OnResize) => {
-            target.style.width = `${width}px`;
-            target.style.height = `${height}px`;
-            target.style.transform = `translate(${drag.beforeTranslate[0]}px, ${drag.beforeTranslate[1]}px) rotate(${rotation ?? 0}deg)`;
-        },
-        [rotation],
-    );
-
-    const handleResizeEnd = useCallback(
-        ({ lastEvent }: OnResizeEnd) => {
-            if (lastEvent) {
-                updateAttributes({
-                    width: lastEvent.width,
-                    height: lastEvent.height,
-                    x: lastEvent.drag.beforeTranslate[0],
-                    y: lastEvent.drag.beforeTranslate[1],
-                });
-            }
-        },
-        [updateAttributes],
-    );
-
-    const handleRotate = useCallback(({ target, beforeRotate, drag }: OnRotate) => {
-        target.style.transform = `translate(${drag.beforeTranslate[0]}px, ${drag.beforeTranslate[1]}px) rotate(${beforeRotate}deg)`;
+    const updateStyle = useCallback((e: OnDrag | OnResize | OnRotate) => {
+        const target = e.target as HTMLElement;
+        if ('transform' in e) target.style.transform = e.transform;
+        if ('width' in e) target.style.width = `${(e as OnResize).width}px`;
+        if ('height' in e) target.style.height = `${(e as OnResize).height}px`;
     }, []);
 
-    const handleRotateEnd = useCallback(
-        ({ lastEvent }: OnRotateEnd) => {
-            if (lastEvent) {
-                updateAttributes({
-                    rotation: lastEvent.beforeRotate,
-                    x: lastEvent.drag.beforeTranslate[0],
-                    y: lastEvent.drag.beforeTranslate[1],
-                });
+    const handleEnd = useCallback(
+        (e: OnDragEnd | OnResizeEnd | OnRotateEnd) => {
+            const { lastEvent } = e;
+            if (!lastEvent) return;
+
+            const drag = 'drag' in lastEvent ? (lastEvent as OnResize | OnRotate).drag : (lastEvent as OnDrag);
+            const attrs: Record<string, number | string | null> = {
+                x: drag.beforeTranslate[0],
+                y: drag.beforeTranslate[1],
+            };
+
+            if ('width' in lastEvent) {
+                attrs.width = lastEvent.width;
+                attrs.height = lastEvent.height;
             }
+            if ('beforeRotate' in lastEvent) {
+                attrs.rotation = lastEvent.beforeRotate;
+            }
+            updateAttributes(attrs);
         },
         [updateAttributes],
     );
@@ -93,15 +64,13 @@ const ImageNodeView = (props: NodeViewProps) => {
 
         const handleMouseDown = (e: MouseEvent) => {
             const target = e.target as HTMLElement;
-            if (targetRef.current?.contains(target)) return;
-            if (target.closest('button') || target.closest('[class*="toolbar"]') || target.closest('.moveable-control-box')) return;
+            if (targetRef.current?.contains(target) || target.closest('button, [class*="toolbar"], .moveable-control-box')) return;
 
-            const { editor } = props;
             const pos = typeof props.getPos === 'function' ? props.getPos() : undefined;
-            if (target.classList.contains('canvas') || target.classList.contains('editorContainer')) {
-                editor.commands.blur();
+            if (target.matches(`.${styles.canvas}, .${styles.editorContainer}`)) {
+                props.editor.commands.blur();
             } else if (pos !== undefined) {
-                editor.commands.setTextSelection(pos + 1);
+                props.editor.commands.setTextSelection(pos + 1);
             }
         };
 
@@ -128,7 +97,7 @@ const ImageNodeView = (props: NodeViewProps) => {
             onPointerDown={(e: React.PointerEvent) => {
                 const target = e.target as HTMLElement;
 
-                if (target.closest('.moveable-control-box')) return;
+                if (target.closest(`.${styles.deleteButton}`) || target.closest('.moveable-control-box')) return;
 
                 if (window.innerWidth <= 800) {
                     props.editor.commands.blur();
@@ -178,7 +147,7 @@ const ImageNodeView = (props: NodeViewProps) => {
                             transform: `translateX(-50%) scale(${deleteScale})`,
                             bottom: `${deleteBottom}px`,
                         }}
-                        onClick={(e) => {
+                        onPointerDown={(e) => {
                             e.stopPropagation();
                             props.editor.commands.deleteSelection();
                         }}
@@ -203,12 +172,12 @@ const ImageNodeView = (props: NodeViewProps) => {
                     zoom={1 / canvasScale}
                     renderDirections={['nw', 'ne', 'sw', 'se']}
                     origin={false}
-                    onDrag={handleDrag}
-                    onDragEnd={handleDragEnd}
-                    onResize={handleResize}
-                    onResizeEnd={handleResizeEnd}
-                    onRotate={handleRotate}
-                    onRotateEnd={handleRotateEnd}
+                    onDrag={updateStyle}
+                    onDragEnd={handleEnd}
+                    onResize={updateStyle}
+                    onResizeEnd={handleEnd}
+                    onRotate={updateStyle}
+                    onRotateEnd={handleEnd}
                     className={styles.moveableControl}
                 />
             )}
@@ -227,47 +196,33 @@ export const ResizableImage = Node.create({
     draggable: false,
 
     addAttributes() {
+        const numAttr = (name: string, def = 0) => ({
+            default: def,
+            parseHTML: (el: HTMLElement) => parseFloat(el.getAttribute(`data-${name}`) || String(def)),
+            renderHTML: (attrs: Record<string, unknown>) => ({ [`data-${name}`]: attrs[name] as string | number }),
+        });
+
         return {
             src: {
                 default: null,
                 parseHTML: (el) => el.getAttribute('src'),
-                renderHTML: (attrs) => ({ src: attrs.src }),
+                renderHTML: (a: Record<string, unknown>) => ({ src: a.src as string }),
             },
             alt: {
                 default: null,
                 parseHTML: (el) => el.getAttribute('alt'),
-                renderHTML: (attrs) => ({ alt: attrs.alt }),
+                renderHTML: (a: Record<string, unknown>) => ({ alt: a.alt as string }),
             },
             title: {
                 default: null,
                 parseHTML: (el) => el.getAttribute('title'),
-                renderHTML: (attrs) => ({ title: attrs.title }),
+                renderHTML: (a: Record<string, unknown>) => ({ title: a.title as string }),
             },
-            width: {
-                default: 300,
-                parseHTML: (el) => parseFloat(el.getAttribute('data-width') || '300'),
-                renderHTML: (attrs) => ({ 'data-width': attrs.width }),
-            },
-            height: {
-                default: 0,
-                parseHTML: (el) => parseFloat(el.getAttribute('data-height') || '0'),
-                renderHTML: (attrs) => ({ 'data-height': attrs.height }),
-            },
-            rotation: {
-                default: 0,
-                parseHTML: (el) => parseFloat(el.getAttribute('data-rotation') || '0'),
-                renderHTML: (attrs) => ({ 'data-rotation': attrs.rotation }),
-            },
-            x: {
-                default: 0,
-                parseHTML: (el) => parseFloat(el.getAttribute('data-x') || '0'),
-                renderHTML: (attrs) => ({ 'data-x': attrs.x }),
-            },
-            y: {
-                default: 0,
-                parseHTML: (el) => parseFloat(el.getAttribute('data-y') || '0'),
-                renderHTML: (attrs) => ({ 'data-y': attrs.y }),
-            },
+            width: numAttr('width', 300),
+            height: numAttr('height', 0),
+            rotation: numAttr('rotation', 0),
+            x: numAttr('x', 0),
+            y: numAttr('y', 0),
         };
     },
 

@@ -18,13 +18,12 @@ export interface FeatureCardProps {
     content: string;
     children?: ReactNode;
     accentColor?: string;
-    index: number;
 }
 
 export interface EntryCardProps {
     entry: Entry;
     side: 'left' | 'right';
-    index?: number;
+    idx?: number;
 }
 
 export interface EntryItemProps {
@@ -83,7 +82,6 @@ export interface RowProps {
     onAccept?: (id: number) => void;
     onDelete: (id: number) => void;
     onViewProfile: (user: User) => void;
-    index?: number;
     acceptingId?: number | null;
     deletingId?: number | null;
 }

@@ -47,46 +47,25 @@ const Typography = ({ editor, isDragMode }: TypographyProps) => {
 
         const updateState = () => {
             try {
-                let attrs = editor.getAttributes('textStyle');
+                const attrs = editor.getAttributes('textStyle');
 
-                if (!attrs.fontFamily && !editor.state.selection.empty) {
-                    const { from } = editor.state.selection;
-                    const node = editor.state.doc.nodeAt(from);
-                    if (node && node.marks) {
-                        const styleMark = node.marks.find((m) => m.type.name === 'textStyle');
-                        if (styleMark && styleMark.attrs.fontFamily) {
-                            attrs = { ...attrs, fontFamily: styleMark.attrs.fontFamily };
-                        }
-                    }
-                }
+                // Font Family
+                const rawFamily = attrs.fontFamily?.replace(/['"]/g, '').trim();
+                const match = FONTS.find((f) => {
+                    const preset = f.value.replace(/['"]/g, '');
+                    return rawFamily && (rawFamily === preset || rawFamily.includes(preset) || preset.includes(rawFamily));
+                });
+                setCurrentFont(match ? match.value : attrs.fontFamily || "'Kaushan Script'");
 
-                if (attrs.fontFamily) {
-                    const family = attrs.fontFamily.replace(/['"]/g, '').trim();
-                    const presets = FONTS.map((f) => f.value.replace(/['"]/g, ''));
-                    const match = presets.find((p) => family === p || family.includes(p) || p.includes(family));
-                    if (match) {
-                        const selectVal = match.includes(' ') ? `'${match}'` : match;
-                        setCurrentFont(selectVal);
-                    } else {
-                        setCurrentFont(family);
-                    }
-                } else {
-                    setCurrentFont("'Kaushan Script'");
-                }
+                // Font Size
+                const headingLevel = [1, 2, 3].find((l) => editor.isActive('heading', { level: l })) as 1 | 2 | 3 | undefined;
+                const defaultSize = headingLevel ? { 1: '36px', 2: '30px', 3: '24px' }[headingLevel] : '16px';
+                setCurrentSize(attrs.fontSize || defaultSize);
 
-                if (attrs.fontSize) {
-                    setCurrentSize(attrs.fontSize);
-                } else {
-                    if (editor.isActive('heading', { level: 1 })) setCurrentSize('36px');
-                    else if (editor.isActive('heading', { level: 2 })) setCurrentSize('30px');
-                    else if (editor.isActive('heading', { level: 3 })) setCurrentSize('24px');
-                    else setCurrentSize('16px');
-                }
-
-                if (editor.isActive({ textAlign: 'center' })) setCurrentAlign('center');
-                else if (editor.isActive({ textAlign: 'right' })) setCurrentAlign('right');
-                else if (editor.isActive({ textAlign: 'justify' })) setCurrentAlign('justify');
-                else setCurrentAlign('left');
+                // Alignment
+                const alignments = ['center', 'right', 'justify'] as const;
+                const activeAlign = alignments.find((a) => editor.isActive({ textAlign: a })) || 'left';
+                setCurrentAlign(activeAlign);
             } catch (err) {
                 console.error('Typography controls update error:', err);
             }

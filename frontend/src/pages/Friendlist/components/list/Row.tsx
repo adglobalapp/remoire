@@ -7,7 +7,7 @@ import Avatar from '../../../../components/common/Avatar';
 import { useUserProfile } from '../../../../contexts/UserProfileContext';
 import classNames from 'classnames';
 
-const Row: React.FC<RowProps> = ({ user, type, onAccept, onDelete, onViewProfile, index = 0, acceptingId, deletingId }) => {
+const Row: React.FC<RowProps> = ({ user, type, onAccept, onDelete, onViewProfile, acceptingId, deletingId }) => {
     const { isBlocked } = useUserProfile();
     const lastSeenText = user.last_seen_at ? `Last seen: ${formatDate(user.last_seen_at)}` : `Joined: ${formatDate(user.created_at)}`;
 
@@ -21,7 +21,6 @@ const Row: React.FC<RowProps> = ({ user, type, onAccept, onDelete, onViewProfile
             className={classNames(styles.friendRow, {
                 'user-blocked': isUserBlocked,
             })}
-            style={{ '--delay': index } as React.CSSProperties}
         >
             <div className={styles.friendMain} onClick={() => onViewProfile(user)}>
                 <Avatar user={user} size={42} className={styles.avatar} />
