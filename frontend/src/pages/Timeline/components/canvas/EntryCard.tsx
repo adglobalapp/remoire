@@ -5,8 +5,20 @@ import { Settings } from 'lucide-react';
 import EntryPreview from '../modal/EntryPreview';
 import AddEntryCard from '../modal/AddEntryCard';
 import { formatDate } from '../../../../utils/dateUtils';
-import { getExcerpt, getImageUrl } from '../../../../utils/contentUtils';
 import Avatar from '../../../../components/common/Avatar';
+
+const getExcerpt = (content: string | null): string => {
+    if (!content) return '';
+    const matches = Array.from(content.matchAll(/"text":"([^"]+)"/g));
+    const text = matches.map((m) => m[1]).join(' ').trim() || content.replace(/<[^>]+>/g, ' ').trim();
+    return text.length > 180 ? text.slice(0, 180) + '...' : text;
+};
+
+const getImageUrl = (content: string | null): string | null => {
+    if (!content) return null;
+    const match = content.match(/"src":"([^"]+)"/);
+    return match ? match[1] : null;
+};
 
 const EntryCard = ({ entry, side, idx = 0 }: EntryCardProps) => {
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);

@@ -9,6 +9,7 @@ import { type ApiError } from '../../types';
 import toast from 'react-hot-toast';
 import { Mail, MailOpen, Trash2, Eye } from 'lucide-react';
 import DeleteConfirmation from '../../components/common/DeleteConfirmation';
+import { formatDateTime } from '../../utils/dateUtils';
 
 const MailboxPage = () => {
     const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -109,10 +110,7 @@ const MailboxPage = () => {
                                             </div>
                                             <div className={styles.info}>
                                                 <span className={styles.message}>{formatData(n)}</span>
-                                                <span className={styles.date}>
-                                                    {new Date(n.created_at).toLocaleDateString()}{' '}
-                                                    {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </span>
+                                                <span className={styles.date}>{formatDateTime(n.created_at)}</span>
                                             </div>
                                         </div>
                                         <div className={styles.actions}>

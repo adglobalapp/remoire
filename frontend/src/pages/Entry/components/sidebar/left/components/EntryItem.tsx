@@ -1,17 +1,6 @@
 import { Trash2 } from 'lucide-react';
 import { type EntryItemProps } from '../../../../../../types';
-
-const formatDateTime = (dateString: string | null): string => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleString('hu-HU', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-};
+import { formatDateTime } from '../../../../../../utils/dateUtils';
 
 const EntryItem = ({ entry, isActive, onSelect, onDelete }: EntryItemProps) => {
     return (
