@@ -59,7 +59,6 @@ test('authenticated user can get their profile', function () {
 test('user can logout', function () {
     $user = User::factory()->create();
 
-    // We need to use sanctum's token for logout to work as expected in the controller
     $token = $user->createToken('test')->plainTextToken;
 
     $this->withToken($token)

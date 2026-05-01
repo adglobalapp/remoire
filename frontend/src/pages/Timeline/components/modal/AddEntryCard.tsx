@@ -17,6 +17,8 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
     const [selectedEntryId, setSelectedEntryId] = useState<number | ''>(entryToEdit?.id || '');
     const [color, setColor] = useState<string>(entryToEdit?.color || '');
     const [imageUrl, setImageUrl] = useState<string>(entryToEdit?.image_url || '');
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string>(entryToEdit?.image_url || '');
     const [isLoading, setIsLoading] = useState(false);
     const [isConfirming, setIsConfirming] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -41,6 +43,8 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
             setColor(isPreset ? entryColor : '');
             setCustomColor(isPreset ? '' : entryColor);
             setImageUrl(entry.image_url || '');
+            setPreviewUrl(entry.image_url || '');
+            setSelectedFile(null);
         }
     };
 
@@ -53,9 +57,22 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
         if (!selectedEntryId) return;
         setIsLoading(true);
         try {
+            let finalImageUrl = imageUrl;
+
+            if (selectedFile) {
+                setIsUploading(true);
+                const uploadRes = await uploadImage(selectedFile);
+                if (uploadRes.url) {
+                    finalImageUrl = uploadRes.url;
+                } else {
+                    throw new Error(uploadRes.error || 'Upload failed');
+                }
+                setIsUploading(false);
+            }
+
             const res = await updateEntry(Number(selectedEntryId), {
                 color: color || customColor || null,
-                image_url: imageUrl || null,
+                image_url: finalImageUrl || null,
             });
 
             if (!entryToEdit && activeTimeline && !activeTimeline.isDefault) {
@@ -64,12 +81,17 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                 if (res?.message) toast.success(res.message);
             }
 
+            if (previewUrl && previewUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(previewUrl);
+            }
+
             onClose();
         } catch (err: unknown) {
             const error = err as ApiError;
             toast.error(error.message || 'Failed to save.');
         } finally {
             setIsLoading(false);
+            setIsUploading(false);
         }
     };
 
@@ -169,31 +191,36 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                                 <Upload size={16} className={styles.iconInfo} /> Cover Image
                             </label>
 
-                            {imageUrl ? (
+                            {previewUrl ? (
                                 <div className={styles.imagePreviewContainer}>
-                                    <img src={imageUrl} alt="Cover" className={styles.previewThumbnail} />
-                                    <button type="button" className="btn btn-secondary" onClick={() => setImageUrl('')}>
+                                    <img src={previewUrl} alt="Cover" className={styles.previewThumbnail} />
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={() => {
+                                            if (previewUrl.startsWith('blob:')) {
+                                                URL.revokeObjectURL(previewUrl);
+                                            }
+                                            setPreviewUrl('');
+                                            setImageUrl('');
+                                            setSelectedFile(null);
+                                        }}
+                                    >
                                         Remove
                                     </button>
                                 </div>
                             ) : (
                                 <label className={`btn btn-secondary ${styles.uploadLabel}`}>
-                                    <span>{isUploading ? 'Uploading...' : 'Choose Image...'}</span>
+                                    <span>{isUploading ? 'Preparing...' : 'Choose Image...'}</span>
                                     <input
                                         type="file"
                                         accept="image/*"
-                                        onChange={async (e) => {
+                                        onChange={(e) => {
                                             const file = e.target.files?.[0];
                                             if (file) {
-                                                setIsUploading(true);
-                                                const result = await uploadImage(file);
-                                                if (result.url) {
-                                                    setImageUrl(result.url);
-                                                    toast.success(result.message || 'Image uploaded');
-                                                } else if (result.error) {
-                                                    toast.error(`Upload error: ${result.error}`, { id: 'upload-error' });
-                                                }
-                                                setIsUploading(false);
+                                                setSelectedFile(file);
+                                                const localUrl = URL.createObjectURL(file);
+                                                setPreviewUrl(localUrl);
                                             }
                                         }}
                                         className={styles.hiddenInput}

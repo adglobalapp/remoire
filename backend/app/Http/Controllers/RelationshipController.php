@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\Relationship;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -11,17 +12,16 @@ class RelationshipController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
+        $friends = Auth::user()->friends()->get();
 
-        return response()->json($user->friends()->get(), 200);
+        return response()->json($friends, 200);
     }
 
     public function requests()
     {
         $user = Auth::user();
-
-        $pending = $user->pendingFriendRequests()->orderBy('relationships.created_at', 'desc')->get();
-        $sent = $user->sentFriendRequests()->orderBy('relationships.created_at', 'desc')->get();
+        $pending = $user->pendingFriendRequests()->latest('relationships.created_at')->get();
+        $sent = $user->sentFriendRequests()->latest('relationships.created_at')->get();
 
         return response()->json([
             'pending' => $pending,
@@ -31,46 +31,33 @@ class RelationshipController extends Controller
 
     public function search(Request $request)
     {
-        $query = $request->query('q');
-        $currentUser = Auth::user();
+        $q = $request->query('q');
+        $me = Auth::user();
 
-        if (strlen($query) < 2) {
+        if (strlen($q) < 2) {
             return response()->json([], 200);
         }
 
-        $blockedUserIds = Relationship::where(function ($q) use ($currentUser) {
-            $q->where('user_id', $currentUser->id)->orWhere('target_id', $currentUser->id);
-        })->where('status', 'blocked')->get()->map(function ($f) use ($currentUser) {
-            return $f->user_id === $currentUser->id ? $f->target_id : $f->user_id;
-        });
+        $blockedIds = Relationship::where(fn ($query) => $query->where('user_id', $me->id)->orWhere('target_id', $me->id))
+            ->where('status', 'blocked')
+            ->get()
+            ->map(fn ($rel) => $rel->user_id === $me->id ? $rel->target_id : $rel->user_id);
 
-        $users = User::where(function ($q) use ($query) {
-            $q->where('name', 'like', "%{$query}%")
-                ->orWhere('friend_code', 'like', "%{$query}%");
-        })
-            ->where('id', '!=', $currentUser->id)
-            ->whereNotIn('id', $blockedUserIds)
+        $users = User::where(fn ($query) => $query->where('name', 'like', "%{$q}%")->orWhere('friend_code', 'like', "%{$q}%"))
+            ->where('id', '!=', $me->id)
+            ->whereNotIn('id', $blockedIds)
             ->get();
 
-        $userIds = $users->pluck('id');
-        $relationships = Relationship::where(function ($q) use ($currentUser, $userIds) {
-            $q->where('user_id', $currentUser->id)->whereIn('target_id', $userIds);
-        })->orWhere(function ($q) use ($currentUser, $userIds) {
-            $q->whereIn('user_id', $userIds)->where('target_id', $currentUser->id);
-        })->get();
+        $relationships = Relationship::where(fn ($query) => $query->where('user_id', $me->id)->whereIn('target_id', $users->pluck('id')))
+            ->orWhere(fn ($query) => $query->whereIn('user_id', $users->pluck('id'))->where('target_id', $me->id))
+            ->get();
 
-        $users->map(function ($user) use ($currentUser, $relationships) {
-            $relationship = $relationships->first(function ($r) use ($currentUser, $user) {
-                return ($r->user_id === $currentUser->id && $r->target_id === $user->id) ||
-                    ($r->user_id === $user->id && $r->target_id === $currentUser->id);
-            });
-
-            $user->relationship_status = $relationship ? $relationship->status : 'none';
+        $users->each(function ($user) use ($me, $relationships) {
+            $rel = $relationships->first(fn ($rel) => ($rel->user_id === $me->id && $rel->target_id === $user->id) || ($rel->user_id === $user->id && $rel->target_id === $me->id));
+            $user->relationship_status = $rel ? $rel->status : 'none';
             if ($user->relationship_status === 'pending') {
-                $user->is_requester = $relationship->user_id === $currentUser->id;
+                $user->is_requester = $rel->user_id === $me->id;
             }
-
-            return $user;
         });
 
         return response()->json($users, 200);
@@ -78,40 +65,24 @@ class RelationshipController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'target_id' => 'required|exists:users,id',
-        ]);
-
-        $user = Auth::user();
+        $request->validate(['target_id' => 'required|exists:users,id']);
+        $me = Auth::user();
         $targetId = $request->target_id;
 
-        if ($user->id == $targetId) {
+        if ($me->id == $targetId) {
             return response()->json(['message' => 'You cannot connect with yourself'], 400);
         }
 
-        $existing = Relationship::where(function ($q) use ($user, $targetId) {
-            $q->where('user_id', $user->id)->where('target_id', $targetId);
-        })->orWhere(function ($q) use ($user, $targetId) {
-            $q->where('user_id', $targetId)->where('target_id', $user->id);
-        })->first();
-
-        if ($existing) {
+        if (Relationship::between($me->id, $targetId)->exists()) {
             return response()->json(['message' => 'Already connected or request pending'], 400);
         }
 
-        Relationship::create([
-            'user_id' => $user->id,
-            'target_id' => $targetId,
-            'status' => 'pending',
-        ]);
+        Relationship::create(['user_id' => $me->id, 'target_id' => $targetId, 'status' => 'pending']);
 
-        \App\Models\Notification::create([
+        Notification::create([
             'user_id' => $targetId,
             'type' => 'friend_request',
-            'data' => [
-                'requester_id' => $user->id,
-                'requester_name' => $user->name,
-            ],
+            'data' => ['requester_id' => $me->id, 'requester_name' => $me->name],
         ]);
 
         return response()->json(['message' => 'Request sent'], 200);
@@ -119,48 +90,30 @@ class RelationshipController extends Controller
 
     public function accept(User $user)
     {
-        $currentUser = Auth::user();
+        $me = Auth::user();
+        $rel = Relationship::where('user_id', $user->id)->where('target_id', $me->id)->where('status', 'pending')->first();
 
-        $relationship = Relationship::where('user_id', $user->id)
-            ->where('target_id', $currentUser->id)
-            ->where('status', 'pending')
-            ->first();
-
-        if (! $relationship) {
+        if (! $rel) {
             return response()->json(['message' => 'Friend request no longer exists'], 404);
         }
 
-        $relationship->update(['status' => 'accepted']);
-
-        \App\Models\Notification::where('user_id', $currentUser->id)
-            ->where('type', 'friend_request')
-            ->where(function ($q) use ($user) {
-                $q->where('data->requester_id', $user->id)
-                    ->orWhere('data->requester_name', $user->name);
-            })
-            ->update(['read_at' => now()]);
+        $rel->update(['status' => 'accepted']);
 
         return response()->json(['message' => 'Request accepted'], 200);
     }
 
     public function destroy(User $user)
     {
-        $currentUser = Auth::user();
+        $me = Auth::user();
+        $rel = Relationship::between($me->id, $user->id)->first();
 
-        $relationship = Relationship::where(function ($q) use ($currentUser, $user) {
-            $q->where('user_id', $currentUser->id)->where('target_id', $user->id);
-        })->orWhere(function ($q) use ($currentUser, $user) {
-            $q->where('user_id', $user->id)->where('target_id', $currentUser->id);
-        })->first();
-
-        if (! $relationship) {
+        if (! $rel) {
             return response()->json(['message' => 'Relationship no longer exists'], 404);
         }
 
-        $status = $relationship->status;
-        $isRequester = $relationship->user_id === $currentUser->id;
-
-        $relationship->delete();
+        $status = $rel->status;
+        $isRequester = $rel->user_id === $me->id;
+        $rel->delete();
 
         $message = 'Connection removed';
         if ($status === 'pending') {
@@ -174,27 +127,9 @@ class RelationshipController extends Controller
 
     public function block(User $user)
     {
-        $currentUser = Auth::user();
-
-        $relationship = Relationship::where(function ($q) use ($currentUser, $user) {
-            $q->where('user_id', $currentUser->id)->where('target_id', $user->id);
-        })->orWhere(function ($q) use ($currentUser, $user) {
-            $q->where('user_id', $user->id)->where('target_id', $currentUser->id);
-        })->first();
-
-        if ($relationship) {
-            $relationship->update([
-                'user_id' => $currentUser->id,
-                'target_id' => $user->id,
-                'status' => 'blocked',
-            ]);
-        } else {
-            Relationship::create([
-                'user_id' => $currentUser->id,
-                'target_id' => $user->id,
-                'status' => 'blocked',
-            ]);
-        }
+        $me = Auth::id();
+        Relationship::between($me, $user->id)->delete();
+        Relationship::create(['user_id' => $me, 'target_id' => $user->id, 'status' => 'blocked']);
 
         return response()->json(['message' => 'User blocked'], 200);
     }

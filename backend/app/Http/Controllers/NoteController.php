@@ -9,10 +9,12 @@ class NoteController extends Controller
 {
     public function index()
     {
-        return auth()->user()->notes()
+        $notes = auth()->user()->notes()
             ->orderBy('is_pinned', 'desc')
             ->orderBy('created_at', 'desc')
             ->get();
+
+        return $notes;
     }
 
     public function store(Request $request)

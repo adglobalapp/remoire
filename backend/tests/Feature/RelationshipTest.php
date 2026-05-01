@@ -13,6 +13,24 @@ test('authenticated user can search for other users', function () {
         ->assertJsonFragment(['name' => 'Alice']);
 });
 
+test('search results include relationship status', function () {
+    $user = User::factory()->create();
+    $friend = User::factory()->create(['name' => 'Bob']);
+    Relationship::create([
+        'user_id' => $user->id,
+        'target_id' => $friend->id,
+        'status' => 'accepted',
+    ]);
+
+    $this->actingAs($user)
+        ->getJson('/api/relationships/search?q=Bob')
+        ->assertStatus(200)
+        ->assertJsonFragment([
+            'name' => 'Bob',
+            'relationship_status' => 'accepted',
+        ]);
+});
+
 test('authenticated user can send friend request', function () {
     $user = User::factory()->create();
     $target = User::factory()->create();

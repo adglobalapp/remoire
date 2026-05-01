@@ -15,10 +15,12 @@ class EntryController extends Controller
         $owned = $user->entries()->with('participants')->get();
         $participated = $user->participatedEntries()->with('participants')->get();
 
-        return $owned->concat($participated)
+        $allEntries = $owned->concat($participated)
             ->unique('id')
             ->sortByDesc('created_at')
             ->values();
+
+        return $allEntries;
     }
 
     public function store(Request $request)
@@ -133,39 +135,19 @@ class EntryController extends Controller
     private function getAllImages(Entry $entry)
     {
         $images = [];
+        $storageUrl = asset('storage/');
 
         if ($entry->image_url) {
-            $images[] = str_replace(asset('storage/'), '', $entry->image_url);
+            $images[] = str_replace($storageUrl, '', $entry->image_url);
         }
+
         if ($entry->content) {
-            $data = json_decode($entry->content, true);
-
-            if (isset($data['pageSettings']['backgroundUrl']) && $data['pageSettings']['backgroundUrl']) {
-                $images[] = str_replace(asset('storage/'), '', $data['pageSettings']['backgroundUrl']);
-            }
-
-            if (isset($data['contentJSON'])) {
-                $images = array_merge($images, $this->extractImagesFromJSON($data['contentJSON']));
+            $pattern = '/'.preg_quote($storageUrl, '/').'([a-zA-Z0-9\/\._-]+)/';
+            if (preg_match_all($pattern, $entry->content, $matches)) {
+                $images = array_merge($images, $matches[1]);
             }
         }
 
         return array_unique($images);
-    }
-
-    private function extractImagesFromJSON($node)
-    {
-        $images = [];
-        if (isset($node['type']) && $node['type'] === 'resizableImage' && isset($node['attrs']['src'])) {
-            $images[] = str_replace(asset('storage/'), '', $node['attrs']['src']);
-        }
-        if (isset($node['type']) && $node['type'] === 'image' && isset($node['attrs']['src'])) {
-            $images[] = str_replace(asset('storage/'), '', $node['attrs']['src']);
-        }
-
-        foreach ($node['content'] ?? [] as $child) {
-            $images = array_merge($images, $this->extractImagesFromJSON($child));
-        }
-
-        return $images;
     }
 }

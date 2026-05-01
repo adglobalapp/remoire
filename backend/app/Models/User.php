@@ -75,9 +75,9 @@ class User extends Authenticatable
     {
         $id = $this->id;
 
-        return User::whereIn('id', function ($q) use ($id) {
-            $q->select('target_id')->from('relationships')->where(['user_id' => $id, 'status' => 'accepted'])
-                ->union($q->newQuery()->select('user_id')->from('relationships')->where(['target_id' => $id, 'status' => 'accepted']));
+        return User::whereIn('id', function ($query) use ($id) {
+            $query->select('target_id')->from('relationships')->where(['user_id' => $id, 'status' => 'accepted'])
+                ->union($query->newQuery()->select('user_id')->from('relationships')->where(['target_id' => $id, 'status' => 'accepted']));
         });
     }
 
@@ -114,25 +114,32 @@ class User extends Authenticatable
                 ->whereYear('date', '<', now()->year)
                 ->get();
 
-            foreach ($anniversaries as $entry) {
-                $exists = Notification::where('user_id', $this->id)
-                    ->where('type', 'anniversary')
-                    ->where('data->entry_id', $entry->id)
-                    ->whereDate('created_at', now()->toDateString())
-                    ->exists();
+            if ($anniversaries->isEmpty()) {
+                return;
+            }
 
-                if (! $exists) {
-                    $years = now()->year - \Carbon\Carbon::parse($entry->date)->year;
-                    Notification::create([
-                        'user_id' => $this->id,
-                        'type' => 'anniversary',
-                        'data' => [
-                            'entry_id' => $entry->id,
-                            'entry_title' => $entry->title,
-                            'years' => $years,
-                        ],
-                    ]);
+            $sentEntryIds = Notification::where('user_id', $this->id)
+                ->where('type', 'anniversary')
+                ->whereDate('created_at', now()->toDateString())
+                ->pluck('data->entry_id')
+                ->toArray();
+
+            foreach ($anniversaries as $entry) {
+                if (in_array($entry->id, $sentEntryIds)) {
+                    continue;
                 }
+
+                $years = now()->year - \Carbon\Carbon::parse($entry->date)->year;
+
+                Notification::create([
+                    'user_id' => $this->id,
+                    'type' => 'anniversary',
+                    'data' => [
+                        'entry_id' => $entry->id,
+                        'entry_title' => $entry->title,
+                        'years' => $years,
+                    ],
+                ]);
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Anniversary check failed: '.$e->getMessage());

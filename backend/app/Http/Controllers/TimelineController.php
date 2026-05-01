@@ -27,14 +27,16 @@ class TimelineController extends Controller
             $timelines = collect([$default]);
         }
 
-        return response()->json($timelines->map(function ($timeline) {
+        $data = $timelines->map(function ($timeline) {
             return [
                 'id' => $timeline->id,
                 'name' => $timeline->name,
                 'isDefault' => $timeline->is_default,
                 'entryIds' => $timeline->entries->pluck('id'),
             ];
-        }));
+        });
+
+        return response()->json($data);
     }
 
     public function store(Request $request)

@@ -15,6 +15,15 @@ class Relationship extends Model
         'status',
     ];
 
+    public function scopeBetween($query, $user1, $user2)
+    {
+        return $query->where(function ($innerQuery) use ($user1, $user2) {
+            $innerQuery->where('user_id', $user1)->where('target_id', $user2);
+        })->orWhere(function ($innerQuery) use ($user1, $user2) {
+            $innerQuery->where('user_id', $user2)->where('target_id', $user1);
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
