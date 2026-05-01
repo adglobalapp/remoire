@@ -129,7 +129,6 @@ export interface AvatarProps {
     text?: string;
     size?: number;
     className?: string;
-    showName?: boolean;
     backgroundColor?: string;
     onClick?: () => void;
     title?: string;

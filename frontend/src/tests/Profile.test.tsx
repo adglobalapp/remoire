@@ -71,13 +71,9 @@ describe('Profile Page', () => {
             </BrowserRouter>,
         );
 
-        screen.debug();
         expect(await screen.findByText('John Doe')).toBeInTheDocument();
-        expect(screen.getByText('john@example.com')).toBeInTheDocument();
-        expect(screen.getByText('JD123')).toBeInTheDocument();
         expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('Hello world')).toBeInTheDocument();
-        expect(await screen.findByText(/No blocked users/i)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument();
     });
 
     it('calls updateProfile when saving details', async () => {

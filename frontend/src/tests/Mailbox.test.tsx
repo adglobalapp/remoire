@@ -91,7 +91,6 @@ describe('MailboxPage', () => {
         const deleteButtons = await screen.findAllByTitle(/Delete notification/i);
         fireEvent.click(deleteButtons[0]);
 
-        // Should show confirmation modal
         expect(screen.getByText(/Are you sure you want to delete this notification/i)).toBeInTheDocument();
 
         const confirmButton = screen.getByRole('button', { name: /^Delete$/ });
@@ -100,5 +99,19 @@ describe('MailboxPage', () => {
         await waitFor(() => {
             expect(notifApi.deleteNotification).toHaveBeenCalledWith(1);
         });
+    });
+
+    it('shows empty state when no notifications', async () => {
+        vi.mocked(notifApi.getNotifications).mockResolvedValue([]);
+
+        render(
+            <BrowserRouter>
+                <AuthContext.Provider value={mockAuthContextValue as AuthContextType}>
+                    <MailboxPage />
+                </AuthContext.Provider>
+            </BrowserRouter>,
+        );
+
+        expect(await screen.findByText(/Your mailbox is empty/i)).toBeInTheDocument();
     });
 });

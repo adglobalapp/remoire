@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { X, Calendar, Mail, User as UserIcon, Clock, UserX, UserMinus } from 'lucide-react';
 import styles from './UserProfile.module.css';
-import { formatDate, formatRelativeDate } from '../../../../utils/dateUtils';
+import { formatDate } from '../../../../utils/dateUtils';
 import { type UserProfileProps } from '../../../../types';
 import Avatar from '../../../../components/common/Avatar';
 import { useAuth } from '../../../../contexts/AuthContext';
@@ -98,7 +98,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onClose }) => {
                                 <label>Last Active</label>
                             </div>
                             <div className={styles.infoContent}>
-                                <span>{formatRelativeDate(user.last_seen_at)}</span>
+                                <span>{formatDate(user.last_seen_at)}</span>
                             </div>
                         </div>
                     </div>

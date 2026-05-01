@@ -10,7 +10,11 @@ import Avatar from '../../../../components/common/Avatar';
 const getExcerpt = (content: string | null): string => {
     if (!content) return '';
     const matches = Array.from(content.matchAll(/"text":"([^"]+)"/g));
-    const text = matches.map((m) => m[1]).join(' ').trim() || content.replace(/<[^>]+>/g, ' ').trim();
+    const text =
+        matches
+            .map((m) => m[1])
+            .join(' ')
+            .trim() || content.replace(/<[^>]+>/g, ' ').trim();
     return text.length > 180 ? text.slice(0, 180) + '...' : text;
 };
 

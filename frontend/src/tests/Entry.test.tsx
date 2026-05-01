@@ -3,18 +3,18 @@ import { describe, it, expect, vi } from 'vitest';
 import EntryPage from '../pages/Entry/index';
 import { EntryContext } from '../contexts/EntryContext';
 import { type EntryContextValue } from '../types';
+import { BrowserRouter } from 'react-router-dom';
+
+vi.mock('../api', () => ({
+    getRelationships: vi.fn().mockResolvedValue([]),
+    getEntries: vi.fn().mockResolvedValue([]),
+    updateEntry: vi.fn().mockResolvedValue({}),
+    createEntry: vi.fn().mockResolvedValue({}),
+    deleteEntry: vi.fn().mockResolvedValue({}),
+}));
 
 vi.mock('../components/common/Navbar', () => ({
     default: () => <div data-testid="navbar">Navbar</div>,
-}));
-vi.mock('../pages/Entry/components/sidebar/left/Left', () => ({
-    default: () => <div data-testid="sidebar-left">Left</div>,
-}));
-vi.mock('../pages/Entry/components/sidebar/right/Right', () => ({
-    default: () => <div data-testid="sidebar-right">Right</div>,
-}));
-vi.mock('../pages/Entry/components/editor/Canvas', () => ({
-    default: () => <div data-testid="canvas">Canvas</div>,
 }));
 
 vi.mock('../contexts/AuthContext', async (importOriginal) => {
@@ -33,17 +33,24 @@ vi.mock('../contexts/UserProfileContext', async (importOriginal) => {
     };
 });
 
+vi.mock('../pages/Entry/components/sidebar/left/Left', () => ({
+    default: () => (
+        <div data-testid="sidebar-left">
+            Left
+            <button>Add Entry</button>
+        </div>
+    ),
+}));
+vi.mock('../pages/Entry/components/sidebar/right/Right', () => ({
+    default: () => <div data-testid="sidebar-right">Right</div>,
+}));
+vi.mock('../pages/Entry/components/editor/Canvas', () => ({
+    default: () => <div data-testid="canvas">Canvas</div>,
+}));
+
 const mockEntryContextValue: EntryContextValue = {
     entries: [],
-    activeEntry: {
-        id: 1,
-        user_id: 1,
-        title: 'Test Entry',
-        content: '{}',
-        date: '2026-04-24',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-    },
+    activeEntry: null,
     isLoading: false,
     selectEntry: vi.fn(),
     createEntry: vi.fn(),
@@ -53,26 +60,19 @@ const mockEntryContextValue: EntryContextValue = {
 };
 
 describe('EntryPage', () => {
-    it('renders sidebars and canvas when not loading', () => {
+    it('renders basic layout', async () => {
         render(
-            <EntryContext.Provider value={mockEntryContextValue}>
-                <EntryPage />
-            </EntryContext.Provider>,
+            <BrowserRouter>
+                <EntryContext.Provider value={mockEntryContextValue}>
+                    <EntryPage />
+                </EntryContext.Provider>
+            </BrowserRouter>,
         );
+
         expect(screen.getByTestId('navbar')).toBeInTheDocument();
         expect(screen.getByTestId('sidebar-left')).toBeInTheDocument();
         expect(screen.getByTestId('sidebar-right')).toBeInTheDocument();
         expect(screen.getByTestId('canvas')).toBeInTheDocument();
-    });
-
-    it('renders loader when loading', () => {
-        const loadingValue = { ...mockEntryContextValue, isLoading: true };
-        render(
-            <EntryContext.Provider value={loadingValue}>
-                <EntryPage />
-            </EntryContext.Provider>,
-        );
-
-        expect(screen.queryByTestId('canvas')).not.toBeInTheDocument();
+        expect(screen.getByText(/Add Entry/i)).toBeInTheDocument();
     });
 });

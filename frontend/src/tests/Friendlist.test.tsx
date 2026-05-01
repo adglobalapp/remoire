@@ -30,10 +30,6 @@ vi.mock('../components/common/Navbar', () => ({
     default: () => <div data-testid="navbar">Navbar</div>,
 }));
 
-vi.mock('../pages/Friendlist/components/list/List', () => ({
-    default: ({ title }: { title: string }) => <div data-testid="list">{title}</div>,
-}));
-
 vi.mock('react-hot-toast', () => ({
     default: {
         success: vi.fn(),
@@ -52,14 +48,35 @@ const mockUserProfileContextValue: UserProfileContextType = {
     unblockUser: vi.fn(),
 };
 
+const mockFriends: User[] = [
+    {
+        id: 2,
+        name: 'Friend One',
+        email: 'friend1@test.com',
+        friend_code: 'F1',
+        relationship_status: 'accepted',
+        created_at: '',
+    },
+];
+
+const mockRequests: { pending: User[]; sent: User[] } = {
+    pending: [
+        {
+            id: 3,
+            name: 'Pending User',
+            email: 'pending@test.com',
+            friend_code: 'P1',
+            relationship_status: 'pending',
+            created_at: '',
+        },
+    ],
+    sent: [],
+};
+
 describe('FriendlistPage', () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
-
-    it('renders loading state initially', () => {
-        vi.mocked(api.getRelationships).mockReturnValue(new Promise(() => {}));
-        vi.mocked(api.getRelationshipRequests).mockReturnValue(new Promise(() => {}));
+    it('renders friend list and requests', async () => {
+        vi.mocked(api.getRelationships).mockResolvedValue(mockFriends);
+        vi.mocked(api.getRelationshipRequests).mockResolvedValue(mockRequests);
 
         render(
             <UserProfileContext.Provider value={mockUserProfileContextValue}>
@@ -67,15 +84,14 @@ describe('FriendlistPage', () => {
             </UserProfileContext.Provider>,
         );
 
-        expect(screen.getByTestId('navbar')).toBeInTheDocument();
+        expect(await screen.findByText('Friend One')).toBeInTheDocument();
+        expect(screen.getByText('Pending User')).toBeInTheDocument();
     });
 
-    it('renders lists after loading data', async () => {
+    it('calls acceptRelationshipRequest when clicking accept', async () => {
         vi.mocked(api.getRelationships).mockResolvedValue([]);
-        vi.mocked(api.getRelationshipRequests).mockResolvedValue({
-            pending: [],
-            sent: [],
-        });
+        vi.mocked(api.getRelationshipRequests).mockResolvedValue(mockRequests);
+        vi.mocked(api.acceptRelationshipRequest).mockResolvedValue({ message: 'Accepted' });
 
         render(
             <UserProfileContext.Provider value={mockUserProfileContextValue}>
@@ -83,10 +99,26 @@ describe('FriendlistPage', () => {
             </UserProfileContext.Provider>,
         );
 
-        expect(await screen.findByText('Friends')).toBeInTheDocument();
-        expect(screen.getByText('Pending Requests')).toBeInTheDocument();
-        expect(screen.getByText('Sent Requests')).toBeInTheDocument();
-        expect(screen.getByText('My Friends')).toBeInTheDocument();
+        const acceptBtn = await screen.findByTitle(/Accept request/i);
+        fireEvent.click(acceptBtn);
+
+        expect(api.acceptRelationshipRequest).toHaveBeenCalledWith(3);
+    });
+
+    it('opens add friend modal when clicking add button', async () => {
+        vi.mocked(api.getRelationships).mockResolvedValue([]);
+        vi.mocked(api.getRelationshipRequests).mockResolvedValue({ pending: [], sent: [] });
+
+        render(
+            <UserProfileContext.Provider value={mockUserProfileContextValue}>
+                <FriendlistPage />
+            </UserProfileContext.Provider>,
+        );
+
+        const addBtn = await screen.findByRole('button', { name: /Add Friend/i });
+        fireEvent.click(addBtn);
+
+        expect(screen.getByPlaceholderText(/Search by name or friend code/i)).toBeInTheDocument();
     });
 });
 
