@@ -11,7 +11,7 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
     const [entries, setEntries] = useState<Entry[]>([]);
     const [activeEntry, setActiveEntry] = useState<Entry | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const { dispatchSave } = useAutoSave(setEntries, setActiveEntry);
 
     useEffect(() => {
@@ -21,7 +21,8 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
             .then(async (data) => {
                 if (data && data.length > 0) {
                     setEntries(data);
-                    setActiveEntry(data[0]);
+                    const firstOwned = data.find((e) => e.user_id === user?.id);
+                    setActiveEntry(firstOwned || null);
                 } else if (!localStorage.getItem('remoire_initialized')) {
                     localStorage.setItem('remoire_initialized', '1');
                     try {
@@ -45,11 +46,13 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
             .finally(() => {
                 setIsLoading(false);
             });
-    }, [isAuthenticated]);
+    }, [isAuthenticated, user]);
 
     const selectEntry = useCallback((entry: Entry) => {
-        setActiveEntry(entry);
-    }, []);
+        if (entry.user_id === user?.id) {
+            setActiveEntry(entry);
+        }
+    }, [user]);
 
     const createEntry = useCallback(async () => {
         try {

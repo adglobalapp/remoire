@@ -1,4 +1,5 @@
 import { useEntryContext } from '../../../../contexts/EntryContext';
+import { useAuth } from '../../../../contexts/AuthContext';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useLayoutEffect } from 'react';
@@ -19,9 +20,13 @@ import { DEFAULT_PAGE_SETTINGS } from '../../../../types';
 
 const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
     const { selectEntry } = useEntryContext();
+    const { user } = useAuth();
     const navigate = useNavigate();
 
+    const isOwner = entry.user_id === user?.id;
+
     const handleEdit = () => {
+        if (!isOwner) return;
         selectEntry(entry);
         navigate('/entries');
         onClose();
@@ -160,9 +165,11 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
                         <button type="button" className={`btn btn-secondary`} onClick={onClose}>
                             Close
                         </button>
-                        <button type="button" className={`btn ${styles.editEntryBtn}`} onClick={handleEdit}>
-                            <Edit3 size={16} /> Edit Entry
-                        </button>
+                        {isOwner && (
+                            <button type="button" className={`btn ${styles.editEntryBtn}`} onClick={handleEdit}>
+                                <Edit3 size={16} /> Edit Entry
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

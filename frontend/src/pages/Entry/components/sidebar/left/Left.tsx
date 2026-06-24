@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plus, PanelLeft, X, Loader2 } from 'lucide-react';
 import DeleteConfirmation from '../../../../../components/common/DeleteConfirmation';
 import { useEntryContext } from '../../../../../contexts/EntryContext';
+import { useAuth } from '../../../../../contexts/AuthContext';
 import styles from './Left.module.css';
 import { type LeftProps } from '../../../../../types';
 import EntryItem from './components/EntryItem';
@@ -9,6 +10,7 @@ import Filter from './components/Filter';
 
 const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const { entries, activeEntry, selectEntry, createEntry, deleteEntry } = useEntryContext();
+    const { user } = useAuth();
     const [activeFilter, setActiveFilter] = useState<'all' | 'today' | 'this-month' | 'this-year'>('all');
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [itemToDelete, setItemToDelete] = useState<number | null>(null);
@@ -17,7 +19,9 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
     const mobileOpen = propOpen || false;
     const toggle = onToggle || (() => {});
 
-    const filteredEntries = entries.filter((entry) => {
+    const ownedEntries = entries.filter((e) => e.user_id === user?.id);
+
+    const filteredEntries = ownedEntries.filter((entry) => {
         const matchesSearch = (entry.title || '').toLowerCase().includes(searchQuery.toLowerCase());
         if (activeFilter === 'all') return matchesSearch;
 
@@ -121,7 +125,7 @@ const Left = ({ isOpen: propOpen, onToggle }: LeftProps) => {
                         message={
                             <span>
                                 Are you sure you want to delete{' '}
-                                <strong>{entries.find((e) => e.id === itemToDelete)?.title || 'Untitled'}</strong>? This action cannot be
+                                <strong>{ownedEntries.find((e) => e.id === itemToDelete)?.title || 'Untitled'}</strong>? This action cannot be
                                 undone.
                             </span>
                         }
