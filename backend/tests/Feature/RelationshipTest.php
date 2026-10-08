@@ -82,3 +82,49 @@ test('user can block another user', function () {
         'status' => 'blocked',
     ]);
 });
+
+test('blocked user cannot remove the block placed on them', function () {
+    $blocker = User::factory()->create();
+    $blocked = User::factory()->create();
+    Relationship::create(['user_id' => $blocker->id, 'target_id' => $blocked->id, 'status' => 'blocked']);
+
+    $this->actingAs($blocked)
+        ->deleteJson("/api/relationships/{$blocker->id}")
+        ->assertStatus(404);
+
+    $this->assertDatabaseHas('relationships', [
+        'user_id' => $blocker->id,
+        'target_id' => $blocked->id,
+        'status' => 'blocked',
+    ]);
+});
+
+test('blocking back keeps the other users block', function () {
+    $first = User::factory()->create();
+    $second = User::factory()->create();
+    Relationship::create(['user_id' => $first->id, 'target_id' => $second->id, 'status' => 'blocked']);
+
+    $this->actingAs($second)
+        ->postJson("/api/relationships/{$first->id}/block")
+        ->assertStatus(200);
+
+    $this->assertDatabaseHas('relationships', ['user_id' => $first->id, 'target_id' => $second->id, 'status' => 'blocked']);
+    $this->assertDatabaseHas('relationships', ['user_id' => $second->id, 'target_id' => $first->id, 'status' => 'blocked']);
+});
+
+test('friend request notification is removed once the request is answered', function (string $action) {
+    $requester = User::factory()->create();
+    $target = User::factory()->create();
+
+    $this->actingAs($requester)->postJson('/api/relationships', ['target_id' => $target->id])->assertStatus(200);
+    $this->assertDatabaseHas('notifications', ['user_id' => $target->id, 'type' => 'friend_request']);
+
+    match ($action) {
+        'accept' => $this->actingAs($target)->postJson("/api/relationships/{$requester->id}/accept"),
+        'reject' => $this->actingAs($target)->deleteJson("/api/relationships/{$requester->id}"),
+        'cancel' => $this->actingAs($requester)->deleteJson("/api/relationships/{$target->id}"),
+        'block' => $this->actingAs($target)->postJson("/api/relationships/{$requester->id}/block"),
+    };
+
+    $this->assertDatabaseMissing('notifications', ['user_id' => $target->id, 'type' => 'friend_request']);
+})->with(['accept', 'reject', 'cancel', 'block']);

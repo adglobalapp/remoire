@@ -159,6 +159,13 @@ const Navbar = () => {
                             >
                                 <User size={18} /> My Profile
                             </NavLink>
+                            <NavLink
+                                to="/mailbox"
+                                className={({ isActive }) => `${styles.mobileLink} ${isActive ? styles.active : ''}`}
+                                onClick={() => setMenuOpen(false)}
+                            >
+                                <Mail size={18} /> Mailbox
+                            </NavLink>
                             <div className={styles.mobileUserBadge}>
                                 <Avatar user={user} size={28} />
                                 <span>{user.name}</span>

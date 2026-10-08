@@ -24,6 +24,13 @@ class Relationship extends Model
         });
     }
 
+    public function scopeNotBlockedBy($query, $userId)
+    {
+        return $query->where(function ($innerQuery) use ($userId) {
+            $innerQuery->where('status', '!=', 'blocked')->orWhere('user_id', '!=', $userId);
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

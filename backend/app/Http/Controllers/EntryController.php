@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Entry;
+use App\Models\Notification;
+use App\Models\Timeline;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class EntryController extends Controller
 {
@@ -90,11 +93,17 @@ class EntryController extends Controller
 
         $toDelete = array_diff($oldImages, $newImages);
         foreach ($toDelete as $path) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+            Storage::disk('public')->delete($path);
         }
 
         if ($request->has('participant_ids')) {
-            $entry->participants()->sync($request->participant_ids);
+            $changes = $entry->participants()->sync($request->participant_ids ?? []);
+
+            // Removed participants lose access, so the entry must leave their timelines too
+            if (! empty($changes['detached'])) {
+                $timelineIds = Timeline::whereIn('user_id', $changes['detached'])->pluck('id');
+                $entry->timelines()->detach($timelineIds);
+            }
         }
 
         $message = 'Entry updated';
@@ -124,10 +133,14 @@ class EntryController extends Controller
 
         $images = $this->getAllImages($entry);
         foreach ($images as $path) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+            Storage::disk('public')->delete($path);
         }
 
         $entry->delete();
+
+        Notification::where('type', 'anniversary')
+            ->where('data->entry_id', $entry->id)
+            ->delete();
 
         return response()->json(['message' => 'Entry deleted'], 200);
     }

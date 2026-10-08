@@ -25,3 +25,11 @@ export const compareDates = (dateA: string | null | undefined, dateB: string | n
     const timeB = dateB ? new Date(dateB).getTime() : 0;
     return ascending ? timeA - timeB : timeB - timeA;
 };
+
+// YYYY-MM-DD in the user's own timezone (toISOString would give the UTC date)
+export const toLocalDateString = (date: Date = new Date()): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};

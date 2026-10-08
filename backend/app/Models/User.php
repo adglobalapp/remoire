@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -25,6 +27,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'anniversaries_checked_on',
     ];
 
     protected function casts(): array
@@ -105,13 +108,41 @@ class User extends Authenticatable
         return $this->hasMany(Notification::class);
     }
 
+    /**
+     * Runs the anniversary check at most once per day for this user.
+     *
+     * The day is claimed with a single conditional UPDATE, so parallel requests
+     * cannot create duplicate notifications, and a notification the user deleted
+     * is not recreated on the next request.
+     */
+    public function checkAnniversariesOncePerDay()
+    {
+        $today = now()->toDateString();
+
+        $claimed = static::whereKey($this->id)
+            ->where(fn ($query) => $query->whereNull('anniversaries_checked_on')->orWhere('anniversaries_checked_on', '<', $today))
+            ->update(['anniversaries_checked_on' => $today]);
+
+        if ($claimed) {
+            $this->checkAnniversaries();
+        }
+    }
+
     public function checkAnniversaries()
     {
         try {
+            $today = now();
+
             $anniversaries = $this->entries()
-                ->whereMonth('date', now()->month)
-                ->whereDay('date', now()->day)
-                ->whereYear('date', '<', now()->year)
+                ->whereYear('date', '<', $today->year)
+                ->where(function ($query) use ($today) {
+                    $query->where(fn ($q) => $q->whereMonth('date', $today->month)->whereDay('date', $today->day));
+
+                    // Leap day memories are celebrated on February 28 in non-leap years
+                    if (! $today->isLeapYear() && $today->month === 2 && $today->day === 28) {
+                        $query->orWhere(fn ($q) => $q->whereMonth('date', 2)->whereDay('date', 29));
+                    }
+                })
                 ->get();
 
             if ($anniversaries->isEmpty()) {
@@ -120,7 +151,7 @@ class User extends Authenticatable
 
             $sentEntryIds = Notification::where('user_id', $this->id)
                 ->where('type', 'anniversary')
-                ->whereDate('created_at', now()->toDateString())
+                ->whereDate('created_at', $today->toDateString())
                 ->pluck('data->entry_id')
                 ->toArray();
 
@@ -129,7 +160,7 @@ class User extends Authenticatable
                     continue;
                 }
 
-                $years = now()->year - \Carbon\Carbon::parse($entry->date)->year;
+                $years = $today->year - Carbon::parse($entry->date)->year;
 
                 Notification::create([
                     'user_id' => $this->id,
@@ -142,7 +173,7 @@ class User extends Authenticatable
                 ]);
             }
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Anniversary check failed: '.$e->getMessage());
+            Log::error('Anniversary check failed: '.$e->getMessage());
         }
     }
 }

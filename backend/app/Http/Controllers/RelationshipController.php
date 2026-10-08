@@ -98,6 +98,7 @@ class RelationshipController extends Controller
         }
 
         $rel->update(['status' => 'accepted']);
+        $this->forgetFriendRequest($user->id, $me->id);
 
         return response()->json(['message' => 'Request accepted'], 200);
     }
@@ -105,7 +106,7 @@ class RelationshipController extends Controller
     public function destroy(User $user)
     {
         $me = Auth::user();
-        $rel = Relationship::between($me->id, $user->id)->first();
+        $rel = Relationship::between($me->id, $user->id)->notBlockedBy($user->id)->first();
 
         if (! $rel) {
             return response()->json(['message' => 'Relationship no longer exists'], 404);
@@ -114,6 +115,10 @@ class RelationshipController extends Controller
         $status = $rel->status;
         $isRequester = $rel->user_id === $me->id;
         $rel->delete();
+
+        if ($status === 'pending') {
+            $this->forgetFriendRequest($rel->user_id, $rel->target_id);
+        }
 
         $message = 'Connection removed';
         if ($status === 'pending') {
@@ -128,9 +133,22 @@ class RelationshipController extends Controller
     public function block(User $user)
     {
         $me = Auth::id();
-        Relationship::between($me, $user->id)->delete();
+
+        // A block placed by the other user must survive, otherwise blocking back would lift it
+        Relationship::between($me, $user->id)->notBlockedBy($user->id)->delete();
         Relationship::create(['user_id' => $me, 'target_id' => $user->id, 'status' => 'blocked']);
 
+        $this->forgetFriendRequest($me, $user->id);
+        $this->forgetFriendRequest($user->id, $me);
+
         return response()->json(['message' => 'User blocked'], 200);
+    }
+
+    private function forgetFriendRequest($requesterId, $targetId)
+    {
+        Notification::where('user_id', $targetId)
+            ->where('type', 'friend_request')
+            ->where('data->requester_id', $requesterId)
+            ->delete();
     }
 }

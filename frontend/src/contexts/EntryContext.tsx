@@ -12,19 +12,26 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
     const [activeEntry, setActiveEntry] = useState<Entry | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const { isAuthenticated, user } = useAuth();
+    const userId = user?.id;
     const { dispatchSave } = useAutoSave(setEntries, setActiveEntry);
 
     useEffect(() => {
-        if (!isAuthenticated) return;
+        // Never keep showing the previous account's entries after logout or account switch
+        setEntries([]);
+        setActiveEntry(null);
+
+        if (!isAuthenticated || !userId) return;
+
+        const initializedKey = `remoire_initialized_${userId}`;
 
         getEntries()
             .then(async (data) => {
                 if (data && data.length > 0) {
                     setEntries(data);
-                    const firstOwned = data.find((e) => e.user_id === user?.id);
+                    const firstOwned = data.find((e) => e.user_id === userId);
                     setActiveEntry(firstOwned || null);
-                } else if (!localStorage.getItem('remoire_initialized')) {
-                    localStorage.setItem('remoire_initialized', '1');
+                } else if (!localStorage.getItem(initializedKey)) {
+                    localStorage.setItem(initializedKey, '1');
                     try {
                         const newEntry = await apiCreateEntry('Untitled');
                         if (newEntry) {
@@ -46,13 +53,16 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
             .finally(() => {
                 setIsLoading(false);
             });
-    }, [isAuthenticated, user]);
+    }, [isAuthenticated, userId]);
 
-    const selectEntry = useCallback((entry: Entry) => {
-        if (entry.user_id === user?.id) {
-            setActiveEntry(entry);
-        }
-    }, [user]);
+    const selectEntry = useCallback(
+        (entry: Entry) => {
+            if (entry.user_id === user?.id) {
+                setActiveEntry(entry);
+            }
+        },
+        [user],
+    );
 
     const createEntry = useCallback(async () => {
         try {
@@ -73,7 +83,8 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
                 setEntries((prev) => {
                     const newList = prev.filter((e) => e.id !== id);
                     if (activeEntry?.id === id) {
-                        setActiveEntry(newList[0] || null);
+                        // Only owned entries can be active (see selectEntry)
+                        setActiveEntry(newList.find((e) => e.user_id === user?.id) || null);
                     }
                     return newList;
                 });
@@ -83,7 +94,7 @@ export const EntryProvider = ({ children }: EntryProviderProps) => {
                 toast.error(error.message || 'Failed to delete entry.');
             }
         },
-        [activeEntry],
+        [activeEntry, user],
     );
 
     const updateEntry = useCallback(

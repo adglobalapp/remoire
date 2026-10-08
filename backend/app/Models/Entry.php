@@ -20,6 +20,8 @@ class Entry extends Model
             if ($entry->content) {
                 $extracted = static::extractTitle($entry->content);
                 $entry->title = $extracted ?: 'Untitled';
+            } elseif (! $entry->title) {
+                $entry->title = 'Untitled';
             }
         });
     }

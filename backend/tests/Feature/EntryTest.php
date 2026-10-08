@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Entry;
+use App\Models\Timeline;
 use App\Models\User;
 
 test('authenticated user can list their entries', function () {
@@ -88,4 +89,32 @@ test('owner can delete their entry', function () {
         ->assertStatus(200);
 
     $this->assertDatabaseMissing('entries', ['id' => $entry->id]);
+});
+
+test('entry without title and content is saved as untitled', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->postJson('/api/entries', ['date' => '2026-05-10'])
+        ->assertStatus(201)
+        ->assertJsonFragment(['title' => 'Untitled']);
+});
+
+test('removed participant loses the entry from their timelines', function () {
+    $owner = User::factory()->create();
+    $participant = User::factory()->create();
+    $entry = Entry::factory()->create(['user_id' => $owner->id]);
+    $entry->participants()->attach($participant->id);
+
+    $ownerTimeline = Timeline::create(['user_id' => $owner->id, 'name' => 'Mine']);
+    $participantTimeline = Timeline::create(['user_id' => $participant->id, 'name' => 'Theirs']);
+    $ownerTimeline->entries()->attach($entry->id);
+    $participantTimeline->entries()->attach($entry->id);
+
+    $this->actingAs($owner)
+        ->putJson("/api/entries/{$entry->id}", ['participant_ids' => []])
+        ->assertStatus(200);
+
+    expect($participantTimeline->entries()->count())->toBe(0)
+        ->and($ownerTimeline->entries()->count())->toBe(1);
 });
