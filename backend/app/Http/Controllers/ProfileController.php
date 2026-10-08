@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
@@ -25,7 +26,7 @@ class ProfileController extends Controller
             $newAvatar = $request->avatar_url;
             if ($user->avatar_url && $user->avatar_url !== $newAvatar) {
                 $oldPath = str_replace(asset('storage/'), '', $user->avatar_url);
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                Storage::disk('public')->delete($oldPath);
             }
             $user->avatar_url = $newAvatar;
         }

@@ -1,41 +1,34 @@
 import { type Entry, type ApiError } from '../types';
 import { API_BASE_URL, getHeaders } from './client';
+import { toLocalDateString } from '../utils/dateUtils';
 
 export const getEntries = async (): Promise<Entry[]> => {
-    try {
-        const res = await fetch(`${API_BASE_URL}/entries`, {
-            headers: getHeaders(),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || `Error: ${res.status}`);
-        return data;
-    } catch (error) {
-        throw error;
-    }
+    const res = await fetch(`${API_BASE_URL}/entries`, {
+        headers: getHeaders(),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || `Error: ${res.status}`);
+    return data;
 };
 
 export const createEntry = async (title: string) => {
-    try {
-        const res = await fetch(`${API_BASE_URL}/entries`, {
-            method: 'POST',
-            headers: getHeaders(),
-            body: JSON.stringify({
-                title,
-                date: new Date().toISOString().split('T')[0],
-            }),
-        });
+    const res = await fetch(`${API_BASE_URL}/entries`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({
+            title,
+            date: toLocalDateString(),
+        }),
+    });
 
-        const data = await res.json();
-        if (!res.ok) {
-            const error = new Error(data.message || 'Failed to create entry') as ApiError;
-            error.status = res.status;
-            error.errors = data.errors;
-            throw error;
-        }
-        return data;
-    } catch (error) {
+    const data = await res.json();
+    if (!res.ok) {
+        const error = new Error(data.message || 'Failed to create entry') as ApiError;
+        error.status = res.status;
+        error.errors = data.errors;
         throw error;
     }
+    return data;
 };
 
 export const updateEntry = async (
@@ -44,40 +37,32 @@ export const updateEntry = async (
         participant_ids?: number[];
     },
 ) => {
-    try {
-        const res = await fetch(`${API_BASE_URL}/entries/${id}`, {
-            method: 'PUT',
-            headers: getHeaders(),
-            body: JSON.stringify(payload),
-        });
+    const res = await fetch(`${API_BASE_URL}/entries/${id}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(payload),
+    });
 
-        const data = await res.json();
+    const data = await res.json();
 
-        if (!res.ok) {
-            const error = new Error(data.message || 'Failed to update entry') as ApiError;
-            error.status = res.status;
-            error.errors = data.errors;
-            throw error;
-        }
-
-        return data;
-    } catch (error) {
+    if (!res.ok) {
+        const error = new Error(data.message || 'Failed to update entry') as ApiError;
+        error.status = res.status;
+        error.errors = data.errors;
         throw error;
     }
+
+    return data;
 };
 
 export const deleteEntry = async (id: number) => {
-    try {
-        const res = await fetch(`${API_BASE_URL}/entries/${id}`, {
-            method: 'DELETE',
-            headers: getHeaders(),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || `Error: ${res.status}`);
-        return data;
-    } catch (error) {
-        throw error;
-    }
+    const res = await fetch(`${API_BASE_URL}/entries/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || `Error: ${res.status}`);
+    return data;
 };
 
 export const uploadImage = async (file: File): Promise<{ url?: string; message?: string; error?: string }> => {

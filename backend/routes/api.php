@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EntryController;
 use App\Http\Controllers\NoteController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\TimelineController;
 use App\Http\Controllers\UploadController;
@@ -41,13 +43,13 @@ Route::middleware(['auth:sanctum', 'last_seen'])->group(function () {
     Route::post('/relationships/{user}/block', [RelationshipController::class, 'block']);
 
     // Profile routes
-    Route::put('/user/profile', [\App\Http\Controllers\ProfileController::class, 'update']);
-    Route::put('/user/password', [\App\Http\Controllers\ProfileController::class, 'updatePassword']);
-    Route::get('/user/blocked', [\App\Http\Controllers\ProfileController::class, 'blockedUsers']);
-    Route::delete('/user/blocked/{user}', [\App\Http\Controllers\ProfileController::class, 'unblock']);
+    Route::put('/user/profile', [ProfileController::class, 'update']);
+    Route::put('/user/password', [ProfileController::class, 'updatePassword']);
+    Route::get('/user/blocked', [ProfileController::class, 'blockedUsers']);
+    Route::delete('/user/blocked/{user}', [ProfileController::class, 'unblock']);
 
     // Notification routes
-    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index']);
-    Route::put('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead']);
-    Route::delete('/notifications/{id}', [\App\Http\Controllers\NotificationController::class, 'destroy']);
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
 });
