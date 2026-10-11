@@ -63,7 +63,7 @@
     color-scheme: dark;
 
     /* Warm ink: the light theme inverted, same burgundy / beige / navy family */
-    --color-dark-blue: #2c2a37;
+    --color-dark-blue: #3a4763;
     --color-burgundy: #c4627e;
     --color-light-beige: #252022;
     --color-dark-beige: #1b1819;
@@ -92,21 +92,21 @@
     --tint-strength: 65%;
     --color-on-palette: #221d1f;
 
-    /* Palette Colors (dark variants): warm mid-tones of the light pastels */
-    --color-pink: #c8668a;
-    --color-yellow: #cca545;
-    --color-green: #74ab63;
-    --color-sky: #529fb2;
-    --color-mauve: #9375c2;
-    --color-peach: #cc8250;
-    --color-flamingo: #bf8a7f;
+    /* Palette Colors (dark variants): vintage ink tones of the light pastels */
+    --color-pink: #b07a80;
+    --color-yellow: #b8954f;
+    --color-green: #7d8a5c;
+    --color-sky: #5a7590;
+    --color-mauve: #7a6488;
+    --color-peach: #a8604a;
+    --color-flamingo: #b5a286;
 
-    --color-pink-rgb: 200, 102, 138;
-    --color-yellow-rgb: 204, 165, 69;
-    --color-green-rgb: 116, 171, 99;
-    --color-sky-rgb: 82, 159, 178;
-    --color-mauve-rgb: 147, 117, 194;
-    --color-peach-rgb: 204, 130, 80;
+    --color-pink-rgb: 176, 122, 128;
+    --color-yellow-rgb: 184, 149, 79;
+    --color-green-rgb: 125, 138, 92;
+    --color-sky-rgb: 90, 117, 144;
+    --color-mauve-rgb: 122, 100, 136;
+    --color-peach-rgb: 168, 96, 74;
 }
 
 /* Paper-like surfaces (notes, journal pages) stay light in dark mode */
