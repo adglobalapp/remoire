@@ -316,7 +316,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-dark-brown);
+    color: var(--color-on-palette);
     font-weight: 400;
     font-family: var(--font-ui);
     font-size: 1.8rem;

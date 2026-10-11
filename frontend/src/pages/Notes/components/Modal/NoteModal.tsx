@@ -82,7 +82,6 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
                 style={
                     {
                         '--note-bg': themedColor(color),
-                        '--note-accent': color,
                     } as React.CSSProperties
                 }
             >
@@ -180,7 +179,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
                             <div
                                 key={c}
                                 className={`${styles.colorCircle} ${color === c ? styles.selected : ''}`}
-                                style={{ '--swatch': themedColor(c), '--swatch-accent': c } as React.CSSProperties}
+                                style={{ '--swatch': themedColor(c) } as React.CSSProperties}
                                 onClick={() => setColor(c)}
                             />
                         ))}

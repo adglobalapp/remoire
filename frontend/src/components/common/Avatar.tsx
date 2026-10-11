@@ -1,6 +1,6 @@
 import React from 'react';
 import { type AvatarProps } from '../../types';
-import { PRESET_COLORS } from '../../utils/constants';
+import { PRESET_COLORS, themedColor } from '../../utils/constants';
 import styles from './Avatar.module.css';
 
 const Avatar: React.FC<AvatarProps> = ({ user, text, size = 32, className = '', backgroundColor, onClick, title }) => {
@@ -11,7 +11,7 @@ const Avatar: React.FC<AvatarProps> = ({ user, text, size = 32, className = '', 
         return name.substring(0, 2).toUpperCase();
     };
 
-    const getColor = (id?: number) => (id === undefined ? PRESET_COLORS[0] : PRESET_COLORS[id % PRESET_COLORS.length]);
+    const getColor = (id?: number) => themedColor(id === undefined ? PRESET_COLORS[0] : PRESET_COLORS[id % PRESET_COLORS.length]);
 
     const displayText = text || (user ? getInitials(user.name) : '?');
     const finalBgColor = backgroundColor || (user?.avatar_url ? 'transparent' : getColor(user?.id));
@@ -25,7 +25,7 @@ const Avatar: React.FC<AvatarProps> = ({ user, text, size = 32, className = '', 
                     height: `${size}px`,
                     fontSize: `${size * 0.6}px`,
                     backgroundColor: finalBgColor,
-                    color: 'var(--color-dark-brown)',
+                    color: 'var(--color-on-palette)',
                     display: 'grid',
                     placeItems: 'center',
                     flexShrink: 0,

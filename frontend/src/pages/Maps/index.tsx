@@ -11,13 +11,13 @@ import { type Entry, type MarkerCluster } from '../../types';
 import Navbar from '../../components/common/Navbar';
 import { Calendar, MapPin, Eye, User } from 'lucide-react';
 import MarkerClusterGroup from 'react-leaflet-cluster';
-import { PRESET_COLORS } from '../../utils/constants';
+import { PRESET_COLORS, themedColor } from '../../utils/constants';
 import styles from './index.module.css';
 
 const createCustomIcon = (color: string) => {
     return L.divIcon({
         className: styles.customMarker,
-        html: `<div class="${styles.markerPin}" style="background-color: ${color};"></div>`,
+        html: `<div class="${styles.markerPin}" style="background-color: ${themedColor(color)};"></div>`,
         iconSize: [24, 24],
         iconAnchor: [12, 24],
         popupAnchor: [0, -32],
@@ -29,7 +29,7 @@ const createClusterIcon = (cluster: MarkerCluster) => {
     const color = PRESET_COLORS[count % PRESET_COLORS.length];
 
     return L.divIcon({
-        html: `<div class="${styles.clusterInner}" style="background-color: ${color};">
+        html: `<div class="${styles.clusterInner}" style="background-color: ${themedColor(color)};">
                 <span>${count}</span>
                </div>`,
         className: styles.customCluster,

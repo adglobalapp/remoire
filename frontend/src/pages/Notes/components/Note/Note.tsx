@@ -12,7 +12,6 @@ const Note: React.FC<NoteProps> = ({ note, onClick, index = 0 }) => {
             style={
                 {
                     '--note-bg': themedColor(note.color || '#ffffff'),
-                    '--note-accent': note.color || '#ffffff',
                     '--delay': index,
                 } as React.CSSProperties
             }

@@ -285,36 +285,29 @@
     }
 }
 
-/* Dark mode: --note-bg resolves to the palette's dark variant, the original color stays as accent */
-:global([data-theme='dark']) .modalContent {
-    border: 1px solid color-mix(in srgb, var(--note-accent) 30%, transparent) !important;
-    --placeholder-color: rgba(255, 255, 255, 0.4);
-}
-
-:global([data-theme='dark']) .headerBtn.pinnedActive,
-:global([data-theme='dark']) .toolbarBtn.active {
-    background-color: var(--note-accent);
-    color: var(--color-light-beige);
-}
-
 :global([data-theme='dark']) .modalContent :global(.ProseMirror ul[data-type='taskList'] input[type='checkbox']) {
     background-color: transparent;
-    border-color: color-mix(in srgb, var(--note-accent) 60%, transparent);
 }
 
-:global([data-theme='dark']) .modalContent :global(.ProseMirror ul[data-type='taskList'] input[type='checkbox']:checked) {
-    background-color: var(--note-accent);
-    border-color: var(--note-accent);
+:global([data-theme='dark']) .modalContent :global(.ProseMirror ul[data-type='taskList'] input[type='checkbox']:checked),
+:global([data-theme='dark']) .toolbarBtn.active {
+    background-color: var(--color-burgundy);
+    border-color: var(--color-burgundy);
 }
 
-:global([data-theme='dark']) .modalContent :global(.ProseMirror ul[data-type='taskList'] input[type='checkbox']:checked::after) {
-    color: var(--color-light-beige);
-}
-
-:global([data-theme='dark']) .colorCircle {
-    border-color: var(--swatch-accent);
+:global([data-theme='dark']) .headerBtn.pinnedActive {
+    color: var(--color-burgundy);
+    background-color: rgba(var(--color-burgundy-rgb), 0.15);
 }
 
 :global([data-theme='dark']) .colorCircle.selected {
     border-color: var(--color-dark-brown);
+}
+
+:global([data-theme='dark']) .modalContent {
+    /* Vivid palette background, so text switches back to dark ink */
+    --color-dark-brown: #1a1726;
+    --ink-rgb: 0, 0, 0;
+    --placeholder-color: rgba(0, 0, 0, 0.4);
+    color: var(--color-dark-brown);
 }

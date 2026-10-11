@@ -7,7 +7,7 @@ import { useEntryContext } from '../../../../contexts/EntryContext';
 import { useTimelineContext } from '../../../../contexts/TimelineContext';
 import DeleteConfirmation from '../../../../components/common/DeleteConfirmation';
 import { type AddEntryCardProps, type ApiError } from '../../../../types';
-import { PRESET_COLORS } from '../../../../utils/constants';
+import { PRESET_COLORS, themedColor } from '../../../../utils/constants';
 import styles from './AddEntryCard.module.css';
 
 const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
@@ -159,7 +159,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                                         key={c}
                                         type="button"
                                         className={`${styles.colorBtn} ${color === c ? styles.colorBtnActive : ''}`}
-                                        style={{ backgroundColor: c }}
+                                        style={{ backgroundColor: themedColor(c) }}
                                         onClick={() => {
                                             setColor(c === color ? '' : c);
                                             setCustomColor('');
@@ -170,7 +170,7 @@ const AddEntryCard = ({ onClose, entryToEdit }: AddEntryCardProps) => {
                                 <button
                                     type="button"
                                     className={`${styles.colorBtn} ${styles.customColorBtn} ${customColor ? styles.colorBtnActive : ''}`}
-                                    style={{ backgroundColor: customColor || 'transparent' }}
+                                    style={{ backgroundColor: customColor ? themedColor(customColor) : 'transparent' }}
                                     onClick={() => colorPickerRef.current?.click()}
                                     title="Custom Color"
                                 >

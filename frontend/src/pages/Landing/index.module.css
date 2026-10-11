@@ -363,14 +363,3 @@
         gap: 12px;
     }
 }
-
-/* The landing uses the palette as bright accents, so it keeps the light variants in dark mode */
-:global([data-theme='dark']) .landingContainer {
-    --color-pink: #f8a5c2;
-    --color-yellow: #f9e2af;
-    --color-green: #a6e3a1;
-    --color-sky: #89dceb;
-    --color-mauve: #cba6f7;
-    --color-peach: #fab387;
-    --color-flamingo: #f5e0dc;
-}

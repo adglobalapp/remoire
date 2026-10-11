@@ -172,39 +172,17 @@
     }
 }
 
-/* Dark mode: --note-bg resolves to the palette's dark variant, the original color stays as accent */
-:global([data-theme='dark']) .noteCard {
-    border-color: color-mix(in srgb, var(--note-accent) 30%, transparent);
-}
-
-:global([data-theme='dark']) .noteCard:hover {
-    border-color: color-mix(in srgb, var(--note-accent) 60%, transparent);
-}
-
-:global([data-theme='dark']) .donkeyEar {
-    background-color: color-mix(in srgb, var(--note-accent) 40%, transparent);
-}
-
-:global([data-theme='dark']) .title {
-    color: var(--note-accent);
-}
-
 :global([data-theme='dark']) .preview ul[data-type='taskList'] input[type='checkbox'] {
     background-color: transparent;
-    border-color: color-mix(in srgb, var(--note-accent) 60%, transparent);
 }
 
 :global([data-theme='dark']) .preview ul[data-type='taskList'] input[type='checkbox']:checked {
-    background-color: var(--note-accent);
-    border-color: var(--note-accent);
+    background-color: var(--color-burgundy);
+    border-color: var(--color-burgundy);
 }
 
-:global([data-theme='dark']) .preview ul[data-type='taskList'] input[type='checkbox']:checked::after {
-    color: var(--color-light-beige);
-}
-
-:global([data-theme='dark']) .pinIcon {
-    color: var(--note-accent);
-    opacity: 0.9;
-    filter: none;
+:global([data-theme='dark']) .noteCard {
+    /* Vivid palette background, so text switches back to dark ink */
+    --color-dark-brown: #1a1726;
+    --ink-rgb: 0, 0, 0;
 }

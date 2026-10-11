@@ -6,6 +6,7 @@ import EntryPreview from '../modal/EntryPreview';
 import AddEntryCard from '../modal/AddEntryCard';
 import { formatDate } from '../../../../utils/dateUtils';
 import Avatar from '../../../../components/common/Avatar';
+import { themedColor } from '../../../../utils/constants';
 
 const getExcerpt = (content: string | null): string => {
     if (!content) return '';
@@ -45,7 +46,7 @@ const EntryCard = ({ entry, side, idx = 0 }: EntryCardProps) => {
                 <div
                     className={styles.card}
                     style={{
-                        borderTop: entry.color ? `6px solid ${entry.color}` : undefined,
+                        borderTop: entry.color ? `6px solid ${themedColor(entry.color)}` : undefined,
                     }}
                     onClick={() => setIsPreviewOpen(true)}
                 >
