@@ -306,7 +306,7 @@
 
 :global([data-theme='dark']) .modalContent {
     /* Vivid palette background, so text switches back to dark ink */
-    --color-dark-brown: #1a1726;
+    --color-dark-brown: #221d1f;
     --ink-rgb: 0, 0, 0;
     --placeholder-color: rgba(0, 0, 0, 0.4);
     color: var(--color-dark-brown);

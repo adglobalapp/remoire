@@ -62,53 +62,51 @@
 :root[data-theme='dark'] {
     color-scheme: dark;
 
-    --color-dark-blue: #0d0b14;
-    --color-burgundy: #e040a0;
-    --color-light-beige: #1a1726;
-    --color-dark-beige: #100e18;
-    --color-dark-brown: #f0eaf8;
-    --color-light-brown: #9b8ec4;
+    /* Warm ink: the light theme inverted, same burgundy / beige / navy family */
+    --color-dark-blue: #2c2a37;
+    --color-burgundy: #c4627e;
+    --color-light-beige: #252022;
+    --color-dark-beige: #1b1819;
+    --color-dark-brown: #ece3d6;
+    --color-light-brown: #b3a492;
 
-    --color-burgundy-hover: #ec4899;
+    --color-burgundy-hover: #d0778f;
 
-    --color-success: #39f5a0;
-    --color-error: #ef4444;
-    --color-success-hover: #20e88b;
-    --color-error-hover: #dc2626;
+    --color-success: #84c070;
+    --color-error: #d0625f;
+    --color-success-hover: #94c589;
+    --color-error-hover: #db7774;
 
-    --color-success-rgb: 57, 245, 160;
-    --color-error-rgb: 255, 77, 106;
+    --color-success-rgb: 132, 192, 112;
+    --color-error-rgb: 208, 98, 95;
 
-    --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.5);
-    --shadow-paper: 0 4px 24px rgba(0, 0, 0, 0.5);
+    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-paper: 0 2px 14px rgba(0, 0, 0, 0.4);
 
-    --color-surface: #211e30;
-    --color-on-accent: #ffffff;
-    --color-strong: #2e2a42;
-    --color-strong-hover: #3d3757;
-    --color-burgundy-rgb: 224, 64, 160;
-    --ink-rgb: 255, 255, 255;
-    --tint-strength: 75%;
-    --color-on-palette: #1a1726;
+    --color-surface: #2e282a;
+    --color-on-accent: #fcf6ed;
+    --color-strong: #3b3437;
+    --color-strong-hover: #4a4246;
+    --color-burgundy-rgb: 196, 98, 126;
+    --ink-rgb: 255, 246, 235;
+    --tint-strength: 65%;
+    --color-on-palette: #221d1f;
 
-    /* Palette Colors (dark variants) */
-    --color-pink: #d65d8b;
-    --color-yellow: #d4a83a;
-    --color-green: #4fae5c;
-    --color-sky: #3a9fb8;
-    --color-mauve: #9468d6;
-    --color-peach: #d9773f;
-    --color-flamingo: #c08a80;
+    /* Palette Colors (dark variants): warm mid-tones of the light pastels */
+    --color-pink: #c8668a;
+    --color-yellow: #cca545;
+    --color-green: #74ab63;
+    --color-sky: #529fb2;
+    --color-mauve: #9375c2;
+    --color-peach: #cc8250;
+    --color-flamingo: #bf8a7f;
 
-    --color-pink-rgb: 214, 93, 139;
-    --color-yellow-rgb: 212, 168, 58;
-    --color-green-rgb: 79, 174, 92;
-    --color-sky-rgb: 58, 159, 184;
-    --color-mauve-rgb: 148, 104, 214;
-    --color-peach-rgb: 217, 119, 63;
-
-    --gradient-accent: linear-gradient(135deg, #e040a0 0%, #7c3aed 100%);
-    --gradient-header: linear-gradient(135deg, #7c3aed 0%, #4f46e5 50%, #2563eb 100%);
+    --color-pink-rgb: 200, 102, 138;
+    --color-yellow-rgb: 204, 165, 69;
+    --color-green-rgb: 116, 171, 99;
+    --color-sky-rgb: 82, 159, 178;
+    --color-mauve-rgb: 147, 117, 194;
+    --color-peach-rgb: 204, 130, 80;
 }
 
 /* Paper-like surfaces (notes, journal pages) stay light in dark mode */
@@ -807,53 +805,15 @@ button {
     opacity: 0.5 !important;
 }
 
-/* Dark Theme Accents */
-:root[data-theme='dark'] .btn-primary,
-:root[data-theme='dark'] .sidebar-btn-add {
-    background: var(--gradient-accent);
-    border-color: transparent;
-    box-shadow: 0 4px 12px rgba(224, 64, 160, 0.15);
-}
-
-:root[data-theme='dark'] .btn-primary:hover,
-:root[data-theme='dark'] .sidebar-btn-add:hover {
-    background: var(--gradient-accent);
-    opacity: 0.9;
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.25);
-}
-
-:root[data-theme='dark'] .sidebar-header {
-    background: var(--gradient-header);
-}
-
-:root[data-theme='dark'] .sidebar-burgundy .sidebar-header {
-    background: var(--gradient-accent);
-}
-
-:root[data-theme='dark'] .sidebar-container {
-    background: rgba(26, 23, 38, 0.7);
-    backdrop-filter: blur(16px) saturate(120%);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+/* Dark Theme Extras */
+:root[data-theme='dark'] .sidebar-item.active {
+    background-color: rgba(var(--color-burgundy-rgb), 0.1);
 }
 
 :root[data-theme='dark'] .global-modal-overlay {
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-}
-
-:root[data-theme='dark'] .global-modal-content:not(.keep-light) {
-    background: rgba(26, 23, 38, 0.85);
-    backdrop-filter: blur(24px) saturate(140%);
-    box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-
-:root[data-theme='dark'] .sidebar-item.active {
-    background-color: rgba(185, 180, 216, 0.08);
+    background: rgba(0, 0, 0, 0.55);
 }
 
 :root[data-theme='dark'] .leaflet-tile-pane {
-    filter: invert(1) hue-rotate(200deg) brightness(0.85) contrast(0.9) saturate(0.4);
+    filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.85) saturate(0.25) sepia(0.15);
 }

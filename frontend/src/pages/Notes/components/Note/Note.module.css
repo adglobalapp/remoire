@@ -183,6 +183,6 @@
 
 :global([data-theme='dark']) .noteCard {
     /* Vivid palette background, so text switches back to dark ink */
-    --color-dark-brown: #1a1726;
+    --color-dark-brown: #221d1f;
     --ink-rgb: 0, 0, 0;
 }
