@@ -9,7 +9,7 @@
     height: 80px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid white;
+    border: 3px solid var(--color-surface);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     flex-shrink: 0;
 }
@@ -94,5 +94,5 @@
     align-items: center;
     margin-top: auto;
     padding-top: 20px;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid rgba(var(--ink-rgb), 0.05);
 }

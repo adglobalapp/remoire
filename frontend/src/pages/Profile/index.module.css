@@ -31,7 +31,7 @@
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(var(--ink-rgb), 0.02);
 }
 
 .formGrid {

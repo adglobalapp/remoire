@@ -115,7 +115,7 @@ const EntryPreview = ({ entry, onClose }: EntryPreviewProps) => {
                         }}
                     >
                         <div
-                            className={styles.previewPaper}
+                            className={`${styles.previewPaper} keep-light`}
                             style={{
                                 backgroundImage: pageSettings.backgroundUrl ? `url(${pageSettings.backgroundUrl})` : undefined,
                                 backgroundSize: pageSettings.backgroundUrl ? 'cover' : undefined,

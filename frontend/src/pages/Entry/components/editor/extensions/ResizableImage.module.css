@@ -9,7 +9,7 @@
     transform: translateX(-50%);
     width: 24px;
     height: 24px;
-    background: white;
+    background: var(--color-surface);
     border: 1px solid #ff4d4f;
     border-radius: 50%;
     display: flex;

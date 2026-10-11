@@ -6,7 +6,7 @@
     cursor: grab;
     user-select: none;
     background-color: var(--color-dark-beige);
-    background-image: radial-gradient(rgba(0, 0, 0, 0.07) 1px, transparent 0);
+    background-image: radial-gradient(rgba(var(--ink-rgb), 0.07) 1px, transparent 0);
     background-size: 24px 24px;
 }
 
@@ -61,7 +61,7 @@
 }
 
 .addButton:disabled {
-    background-color: var(--color-light-brown);
+    background-color: var(--color-strong-hover);
     opacity: 0.5;
     cursor: not-allowed;
     box-shadow: none;
@@ -72,8 +72,8 @@
     top: 24px;
     right: 24px;
     z-index: 100;
-    background-color: var(--color-dark-brown);
-    color: var(--color-light-beige);
+    background-color: var(--color-strong);
+    color: var(--color-on-accent);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;

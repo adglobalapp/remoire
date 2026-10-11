@@ -34,7 +34,7 @@
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(var(--ink-rgb), 0.05);
     width: 100%;
     animation: listFadeUp 0.45s cubic-bezier(0.25, 1, 0.5, 1) both;
 }
@@ -44,7 +44,7 @@
     padding: 10px 24px;
     font-size: 1.4rem;
     text-transform: uppercase;
-    color: var(--color-light-beige);
+    color: var(--color-on-accent);
     font-weight: 400;
     font-family: var(--font-ui);
 }
@@ -54,7 +54,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 24px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(var(--ink-rgb), 0.03);
     transition: background 0.2s;
     position: relative;
 }
@@ -64,7 +64,7 @@
 }
 
 .notificationRow:hover {
-    background: rgba(84, 29, 48, 0.03);
+    background: rgba(var(--color-burgundy-rgb), 0.03);
 }
 
 .notifMain {
@@ -76,7 +76,7 @@
 
 .unread .notifIcon {
     background-color: var(--color-burgundy);
-    color: var(--color-light-beige);
+    color: var(--color-on-accent);
 }
 
 .info {
@@ -126,7 +126,7 @@
     width: 42px;
     height: 42px;
     border-radius: 50%;
-    background-color: rgba(84, 29, 48, 0.1);
+    background-color: rgba(var(--color-burgundy-rgb), 0.1);
     display: flex;
     align-items: center;
     justify-content: center;

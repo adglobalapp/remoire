@@ -128,14 +128,14 @@
 }
 
 .statBox {
-    background-color: white;
+    background-color: var(--color-surface);
     padding: 12px 20px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(var(--ink-rgb), 0.05);
 }
 
 .statCount {
@@ -147,9 +147,9 @@
 
 :global(.leaflet-control-zoom) :global(.leaflet-control-zoom-in),
 :global(.leaflet-control-zoom) :global(.leaflet-control-zoom-out) {
-    background-color: white !important;
+    background-color: var(--color-surface) !important;
     color: var(--color-dark-brown) !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(var(--ink-rgb), 0.1) !important;
 }
 
 :global(.leaflet-control-zoom) :global(.leaflet-control-zoom-in):hover,
@@ -234,14 +234,14 @@
 }
 
 .statBox {
-    background-color: white;
+    background-color: var(--color-surface);
     padding: 12px 20px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(var(--ink-rgb), 0.05);
 }
 
 .statCount {
@@ -262,9 +262,9 @@
 
 :global(.leaflet-control-zoom) :global(.leaflet-control-zoom-in),
 :global(.leaflet-control-zoom) :global(.leaflet-control-zoom-out) {
-    background-color: white !important;
+    background-color: var(--color-surface) !important;
     color: var(--color-dark-brown) !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(var(--ink-rgb), 0.1) !important;
 }
 
 :global(.leaflet-control-zoom) :global(.leaflet-control-zoom-in):hover,

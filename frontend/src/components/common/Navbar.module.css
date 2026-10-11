@@ -4,7 +4,7 @@
     justify-content: space-between;
     padding: 0.2rem 2rem;
     background-color: var(--color-light-beige);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+    border-bottom: 1px solid rgba(var(--ink-rgb), 0.07);
     height: 56px;
     position: sticky;
     top: 0;
@@ -119,7 +119,7 @@
     background-color: var(--color-light-beige);
     border-radius: 0 0 10px 10px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(0, 0, 0, 0.07);
+    border: 1px solid rgba(var(--ink-rgb), 0.07);
     border-top: none;
     min-width: 100%;
     padding: 0.3rem 0.3rem 0.4rem;
@@ -130,7 +130,7 @@
 
 .dropdownHeader {
     padding: 0.6rem 0.8rem 0.5rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(var(--ink-rgb), 0.06);
     margin-bottom: 0.2rem;
 }
 
@@ -178,7 +178,7 @@
 
 .dropdownSeparator {
     height: 1px;
-    background-color: rgba(0, 0, 0, 0.06);
+    background-color: rgba(var(--ink-rgb), 0.06);
     margin: 0.2rem 0.5rem;
 }
 
@@ -245,7 +245,7 @@
 
 .hamburger:hover {
     opacity: 1;
-    background-color: rgba(0, 0, 0, 0.06);
+    background-color: rgba(var(--ink-rgb), 0.06);
 }
 
 .mobileMenu {
@@ -256,7 +256,7 @@
     right: 0;
     padding: 0.5rem 0;
     background-color: var(--color-light-beige);
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid rgba(var(--ink-rgb), 0.05);
     flex-direction: column;
     gap: 0;
     animation: slideDown 0.2s ease-out;
@@ -304,7 +304,7 @@
     gap: 0.8rem;
     padding: 1rem 2rem 0.6rem;
     margin-top: 0.5rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-top: 1px solid rgba(var(--ink-rgb), 0.1);
     color: var(--color-dark-brown);
     font-size: 1.4rem;
     opacity: 0.7;
@@ -356,4 +356,40 @@
     .mobileMenu {
         display: flex;
     }
+}
+
+.themeSwitch {
+    position: relative;
+    width: 30px;
+    height: 17px;
+    margin-left: auto;
+    border-radius: 999px;
+    background-color: rgba(var(--ink-rgb), 0.15);
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.themeSwitch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background-color: var(--color-white);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+}
+
+.themeSwitchOn {
+    background-color: var(--color-burgundy);
+}
+
+.themeSwitchOn::after {
+    transform: translateX(13px);
+}
+
+.mobileLink .themeSwitch {
+    margin-left: 0.4rem;
 }

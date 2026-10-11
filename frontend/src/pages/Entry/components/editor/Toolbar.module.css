@@ -64,9 +64,9 @@
 }
 
 .scrollArrow svg {
-    stroke: var(--color-light-beige) !important;
+    stroke: var(--color-on-accent) !important;
     stroke-width: 2.5px;
-    color: var(--color-light-beige) !important;
+    color: var(--color-on-accent) !important;
 }
 
 .scrollArrow:hover {

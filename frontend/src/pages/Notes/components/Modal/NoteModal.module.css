@@ -44,7 +44,7 @@
 }
 
 .headerBtn {
-    background: rgba(0, 0, 0, 0.06);
+    background: rgba(var(--ink-rgb), 0.06);
     border: none;
     cursor: pointer;
     color: var(--color-dark-brown);
@@ -61,7 +61,7 @@
 
 .headerBtn:hover {
     opacity: 1;
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgba(var(--ink-rgb), 0.1);
 }
 
 .headerBtn.pinnedActive {
@@ -96,7 +96,7 @@
     display: flex;
     gap: 0.4rem;
     padding: 0.5rem;
-    background: rgba(0, 0, 0, 0.04);
+    background: rgba(var(--ink-rgb), 0.04);
     border-radius: 12px;
     margin-bottom: 0.8rem;
     flex-wrap: wrap;
@@ -120,7 +120,7 @@
 }
 
 .toolbarBtn:hover {
-    background-color: rgba(0, 0, 0, 0.08);
+    background-color: rgba(var(--ink-rgb), 0.08);
     opacity: 1;
 }
 
@@ -133,7 +133,7 @@
 .toolbarDivider {
     width: 1px;
     height: 20px;
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(var(--ink-rgb), 0.1);
     margin: 0 0.2rem;
 }
 
@@ -178,7 +178,7 @@
     cursor: pointer;
     width: 18px;
     height: 18px;
-    border: 1.5px solid rgba(0, 0, 0, 0.25);
+    border: 1.5px solid rgba(var(--ink-rgb), 0.25);
     border-radius: 4px;
     background-color: rgba(255, 255, 255, 0.4);
 
@@ -208,7 +208,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px dashed rgba(0, 0, 0, 0.05);
+    border-top: 1px dashed rgba(var(--ink-rgb), 0.05);
 }
 
 .footerActions {
@@ -222,11 +222,12 @@
 }
 
 .colorCircle {
+    background-color: var(--swatch);
     width: 22px;
     height: 22px;
     border-radius: 50%;
     cursor: pointer;
-    border: 2px solid white;
+    border: 2px solid var(--color-surface);
     transition:
         transform 0.2s,
         border-color 0.2s;
@@ -282,4 +283,38 @@
         width: 100%;
         justify-content: flex-end;
     }
+}
+
+/* Dark mode: --note-bg resolves to the palette's dark variant, the original color stays as accent */
+:global([data-theme='dark']) .modalContent {
+    border: 1px solid color-mix(in srgb, var(--note-accent) 30%, transparent) !important;
+    --placeholder-color: rgba(255, 255, 255, 0.4);
+}
+
+:global([data-theme='dark']) .headerBtn.pinnedActive,
+:global([data-theme='dark']) .toolbarBtn.active {
+    background-color: var(--note-accent);
+    color: var(--color-light-beige);
+}
+
+:global([data-theme='dark']) .modalContent :global(.ProseMirror ul[data-type='taskList'] input[type='checkbox']) {
+    background-color: transparent;
+    border-color: color-mix(in srgb, var(--note-accent) 60%, transparent);
+}
+
+:global([data-theme='dark']) .modalContent :global(.ProseMirror ul[data-type='taskList'] input[type='checkbox']:checked) {
+    background-color: var(--note-accent);
+    border-color: var(--note-accent);
+}
+
+:global([data-theme='dark']) .modalContent :global(.ProseMirror ul[data-type='taskList'] input[type='checkbox']:checked::after) {
+    color: var(--color-light-beige);
+}
+
+:global([data-theme='dark']) .colorCircle {
+    border-color: var(--swatch-accent);
+}
+
+:global([data-theme='dark']) .colorCircle.selected {
+    border-color: var(--color-dark-brown);
 }

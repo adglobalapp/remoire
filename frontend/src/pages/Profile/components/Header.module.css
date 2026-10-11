@@ -139,7 +139,7 @@
 }
 
 .copyBtn:hover {
-    background: rgba(84, 29, 48, 0.05);
+    background: rgba(var(--color-burgundy-rgb), 0.05);
 }
 
 .hiddenFileInput {

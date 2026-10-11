@@ -3,7 +3,7 @@
     border-radius: 16px;
     padding: 2.25rem 1.75rem 1.75rem 1.75rem;
     position: relative;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(var(--ink-rgb), 0.08);
     cursor: pointer;
     transition:
         transform 0.25s cubic-bezier(0.25, 1, 0.5, 1),
@@ -43,7 +43,7 @@
     right: 0;
     width: 32px;
     height: 32px;
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgba(var(--ink-rgb), 0.1);
     border-bottom-left-radius: 16px;
     z-index: 2;
     pointer-events: none;
@@ -56,7 +56,7 @@
     font-weight: 500;
     margin: 0;
     padding-bottom: 0.65rem;
-    border-bottom: 1px dashed rgba(0, 0, 0, 0.08);
+    border-bottom: 1px dashed rgba(var(--ink-rgb), 0.08);
     color: var(--color-dark-brown);
     line-height: 1.1;
     overflow: hidden;
@@ -68,7 +68,7 @@
 .preview {
     font-family: var(--font-body), sans-serif;
     font-size: 0.95rem;
-    color: rgba(0, 0, 0, 0.7);
+    color: rgba(var(--ink-rgb), 0.7);
     line-height: 1.5;
     overflow: hidden;
     flex: 1;
@@ -111,7 +111,7 @@
     -webkit-appearance: none;
     width: 14px;
     height: 14px;
-    border: 1.5px solid rgba(0, 0, 0, 0.2);
+    border: 1.5px solid rgba(var(--ink-rgb), 0.2);
     border-radius: 3px;
     margin-top: 3px;
     flex-shrink: 0;
@@ -170,4 +170,41 @@
         line-clamp: 4;
         font-size: 0.95rem;
     }
+}
+
+/* Dark mode: --note-bg resolves to the palette's dark variant, the original color stays as accent */
+:global([data-theme='dark']) .noteCard {
+    border-color: color-mix(in srgb, var(--note-accent) 30%, transparent);
+}
+
+:global([data-theme='dark']) .noteCard:hover {
+    border-color: color-mix(in srgb, var(--note-accent) 60%, transparent);
+}
+
+:global([data-theme='dark']) .donkeyEar {
+    background-color: color-mix(in srgb, var(--note-accent) 40%, transparent);
+}
+
+:global([data-theme='dark']) .title {
+    color: var(--note-accent);
+}
+
+:global([data-theme='dark']) .preview ul[data-type='taskList'] input[type='checkbox'] {
+    background-color: transparent;
+    border-color: color-mix(in srgb, var(--note-accent) 60%, transparent);
+}
+
+:global([data-theme='dark']) .preview ul[data-type='taskList'] input[type='checkbox']:checked {
+    background-color: var(--note-accent);
+    border-color: var(--note-accent);
+}
+
+:global([data-theme='dark']) .preview ul[data-type='taskList'] input[type='checkbox']:checked::after {
+    color: var(--color-light-beige);
+}
+
+:global([data-theme='dark']) .pinIcon {
+    color: var(--note-accent);
+    opacity: 0.9;
+    filter: none;
 }

@@ -8,7 +8,7 @@
     padding: 10px 24px;
     font-size: 1.4rem;
     text-transform: uppercase;
-    color: var(--color-light-beige);
+    color: var(--color-on-accent);
     font-weight: 400;
     font-family: var(--font-ui);
     border-top-left-radius: 12px;
@@ -21,7 +21,7 @@
     border-bottom-right-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
     overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(var(--ink-rgb), 0.03);
     border-top: none;
 }
 
@@ -30,7 +30,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 24px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(var(--ink-rgb), 0.03);
     transition: background 0.2s;
 }
 
@@ -39,7 +39,7 @@
 }
 
 .listRow:hover {
-    background: rgba(84, 29, 48, 0.02);
+    background: rgba(var(--color-burgundy-rgb), 0.02);
 }
 
 .listUser {
@@ -64,8 +64,8 @@
     font-size: 1.2rem !important;
     font-weight: 400;
     transition: all 0.2s;
-    border: 1px solid rgba(84, 29, 48, 0.2);
-    background: rgba(84, 29, 48, 0.04);
+    border: 1px solid rgba(var(--color-burgundy-rgb), 0.2);
+    background: rgba(var(--color-burgundy-rgb), 0.04);
     color: var(--color-burgundy);
     white-space: nowrap;
     height: 30px;

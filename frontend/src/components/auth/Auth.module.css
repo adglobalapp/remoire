@@ -22,7 +22,7 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(var(--ink-rgb), 0.05);
     animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
 }
@@ -65,7 +65,7 @@
 
 .subtitle {
     font-size: 1rem;
-    color: rgba(0, 0, 0, 0.5);
+    color: rgba(var(--ink-rgb), 0.5);
     margin: 0;
 }
 
@@ -75,7 +75,7 @@
     right: 16px;
     background: none;
     border: none;
-    color: rgba(0, 0, 0, 0.3);
+    color: rgba(var(--ink-rgb), 0.3);
     cursor: pointer;
     padding: 4px;
     transition: color 0.2s;
@@ -107,9 +107,9 @@
 .formGroup input {
     width: 100%;
     padding: 10px 14px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(var(--ink-rgb), 0.1);
     border-radius: 8px;
-    background: white;
+    background: var(--color-surface);
     font-size: 0.95rem;
     color: var(--color-dark-brown);
     transition:
@@ -120,14 +120,14 @@
 .formGroup input:focus {
     outline: none;
     border-color: var(--color-burgundy);
-    box-shadow: 0 0 0 4px rgba(116, 33, 33, 0.1);
+    box-shadow: 0 0 0 4px rgba(var(--color-burgundy-rgb), 0.1);
 }
 
 .submitBtn {
     width: 100%;
     padding: 14px;
     background: var(--color-burgundy);
-    color: var(--color-light-beige);
+    color: var(--color-on-accent);
     border: none;
     border-radius: 8px;
     font-size: 1.5rem;
@@ -158,13 +158,13 @@
 
 .modalFooter {
     text-align: center;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid rgba(var(--ink-rgb), 0.05);
     padding-top: 20px;
 }
 
 .footerText {
     font-size: 0.95rem;
-    color: rgba(0, 0, 0, 0.5);
+    color: rgba(var(--ink-rgb), 0.5);
     margin: 0;
 }
 

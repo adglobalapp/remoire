@@ -2,6 +2,7 @@ import React from 'react';
 import { Pin } from 'lucide-react';
 import { type NoteProps } from '../../../../types';
 import styles from './Note.module.css';
+import { themedColor } from '../../../../utils/constants';
 
 const Note: React.FC<NoteProps> = ({ note, onClick, index = 0 }) => {
     return (
@@ -10,7 +11,8 @@ const Note: React.FC<NoteProps> = ({ note, onClick, index = 0 }) => {
             onClick={onClick}
             style={
                 {
-                    '--note-bg': note.color || '#ffffff',
+                    '--note-bg': themedColor(note.color || '#ffffff'),
+                    '--note-accent': note.color || '#ffffff',
                     '--delay': index,
                 } as React.CSSProperties
             }

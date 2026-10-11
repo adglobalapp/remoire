@@ -7,7 +7,7 @@ import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
 import Placeholder from '@tiptap/extension-placeholder';
 import { type NoteModalProps } from '../../../../types';
-import { PRESET_COLORS } from '../../../../utils/constants';
+import { PRESET_COLORS, themedColor } from '../../../../utils/constants';
 import styles from './NoteModal.module.css';
 
 const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }) => {
@@ -81,7 +81,8 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
                 onClick={(e) => e.stopPropagation()}
                 style={
                     {
-                        '--note-bg': color,
+                        '--note-bg': themedColor(color),
+                        '--note-accent': color,
                     } as React.CSSProperties
                 }
             >
@@ -179,7 +180,7 @@ const NoteModal: React.FC<NoteModalProps> = ({ note, onClose, onSave, onDelete }
                             <div
                                 key={c}
                                 className={`${styles.colorCircle} ${color === c ? styles.selected : ''}`}
-                                style={{ backgroundColor: c }}
+                                style={{ '--swatch': themedColor(c), '--swatch-accent': c } as React.CSSProperties}
                                 onClick={() => setColor(c)}
                             />
                         ))}

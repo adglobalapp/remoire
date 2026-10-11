@@ -241,7 +241,7 @@ const Canvas = () => {
                     >
                         {activeEntry && (
                             <div
-                                className={styles.paper}
+                                className={`${styles.paper} keep-light`}
                                 style={{
                                     backgroundImage: pageSettings.backgroundUrl ? `url(${pageSettings.backgroundUrl})` : undefined,
                                     backgroundSize: pageSettings.backgroundUrl ? 'cover' : undefined,

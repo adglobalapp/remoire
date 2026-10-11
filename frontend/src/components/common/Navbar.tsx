@@ -1,4 +1,4 @@
-import { BookMarked, Users, Map, StickyNote, NotebookText, TrendingUp, LogOut, User, Menu, X, Mail } from 'lucide-react';
+import { BookMarked, Users, Map, StickyNote, NotebookText, TrendingUp, LogOut, User, Menu, X, Mail, Moon } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import styles from './Navbar.module.css';
 import { useAuth } from '../../contexts/AuthContext';
@@ -6,6 +6,7 @@ import Avatar from './Avatar';
 import { getNotifications } from '../../api/notifications';
 import { type Notification } from '../../types';
 import { useEffect, useState } from 'react';
+import { useTheme } from '../../hooks/useTheme';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
@@ -13,6 +14,7 @@ const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);
+    const { theme, toggleTheme } = useTheme();
 
     useEffect(() => {
         if (user || profileMenuOpen) {
@@ -84,6 +86,15 @@ const Navbar = () => {
                                             {unreadCount > 0 && <div className={styles.dropdownUnreadDot} />}
                                         </div>
                                         <span>Mailbox</span>
+                                    </div>
+                                    <div
+                                        className={styles.dropdownItem}
+                                        onClick={toggleTheme}
+                                        role="switch"
+                                        aria-checked={theme === 'dark'}
+                                    >
+                                        <Moon size={15} /> Dark mode
+                                        <span className={`${styles.themeSwitch} ${theme === 'dark' ? styles.themeSwitchOn : ''}`} />
                                     </div>
                                     <div className={styles.dropdownSeparator} />
                                     <div
@@ -159,6 +170,10 @@ const Navbar = () => {
                             >
                                 <User size={18} /> My Profile
                             </NavLink>
+                            <div className={styles.mobileLink} onClick={toggleTheme} role="switch" aria-checked={theme === 'dark'}>
+                                <Moon size={18} /> Dark mode
+                                <span className={`${styles.themeSwitch} ${theme === 'dark' ? styles.themeSwitchOn : ''}`} />
+                            </div>
                             <div className={styles.mobileUserBadge}>
                                 <Avatar user={user} size={28} />
                                 <span>{user.name}</span>
